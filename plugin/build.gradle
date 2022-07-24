@@ -1,0 +1,57 @@
+plugins {
+    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
+    id 'java-gradle-plugin'
+
+    // Apply the Groovy plugin to add support for Groovy
+    id 'groovy'
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+testing {
+    suites {
+        // Configure the built-in test suite
+        test {
+            // Use Spock test framework
+            useSpock('2.1-groovy-3.0')
+        }
+
+        // Create a new test suite
+        functionalTest(JvmTestSuite) {
+            // Use Spock test framework
+            useSpock('2.1-groovy-3.0')
+
+            dependencies {
+                // functionalTest test suite depends on the production code in tests
+                implementation project
+            }
+
+            targets {
+                all {
+                    // This test suite should run after the built-in test suite has run its tests
+                    testTask.configure { shouldRunAfter(test) } 
+                }
+            }
+        }
+    }
+}
+
+gradlePlugin {
+    // Define the plugin
+    plugins {
+        greeting {
+            id = 'io.noumenal.gradle.snowflake.greeting'
+            implementationClass = 'io.noumenal.gradle.snowflake.GradleSnowflakePlugin'
+        }
+    }
+}
+
+gradlePlugin.testSourceSets(sourceSets.functionalTest)
+
+tasks.named('check') {
+    // Include functionalTest as part of the check lifecycle
+    dependsOn(testing.suites.functionalTest)
+}

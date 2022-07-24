@@ -1,0 +1,22 @@
+plugins {
+   id "com.github.burrunan.s3-build-cache" version "1.3"
+}
+
+rootProject.name = 'gradle-snowflake'
+include('plugin')
+
+ext.isCiServer = System.getenv().containsKey("CI")
+buildCache {
+   local {
+      // Local build cache is dangerous as it might produce inconsistent results
+      // in case developer modifies files while the build is running
+      enabled = false
+   }
+   remote(com.github.burrunan.s3cache.AwsS3BuildCache) {
+      region = 'us-east-1'
+      bucket = 'nio-gradle-cache'
+      prefix = "${rootProject.name}/"
+      push = isCiServer
+      lookupDefaultAwsCredentials = true
+   }
+}
