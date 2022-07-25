@@ -4,11 +4,16 @@ plugins {
 
     // Apply the Groovy plugin to add support for Groovy
     id 'groovy'
+
+    id 'com.adarshr.test-logger' version '3.2.0'
+    id "com.redpillanalytics.gradle-properties" version "1.0.7"
 }
 
-repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+dependencies {
+    implementation 'org.codehaus.groovy:groovy:3.0.12'
+    implementation 'org.slf4j:slf4j-simple:1.7.36'
+    implementation 'com.snowflake:snowpark:1.5.0'
+    implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
 }
 
 testing {
@@ -42,9 +47,9 @@ testing {
 gradlePlugin {
     // Define the plugin
     plugins {
-        greeting {
-            id = 'io.noumenal.gradle.snowflake.greeting'
-            implementationClass = 'io.noumenal.gradle.snowflake.GradleSnowflakePlugin'
+        snowflake {
+            id = 'io.noumenal.gradle.snowflake'
+            implementationClass = 'io.noumenal.SnowflakePlugin'
         }
     }
 }
@@ -54,4 +59,13 @@ gradlePlugin.testSourceSets(sourceSets.functionalTest)
 tasks.named('check') {
     // Include functionalTest as part of the check lifecycle
     dependsOn(testing.suites.functionalTest)
+}
+
+tasks.withType(Test) {
+    failFast true
+    testLogging.showStandardStreams true
+    systemProperty "account", getProperty("snowflake.account").toString()
+    systemProperty "user", getProperty("snowflake.user")
+    systemProperty "password", getProperty("snowflake.password")
+    systemProperty "database", getProperty("snowflake.database")
 }
