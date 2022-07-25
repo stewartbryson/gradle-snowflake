@@ -28,7 +28,13 @@ class SnowflakePluginFunctionalTest extends Specification {
    File buildFile, settingsFile
 
    @Shared
-   String account = System.getProperty("account"), user = System.getProperty("user"), password = System.getProperty("password"), database = System.getProperty("database")
+   String account = System.getProperty("account"),
+           user = System.getProperty("user"),
+           password = System.getProperty("password"),
+           database = System.getProperty("database"),
+           role = System.getProperty("role"),
+           warehouse = System.getProperty("warehouse"),
+           schema = System.getProperty("schema")
 
    def setupSpec() {
       settingsFile = new File(projectDir, 'settings.gradle').write("")
@@ -45,7 +51,10 @@ class SnowflakePluginFunctionalTest extends Specification {
               "-Psnowflake.account=$account".toString(),
               "-Psnowflake.user=$user".toString(),
               "-Psnowflake.password=$password".toString(),
-              "-Psnowflake.database=$database".toString()
+              "-Psnowflake.database=$database".toString(),
+              "-Psnowflake.role=$role".toString(),
+              "-Psnowflake.warehouse=$warehouse".toString(),
+              "-Psnowflake.schema=$schema".toString()
       ]
       args.add(0, taskName)
       args.addAll(systemArgs)

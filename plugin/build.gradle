@@ -1,71 +1,74 @@
 plugins {
-    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
-    id 'java-gradle-plugin'
+   // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
+   id 'java-gradle-plugin'
 
-    // Apply the Groovy plugin to add support for Groovy
-    id 'groovy'
+   // Apply the Groovy plugin to add support for Groovy
+   id 'groovy'
 
-    id 'com.adarshr.test-logger' version '3.2.0'
-    id "com.redpillanalytics.gradle-properties" version "1.0.7"
+   id 'com.adarshr.test-logger' version '3.2.0'
+   id "com.redpillanalytics.gradle-properties" version "1.0.7"
 }
 
 dependencies {
-    implementation 'org.codehaus.groovy:groovy:3.0.12'
-    implementation 'org.slf4j:slf4j-simple:1.7.36'
-    implementation 'com.snowflake:snowpark:1.5.0'
-    implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
+   implementation 'org.codehaus.groovy:groovy:3.0.12'
+   implementation 'org.slf4j:slf4j-simple:1.7.36'
+   implementation 'com.snowflake:snowpark:1.5.0'
+   implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
 }
 
 testing {
-    suites {
-        // Configure the built-in test suite
-        test {
-            // Use Spock test framework
-            useSpock('2.1-groovy-3.0')
-        }
+   suites {
+      // Configure the built-in test suite
+      test {
+         // Use Spock test framework
+         useSpock('2.1-groovy-3.0')
+      }
 
-        // Create a new test suite
-        functionalTest(JvmTestSuite) {
-            // Use Spock test framework
-            useSpock('2.1-groovy-3.0')
+      // Create a new test suite
+      functionalTest(JvmTestSuite) {
+         // Use Spock test framework
+         useSpock('2.1-groovy-3.0')
 
-            dependencies {
-                // functionalTest test suite depends on the production code in tests
-                implementation project
+         dependencies {
+            // functionalTest test suite depends on the production code in tests
+            implementation project
+         }
+
+         targets {
+            all {
+               // This test suite should run after the built-in test suite has run its tests
+               testTask.configure { shouldRunAfter(test) }
             }
-
-            targets {
-                all {
-                    // This test suite should run after the built-in test suite has run its tests
-                    testTask.configure { shouldRunAfter(test) } 
-                }
-            }
-        }
-    }
+         }
+      }
+   }
 }
 
 gradlePlugin {
-    // Define the plugin
-    plugins {
-        snowflake {
-            id = 'io.noumenal.gradle.snowflake'
-            implementationClass = 'io.noumenal.SnowflakePlugin'
-        }
-    }
+   // Define the plugin
+   plugins {
+      snowflake {
+         id = 'io.noumenal.gradle.snowflake'
+         implementationClass = 'io.noumenal.SnowflakePlugin'
+      }
+   }
 }
 
 gradlePlugin.testSourceSets(sourceSets.functionalTest)
 
 tasks.named('check') {
-    // Include functionalTest as part of the check lifecycle
-    dependsOn(testing.suites.functionalTest)
+   // Include functionalTest as part of the check lifecycle
+   dependsOn(testing.suites.functionalTest)
 }
 
 tasks.withType(Test) {
-    failFast true
-    testLogging.showStandardStreams true
-    systemProperty "account", getProperty("snowflake.account").toString()
-    systemProperty "user", getProperty("snowflake.user")
-    systemProperty "password", getProperty("snowflake.password")
-    systemProperty "database", getProperty("snowflake.database")
+   failFast true
+   testLogging.showStandardStreams true
+   systemProperty "account", getProperty("snowflake.account").toString()
+   systemProperty "user", getProperty("snowflake.user")
+   systemProperty "password", getProperty("snowflake.password")
+   systemProperty "database", getProperty("snowflake.database")
+   systemProperty "role", getProperty("snowflake.role")
+   systemProperty "warehouse", getProperty("snowflake.warehouse")
+   systemProperty "schema", getProperty("snowflake.schema")
 }

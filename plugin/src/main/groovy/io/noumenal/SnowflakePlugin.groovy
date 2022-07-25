@@ -14,11 +14,9 @@ class SnowflakePlugin implements Plugin<Project> {
         project.extensions.create(PLUGIN, SnowflakeExtension)
         project.apply plugin: 'com.redpillanalytics.gradle-properties'
         project.apply plugin: 'maven-publish'
-        // Register a task
-        project.afterEvaluate {
-            project.pluginProps.setParameters(project, PLUGIN)
-            project.task("snowflakePublish", type: SnowflakePublish)
-        }
+        project.pluginProps.setParameters(project, PLUGIN)
 
+        // Register a task
+        project.tasks.register("snowflakePublish", SnowflakePublish)
     }
 }
