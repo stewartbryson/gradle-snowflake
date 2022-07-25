@@ -7,6 +7,19 @@ class SnowflakeExtension {
       this.project = project
    }
    private Project project
+
+   Map getProperties() {
+      [
+              url      : account,
+              user     : user,
+              password : password,
+              role     : role,
+              warehouse: warehouse,
+              db       : database,
+              schema   : schema
+      ]
+   }
+
    String account
    String user
    String password
@@ -14,5 +27,5 @@ class SnowflakeExtension {
    String schema = 'public'
    String role = 'sysadmin'
    String warehouse = "compute_wh"
-   String publication = 'snowflake'
+   String stage
 }

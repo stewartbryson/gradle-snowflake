@@ -1,5 +1,9 @@
 package io.noumenal
 
+import com.snowflake.snowpark_java.Column
+import com.snowflake.snowpark_java.DataFrame
+import com.snowflake.snowpark_java.Functions
+import com.snowflake.snowpark_java.Row
 import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
@@ -66,6 +70,13 @@ class SnowflakePublish extends DefaultTask {
    )
    String role = project.extensions."$PLUGIN".role
 
+   @Optional
+   @Input
+   @Option(option = "stage",
+           description = "The Snowflake external stage to publish to."
+   )
+   String stage = project.extensions."$PLUGIN".stage
+
    @TaskAction
    def publish() {
       Map props = [
@@ -77,12 +88,24 @@ class SnowflakePublish extends DefaultTask {
               db       : database,
               schema   : schema
       ]
-      log.warn "Props: ${props?.remove(password)}"
+      Map printable = props.clone()
+      printable.password = "*********"
+      log.info "Snowflake config: $printable"
+      Session session
       try {
-         Session session = Session.builder().configs(props).create()
+         session = Session.builder().configs(props).create()
       } catch (NullPointerException npe) {
          throw new Exception("Snowflake connection details are missing.")
       }
 
+      // get the stage URL
+      Row[] rows = session
+              .table('information_schema.stages')
+              .where(Functions.col("stage_name").equal_to(Functions.lit(stage.toUpperCase())))
+              .where(Functions.col('stage_type').equal_to(Functions.lit('External Named')))
+              .select(Functions.col("stage_url"))
+              .collect()
+      String url = rows[0].getString(0)
+      log.warn "$rows"
    }
 }

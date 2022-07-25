@@ -29,12 +29,13 @@ class FunctionalTest extends Specification {
 
    @Shared
    String account = System.getProperty("account"),
-           user = System.getProperty("user"),
-           password = System.getProperty("password"),
-           database = System.getProperty("database"),
-           role = System.getProperty("role"),
-           warehouse = System.getProperty("warehouse"),
-           schema = System.getProperty("schema")
+          user = System.getProperty("user"),
+          password = System.getProperty("password"),
+          database = System.getProperty("database"),
+          role = System.getProperty("role"),
+          warehouse = System.getProperty("warehouse"),
+          schema = System.getProperty("schema"),
+          stage = System.getProperty("stage")
 
    def setupSpec() {
       settingsFile = new File(projectDir, 'settings.gradle').write("")
@@ -54,13 +55,14 @@ class FunctionalTest extends Specification {
               "-Psnowflake.database=$database".toString(),
               "-Psnowflake.role=$role".toString(),
               "-Psnowflake.warehouse=$warehouse".toString(),
-              "-Psnowflake.schema=$schema".toString()
+              "-Psnowflake.schema=$schema".toString(),
+              "-Psnowflake.stage=$stage".toString()
       ]
       args.add(0, taskName)
       args.addAll(systemArgs)
 
       // Don't print the password
-      log.warn "runner arguments: ${args.collect().removeAll { String item -> item.contains("password")}.collect()}"
+      log.warn "runner arguments: ${args.collect().removeAll { String item -> item.contains("password") }.collect()}"
 
       // execute the Gradle test build
       result = GradleRunner.create()

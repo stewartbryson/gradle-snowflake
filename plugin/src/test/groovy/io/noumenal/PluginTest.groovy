@@ -10,7 +10,7 @@ import spock.lang.Specification
 /**
  * A simple unit test for the 'io.noumenal.gradle.snowflake' plugin.
  */
-class SnowflakePluginTest extends Specification {
+class PluginTest extends Specification {
     def "plugin registers task"() {
         given:
         def project = ProjectBuilder.builder().build()
