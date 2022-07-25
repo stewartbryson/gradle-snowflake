@@ -13,7 +13,7 @@ import org.gradle.testkit.runner.GradleRunner
  * A simple functional test for the 'io.noumenal.gradle.snowflake' plugin.
  */
 @Slf4j
-class SnowflakePluginFunctionalTest extends Specification {
+class FunctionalTest extends Specification {
    @Shared
    def result
 
@@ -58,7 +58,10 @@ class SnowflakePluginFunctionalTest extends Specification {
       ]
       args.add(0, taskName)
       args.addAll(systemArgs)
-      log.warn "runner arguments: ${args}"
+
+      // Don't print the password
+      log.warn "runner arguments: ${args.collect().removeAll { String item -> item.contains("password")}.collect()}"
+
       // execute the Gradle test build
       result = GradleRunner.create()
               .withProjectDir(projectDir)

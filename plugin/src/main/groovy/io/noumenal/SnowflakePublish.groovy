@@ -17,7 +17,7 @@ class SnowflakePublish extends DefaultTask {
    SnowflakePublish() {
       description = "Publish a Java artifact to an external stage and create Snowflake Functions and Procedures."
       group = "publishing"
-      //dependsOn project.tasks.publish
+      dependsOn project.tasks.publish
    }
 
    @Optional
@@ -27,18 +27,57 @@ class SnowflakePublish extends DefaultTask {
    )
    String account = project.extensions."$PLUGIN".account
 
+   @Optional
+   @Input
+   @Option(option = "user",
+           description = "The user to connect to Snowflake."
+   )
+   String user = project.extensions."$PLUGIN".user
+
+   @Optional
+   @Input
+   @Option(option = "password",
+           description = "The password to connect to Snowflake."
+   )
+   String password = project.extensions."$PLUGIN".password
+
+   @Optional
+   @Input
+   @Option(option = "database",
+           description = "The Snowflake database to use."
+   )
+   String database = project.extensions."$PLUGIN".database
+
+   @Input
+   @Option(option = "schema",
+           description = "The Snowflake schema to use."
+   )
+   String schema = project.extensions."$PLUGIN".schema
+
+   @Input
+   @Option(option = "warehouse",
+           description = "The Snowflake warehouse to use."
+   )
+   String warehouse = project.extensions."$PLUGIN".warehouse
+
+   @Input
+   @Option(option = "role",
+           description = "The Snowflake role to use."
+   )
+   String role = project.extensions."$PLUGIN".role
+
    @TaskAction
    def publish() {
       Map props = [
               url      : account,
-              user     : project.extensions.snowflake.user,
-              password : project.extensions.snowflake.password,
-              role     : project.extensions.snowflake.role,
-              warehouse: project.extensions.snowflake.warehouse,
-              db       : project.extensions.snowflake.database,
-              schema   : project.extensions.snowflake.schema
+              user     : user,
+              password : password,
+              role     : role,
+              warehouse: warehouse,
+              db       : database,
+              schema   : schema
       ]
-      log.warn "Props: $props"
+      log.warn "Props: ${props?.remove(password)}"
       try {
          Session session = Session.builder().configs(props).create()
       } catch (NullPointerException npe) {
