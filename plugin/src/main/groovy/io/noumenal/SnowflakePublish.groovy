@@ -21,7 +21,6 @@ class SnowflakePublish extends DefaultTask {
    SnowflakePublish() {
       description = "Publish a Java artifact to an external stage and create Snowflake Functions and Procedures."
       group = "publishing"
-      dependsOn project.tasks.publish
    }
 
    @Optional
