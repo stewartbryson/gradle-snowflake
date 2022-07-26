@@ -10,7 +10,7 @@ env:
   ORG_GRADLE_PROJECT_snowflake_account: ${{secrets.SNOWFLAKE_ACCOUNT}}
   ORG_GRADLE_PROJECT_snowflake_user: ${{secrets.SNOWFLAKE_USER}}
   ORG_GRADLE_PROJECT_snowflake_password: ${{secrets.SNOWFLAKE_PASSWORD}}
-  ORG_GRADLE_PROJECT_publish_url: ${{secrets.PUBLISH_URL}}
+  ORG_GRADLE_PROJECT_snowflake_publishUrl: ${{secrets.SNOWFLAKE_PUBLISHURL}}
   AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
   AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
