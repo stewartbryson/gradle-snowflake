@@ -78,6 +78,7 @@ class SnowflakePublish extends DefaultTask {
 
    @TaskAction
    def publish() {
+      //def handler = project.extensions."$PLUGIN".handler
       Map props = [
               url      : account,
               user     : user,
@@ -91,20 +92,21 @@ class SnowflakePublish extends DefaultTask {
       printable.password = "*********"
       log.info "Snowflake config: $printable"
       Session session
+
+      // get a Snowflake session
       try {
          session = Session.builder().configs(props).create()
       } catch (NullPointerException npe) {
          throw new Exception("Snowflake connection details are missing.")
       }
 
-      // get the stage URL
-      Row[] rows = session
-              .table('information_schema.stages')
-              .where(Functions.col("stage_name").equal_to(Functions.lit(stage.toUpperCase())))
-              .where(Functions.col('stage_type').equal_to(Functions.lit('External Named')))
-              .select(Functions.col("stage_url"))
-              .collect()
-      String url = rows[0].getString(0)
-      log.warn "$rows"
+      // create snowflake application
+      String imports = project.extensions."$PLUGIN".imports
+      project."$PLUGIN".applications.each { ApplicationContainer app ->
+         String createObject = app.create + "imports = ($imports)"
+         log.warn createObject
+         session.jdbcConnection().createStatement().execute(createObject)
+      }
+
    }
 }

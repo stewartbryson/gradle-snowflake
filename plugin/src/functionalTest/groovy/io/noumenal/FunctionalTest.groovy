@@ -35,13 +35,18 @@ class FunctionalTest extends Specification {
           role = System.getProperty("role"),
           warehouse = System.getProperty("warehouse"),
           schema = System.getProperty("schema"),
-          stage = System.getProperty("stage")
+          stage = System.getProperty("stage"),
+          publishUrl = System.getProperty("publishUrl")
 
    def setupSpec() {
       settingsFile = new File(projectDir, 'settings.gradle').write("")
       buildFile = new File(projectDir, 'build.gradle').write("""
                     |plugins {
                     |    id('io.noumenal.gradle.snowflake')
+                    |}
+                    |snowflake {
+                    |  groupId = 'io.noumenal'
+                    |  artifactId = 'test-gradle-snowflake'
                     |}
                     |""".stripMargin())
    }
@@ -56,7 +61,8 @@ class FunctionalTest extends Specification {
               "-Psnowflake.role=$role".toString(),
               "-Psnowflake.warehouse=$warehouse".toString(),
               "-Psnowflake.schema=$schema".toString(),
-              "-Psnowflake.stage=$stage".toString()
+              "-Psnowflake.stage=$stage".toString(),
+              "-Psnowflake.publishUrl=$publishUrl".toString()
       ]
       args.add(0, taskName)
       args.addAll(systemArgs)

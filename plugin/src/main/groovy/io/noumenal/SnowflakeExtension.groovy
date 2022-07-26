@@ -32,4 +32,9 @@ class SnowflakeExtension {
    String getPublishTask() {
       toCamelCase("publish_snowflake_publication_to_${stage}Repository")
    }
+
+   String getImports() {
+      "'@${stage}/${groupId.replace('.','/')}/${artifactId}/${project.version}/$artifactId-${project.version}-all.jar'"
+   }
+
 }

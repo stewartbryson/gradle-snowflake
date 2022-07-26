@@ -73,4 +73,5 @@ tasks.withType(Test) {
    systemProperty "warehouse", getProperty("snowflake.warehouse")
    systemProperty "schema", getProperty("snowflake.schema")
    systemProperty "stage", getProperty("snowflake.stage")
+   systemProperty "publishUrl", getProperty("snowflake.publishUrl")
 }
