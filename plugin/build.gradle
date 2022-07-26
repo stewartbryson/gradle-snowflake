@@ -1,6 +1,7 @@
 plugins {
    id 'java-gradle-plugin'
    id 'groovy'
+   id 'maven-publish'
    id 'com.adarshr.test-logger' version '3.2.0'
    id "com.redpillanalytics.gradle-properties" version "1.0.7"
 }
@@ -72,4 +73,16 @@ tasks.withType(Test) {
    systemProperty "schema", getProperty("snowflake.schema")
    systemProperty "stage", getProperty("snowflake.stage")
    systemProperty "publishUrl", getProperty("snowflake.publishUrl")
+}
+
+publishing {
+   repositories {
+      maven {
+         name 's3'
+         url 's3://nio-maven'
+         authentication {
+            awsIm(AwsImAuthentication)
+         }
+      }
+   }
 }

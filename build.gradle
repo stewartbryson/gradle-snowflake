@@ -1,5 +1,7 @@
 plugins {
    id "com.github.ben-manes.versions" version "0.42.0"
+   id "pl.allegro.tech.build.axion-release" version "1.13.14"
+   id "com.github.breadmoirai.github-release" version "2.4.1"
 }
 
 subprojects {
@@ -13,3 +15,26 @@ subprojects {
       }
    }
 }
+
+scmVersion {
+   tag {
+      prefix = 'v'
+      versionSeparator = ''
+   }
+   ignoreUncommittedChanges = true
+}
+
+
+allprojects {
+   project.version = scmVersion.version
+}
+
+githubRelease {
+   token project.findProperty('githubToken').toString()
+   owner 'noumenalio'
+   repo rootProject.name
+   overwrite true
+   releaseAssets = ["plugin/build/libs/*.jar"]
+   generateReleaseNotes true
+}
+
