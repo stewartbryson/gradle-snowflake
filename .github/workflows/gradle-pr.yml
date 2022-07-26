@@ -1,9 +1,10 @@
 name: Run Gradle on PRs
 
-on: pull_request
+on:
+  pull_request
 
 env:
-  ORG_GRADLE_PROJECT_snowflake_user: ${{SNOWFLAKE_USER}}
+  ORG_GRADLE_PROJECT_snowflake_user: ${{ SNOWFLAKE_USER }}
   ORG_GRADLE_PROJECT_snowflake_password: ${{SNOWFLAKE_PASSWORD}}
   ORG_GRADLE_PROJECT_snowflake_account: ${{SNOWFLAKE_ACCOUNT}}
   ORG_GRADLE_PROJECT_publish_url: ${{PUBLISH_URL}}
