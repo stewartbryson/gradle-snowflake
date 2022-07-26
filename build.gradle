@@ -22,6 +22,7 @@ scmVersion {
       versionSeparator = ''
    }
    ignoreUncommittedChanges = true
+   localOnly = true
 }
 
 
@@ -37,4 +38,6 @@ githubRelease {
    releaseAssets = ["plugin/build/libs/*.jar"]
    generateReleaseNotes true
 }
+
+
 

@@ -54,25 +54,16 @@ gradlePlugin {
 
 gradlePlugin.testSourceSets(sourceSets.functionalTest)
 
-tasks.named('check') {
-   // Include functionalTest as part of the check lifecycle
-   dependsOn(testing.suites.functionalTest)
-}
-
 build.dependsOn validatePlugins
 
 tasks.withType(Test) {
    failFast true
    testLogging.showStandardStreams true
-   systemProperty "account", getProperty("snowflake.account").toString()
-   systemProperty "user", getProperty("snowflake.user")
-   systemProperty "password", getProperty("snowflake.password")
-   systemProperty "database", getProperty("snowflake.database")
-   systemProperty "role", getProperty("snowflake.role")
-   systemProperty "warehouse", getProperty("snowflake.warehouse")
-   systemProperty "schema", getProperty("snowflake.schema")
-   systemProperty "stage", getProperty("snowflake.stage")
-   systemProperty "publishUrl", getProperty("snowflake.publishUrl")
+   systemProperty "account", findProperty("snowflake.account")
+   systemProperty "user", findProperty("snowflake.user")
+   systemProperty "password", findProperty("snowflake.password")
+   systemProperty "schema", findProperty("snowflake.schema")
+   systemProperty "publishUrl", findProperty("snowflake.publishUrl")
 }
 
 publishing {

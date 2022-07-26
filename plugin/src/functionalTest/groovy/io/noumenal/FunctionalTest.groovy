@@ -31,11 +31,7 @@ class FunctionalTest extends Specification {
    String account = System.getProperty("account"),
           user = System.getProperty("user"),
           password = System.getProperty("password"),
-          database = System.getProperty("database"),
-          role = System.getProperty("role"),
-          warehouse = System.getProperty("warehouse"),
           schema = System.getProperty("schema"),
-          stage = System.getProperty("stage"),
           publishUrl = System.getProperty("publishUrl")
 
    def setupSpec() {
@@ -47,6 +43,9 @@ class FunctionalTest extends Specification {
                     |snowflake {
                     |  groupId = 'io.noumenal'
                     |  artifactId = 'test-gradle-snowflake'
+                    |  role = 'devops'
+                    |  database = 'devops'
+                    |version='0.1.0'
                     |}
                     |""".stripMargin())
    }
@@ -57,18 +56,14 @@ class FunctionalTest extends Specification {
               "-Psnowflake.account=$account".toString(),
               "-Psnowflake.user=$user".toString(),
               "-Psnowflake.password=$password".toString(),
-              "-Psnowflake.database=$database".toString(),
-              "-Psnowflake.role=$role".toString(),
-              "-Psnowflake.warehouse=$warehouse".toString(),
               "-Psnowflake.schema=$schema".toString(),
-              "-Psnowflake.stage=$stage".toString(),
               "-Psnowflake.publishUrl=$publishUrl".toString()
       ]
       args.add(0, taskName)
       args.addAll(systemArgs)
 
       // Don't print the password
-      log.warn "runner arguments: ${args.collect().removeAll { String item -> item.contains("password") }.collect()}"
+      //log.warn "runner arguments: ${args}"
 
       // execute the Gradle test build
       result = GradleRunner.create()

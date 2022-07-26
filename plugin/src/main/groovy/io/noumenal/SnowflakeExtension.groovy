@@ -12,12 +12,12 @@ class SnowflakeExtension {
    String password
    String database
    String schema = 'public'
-   String role = 'sysadmin'
+   String role
    String warehouse = "compute_wh"
    String stage = 'maven'
    String publishUrl
-   String groupId
-   String artifactId
+   String groupId = project.getGroup()
+   String artifactId = project.getName()
    Boolean useCustomMaven = false
 
    private static String toSnakeCase( String text ) {

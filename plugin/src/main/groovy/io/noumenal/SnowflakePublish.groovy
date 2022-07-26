@@ -1,9 +1,5 @@
 package io.noumenal
 
-import com.snowflake.snowpark_java.Column
-import com.snowflake.snowpark_java.DataFrame
-import com.snowflake.snowpark_java.Functions
-import com.snowflake.snowpark_java.Row
 import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
@@ -12,6 +8,9 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
+
+import java.sql.ResultSet
+import java.sql.Statement
 
 @Slf4j
 @CacheableTask
@@ -76,6 +75,13 @@ class SnowflakePublish extends DefaultTask {
    )
    String stage = project.extensions."$PLUGIN".stage
 
+   @Optional
+   @Input
+   @Option(option = "publishUrl",
+           description = "The url of the Snowflake external stage to publish to."
+   )
+   String publishUrl = project.extensions."$PLUGIN".publishUrl
+
    @TaskAction
    def publish() {
       //def handler = project.extensions."$PLUGIN".handler
@@ -100,8 +106,18 @@ class SnowflakePublish extends DefaultTask {
          throw new Exception("Snowflake connection details are missing.")
       }
 
+      // ensure that the stage and the publishUrl are aligned
+      Statement statement = session.jdbcConnection().createStatement()
+      String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_type='External Named'"
+      ResultSet rs = statement.executeQuery(sql)
+      String selectStage
+      if(rs.next()){ selectStage = rs.getString(1)}
+      assert selectStage == publishUrl
+
       // create snowflake application
       String imports = project.extensions."$PLUGIN".imports
+
+      // automatically create application spec objects
       project."$PLUGIN".applications.each { ApplicationContainer app ->
          String createText = app.getCreate(imports)
          log.info "Deploying ==> \n$createText"
