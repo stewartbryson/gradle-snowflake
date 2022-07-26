@@ -67,11 +67,7 @@ tasks.withType(Test) {
    systemProperty "account", findProperty("snowflake.account").toString()
    systemProperty "user", findProperty("snowflake.user")
    systemProperty "password", findProperty("snowflake.password")
-   systemProperty "database", findProperty("snowflake.database")
-   systemProperty "role", findProperty("snowflake.role")
-   systemProperty "warehouse", findProperty("snowflake.warehouse")
    systemProperty "schema", findProperty("snowflake.schema")
-   systemProperty "stage", findProperty("snowflake.stage")
    systemProperty "publishUrl", findProperty("snowflake.publishUrl")
 }
 

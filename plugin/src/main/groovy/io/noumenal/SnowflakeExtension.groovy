@@ -12,7 +12,7 @@ class SnowflakeExtension {
    String password
    String database
    String schema = 'public'
-   String role = 'sysadmin'
+   String role
    String warehouse = "compute_wh"
    String stage = 'maven'
    String publishUrl
