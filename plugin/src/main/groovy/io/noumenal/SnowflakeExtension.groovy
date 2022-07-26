@@ -16,8 +16,8 @@ class SnowflakeExtension {
    String warehouse = "compute_wh"
    String stage = 'maven'
    String publishUrl
-   String groupId
-   String artifactId
+   String groupId = project.getGroup()
+   String artifactId = project.getName()
    Boolean useCustomMaven = false
 
    private static String toSnakeCase( String text ) {

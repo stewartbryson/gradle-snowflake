@@ -64,7 +64,7 @@ build.dependsOn validatePlugins
 tasks.withType(Test) {
    failFast true
    testLogging.showStandardStreams true
-   systemProperty "account", findProperty("snowflake.account").toString()
+   systemProperty "account", findProperty("snowflake.account")
    systemProperty "user", findProperty("snowflake.user")
    systemProperty "password", findProperty("snowflake.password")
    systemProperty "schema", findProperty("snowflake.schema")

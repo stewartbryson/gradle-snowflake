@@ -1,12 +1,10 @@
 package io.noumenal
 
 import groovy.util.logging.Slf4j
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.aws.AwsImAuthentication
-import scala.App
 
 @Slf4j
 class SnowflakePlugin implements Plugin<Project> {
