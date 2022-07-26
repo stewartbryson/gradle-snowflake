@@ -3,13 +3,13 @@ name: Run Gradle on PRs
 on:
   pull_request
 
-env:
-  ORG_GRADLE_PROJECT_snowflake_account: ${{secrets.SNOWFLAKE_ACCOUNT}}
-  ORG_GRADLE_PROJECT_snowflake_user: ${{secrets.SNOWFLAKE_USER}}
-  ORG_GRADLE_PROJECT_snowflake_password: ${{secrets.SNOWFLAKE_PASSWORD}}
-  ORG_GRADLE_PROJECT_snowflake_publishUrl: ${{secrets.SNOWFLAKE_PUBLISHURL}}
-  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+#env:
+#  ORG_GRADLE_PROJECT_snowflake_account: ${{secrets.SNOWFLAKE_ACCOUNT}}
+#  ORG_GRADLE_PROJECT_snowflake_user: ${{secrets.SNOWFLAKE_USER}}
+#  ORG_GRADLE_PROJECT_snowflake_password: ${{secrets.SNOWFLAKE_PASSWORD}}
+#  ORG_GRADLE_PROJECT_snowflake_publishUrl: ${{secrets.SNOWFLAKE_PUBLISHURL}}
+#  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+#  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
 jobs:
   build:
@@ -17,6 +17,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - run: 'echo "$GRADLE_PROPERTIES" >> gradle.properties'
+        shell: bash
+        env:
+          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
       - name: Gradle build and test
         uses: gradle/gradle-build-action@v2

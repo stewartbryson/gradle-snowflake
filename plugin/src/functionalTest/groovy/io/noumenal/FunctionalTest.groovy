@@ -63,7 +63,7 @@ class FunctionalTest extends Specification {
       args.addAll(systemArgs)
 
       // Don't print the password
-      log.warn "runner arguments: ${args.collect().removeAll { String item -> item.contains("password") }.collect()}"
+      //log.warn "runner arguments: ${args}"
 
       // execute the Gradle test build
       result = GradleRunner.create()

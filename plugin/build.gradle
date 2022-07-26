@@ -54,11 +54,6 @@ gradlePlugin {
 
 gradlePlugin.testSourceSets(sourceSets.functionalTest)
 
-tasks.named('check') {
-   // Include functionalTest as part of the check lifecycle
-   dependsOn(testing.suites.functionalTest)
-}
-
 build.dependsOn validatePlugins
 
 tasks.withType(Test) {
