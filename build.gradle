@@ -5,7 +5,7 @@ plugins {
 }
 
 subprojects {
-   group = 'io.noumennal'
+   group = 'io.noumenal'
 
    repositories {
       mavenCentral()

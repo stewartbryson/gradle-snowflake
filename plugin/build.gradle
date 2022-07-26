@@ -42,6 +42,12 @@ testing {
    }
 }
 
+//pluginBundle {
+//   website = 'http://noumenal.io/'
+//   vcsUrl = 'https://github.com/noumenalio/gradle-snowflake'
+//   tags = ['snowflake', 'snowpark', 'dataops']
+//}
+
 gradlePlugin {
    // Define the plugin
    plugins {
