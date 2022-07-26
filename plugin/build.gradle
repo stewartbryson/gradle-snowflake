@@ -64,15 +64,15 @@ build.dependsOn validatePlugins
 tasks.withType(Test) {
    failFast true
    testLogging.showStandardStreams true
-   systemProperty "account", getProperty("snowflake.account").toString()
-   systemProperty "user", getProperty("snowflake.user")
-   systemProperty "password", getProperty("snowflake.password")
-   systemProperty "database", getProperty("snowflake.database")
-   systemProperty "role", getProperty("snowflake.role")
-   systemProperty "warehouse", getProperty("snowflake.warehouse")
-   systemProperty "schema", getProperty("snowflake.schema")
-   systemProperty "stage", getProperty("snowflake.stage")
-   systemProperty "publishUrl", getProperty("snowflake.publishUrl")
+   systemProperty "account", findProperty("snowflake.account").toString()
+   systemProperty "user", findProperty("snowflake.user")
+   systemProperty "password", findProperty("snowflake.password")
+   systemProperty "database", findProperty("snowflake.database")
+   systemProperty "role", findProperty("snowflake.role")
+   systemProperty "warehouse", findProperty("snowflake.warehouse")
+   systemProperty "schema", findProperty("snowflake.schema")
+   systemProperty "stage", findProperty("snowflake.stage")
+   systemProperty "publishUrl", findProperty("snowflake.publishUrl")
 }
 
 publishing {
