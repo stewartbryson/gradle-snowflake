@@ -103,10 +103,9 @@ class SnowflakePublish extends DefaultTask {
       // create snowflake application
       String imports = project.extensions."$PLUGIN".imports
       project."$PLUGIN".applications.each { ApplicationContainer app ->
-         String createObject = app.create + "imports = ($imports)"
-         log.warn createObject
-         session.jdbcConnection().createStatement().execute(createObject)
+         String createText = app.getCreate(imports)
+         log.info "Deploying ==> \n$createText"
+         session.jdbcConnection().createStatement().execute(createText)
       }
-
    }
 }

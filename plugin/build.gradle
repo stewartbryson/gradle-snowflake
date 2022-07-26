@@ -1,10 +1,6 @@
 plugins {
-   // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
    id 'java-gradle-plugin'
-
-   // Apply the Groovy plugin to add support for Groovy
    id 'groovy'
-
    id 'com.adarshr.test-logger' version '3.2.0'
    id "com.redpillanalytics.gradle-properties" version "1.0.7"
 }
@@ -61,6 +57,8 @@ tasks.named('check') {
    // Include functionalTest as part of the check lifecycle
    dependsOn(testing.suites.functionalTest)
 }
+
+build.dependsOn validatePlugins
 
 tasks.withType(Test) {
    failFast true

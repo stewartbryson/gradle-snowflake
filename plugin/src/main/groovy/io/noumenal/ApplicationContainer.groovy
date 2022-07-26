@@ -21,12 +21,12 @@ class ApplicationContainer {
       objectType == 'function'
    }
 
-   String getCreate() {
-      "CREATE ${hasReplace ? 'OR REPLACE ' : ''} $objectType $name (${inputs.join(', ')})\n" +
+   String getCreate(String imports) {
+      "CREATE ${hasReplace ? 'OR REPLACE' : ''} $objectType $name (${inputs.join(', ')})\n" +
               (isFunction() ? "  returns ${returns}\n" : "") +
               """|  language JAVA
                  |  handler = '$handler'
-                 |  """.stripMargin()
+                 |  imports = ($imports)""".stripMargin()
    }
 
 }
