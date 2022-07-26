@@ -13,6 +13,9 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 
+import java.sql.ResultSet
+import java.sql.Statement
+
 @Slf4j
 @CacheableTask
 class SnowflakePublish extends DefaultTask {
@@ -102,6 +105,13 @@ class SnowflakePublish extends DefaultTask {
 
       // create snowflake application
       String imports = project.extensions."$PLUGIN".imports
+
+      // ensure that the stage and the publishUrl are aligned
+//      Statement statement = session.jdbcConnection().createStatement()
+//      ResultSet resultSet = statement.executeQuery("select stage_url from information_schema.stages where stage_name=upper($stage) and stage_type='External Named'")
+//      log.warn "Result: ${resultSet}"
+
+      // automatically create application spec objects
       project."$PLUGIN".applications.each { ApplicationContainer app ->
          String createText = app.getCreate(imports)
          log.info "Deploying ==> \n$createText"

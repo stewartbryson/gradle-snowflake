@@ -24,6 +24,7 @@ class SnowflakePlugin implements Plugin<Project> {
       project.afterEvaluate {
          // create maven publishing
          if (!project.extensions."$PLUGIN".useCustomMaven) {
+            //log.warn "Publish: ${project.extensions."$PLUGIN".publishUrl}"
 
             // create publication
             project.publishing.publications {
@@ -44,8 +45,6 @@ class SnowflakePlugin implements Plugin<Project> {
                   }
                }
             }
-//            def applicationContainer = project.container(ApplicationContainer)
-//            project."$PLUGIN".extensions.add('applications', applicationContainer)
          }
 
          // Register a task

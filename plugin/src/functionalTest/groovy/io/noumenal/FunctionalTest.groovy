@@ -45,6 +45,7 @@ class FunctionalTest extends Specification {
                     |  artifactId = 'test-gradle-snowflake'
                     |  role = 'devops'
                     |  database = 'devops'
+                    |version='0.1.0'
                     |}
                     |""".stripMargin())
    }
