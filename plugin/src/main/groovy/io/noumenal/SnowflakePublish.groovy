@@ -2,9 +2,11 @@ package io.noumenal
 
 import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
+import net.snowflake.client.jdbc.SnowflakeStatement
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
@@ -17,6 +19,11 @@ import java.sql.Statement
 class SnowflakePublish extends DefaultTask {
    private static String PLUGIN = 'snowflake'
 
+   @Internal
+   def getExtension() {
+      project.extensions."$PLUGIN"
+   }
+
    SnowflakePublish() {
       description = "Publish a Java artifact to an external stage and create Snowflake Functions and Procedures."
       group = "publishing"
@@ -27,64 +34,63 @@ class SnowflakePublish extends DefaultTask {
    @Option(option = "account",
            description = "The URL of the Snowflake account."
    )
-   String account = project.extensions."$PLUGIN".account
+   String account = extension.account
 
    @Optional
    @Input
    @Option(option = "user",
            description = "The user to connect to Snowflake."
    )
-   String user = project.extensions."$PLUGIN".user
+   String user = extension.user
 
    @Optional
    @Input
    @Option(option = "password",
            description = "The password to connect to Snowflake."
    )
-   String password = project.extensions."$PLUGIN".password
+   String password = extension.password
 
    @Optional
    @Input
    @Option(option = "database",
            description = "The Snowflake database to use."
    )
-   String database = project.extensions."$PLUGIN".database
+   String database = extension.database
 
    @Input
    @Option(option = "schema",
            description = "The Snowflake schema to use."
    )
-   String schema = project.extensions."$PLUGIN".schema
+   String schema = extension.schema
 
    @Input
    @Option(option = "warehouse",
            description = "The Snowflake warehouse to use."
    )
-   String warehouse = project.extensions."$PLUGIN".warehouse
+   String warehouse = extension.warehouse
 
    @Input
    @Option(option = "role",
            description = "The Snowflake role to use."
    )
-   String role = project.extensions."$PLUGIN".role
+   String role = extension.role
 
    @Optional
    @Input
    @Option(option = "stage",
            description = "The Snowflake external stage to publish to."
    )
-   String stage = project.extensions."$PLUGIN".stage
+   String stage = extension.stage
 
    @Optional
    @Input
    @Option(option = "publishUrl",
            description = "The url of the Snowflake external stage to publish to."
    )
-   String publishUrl = project.extensions."$PLUGIN".publishUrl
+   String publishUrl = extension.publishUrl
 
-   @TaskAction
-   def publish() {
-      //def handler = project.extensions."$PLUGIN".handler
+   @Internal
+   Session getSession() {
       Map props = [
               url      : account,
               user     : user,
@@ -97,31 +103,65 @@ class SnowflakePublish extends DefaultTask {
       Map printable = props.clone()
       printable.password = "*********"
       log.info "Snowflake config: $printable"
-      Session session
 
+      Session session
       // get a Snowflake session
       try {
          session = Session.builder().configs(props).create()
       } catch (NullPointerException npe) {
          throw new Exception("Snowflake connection details are missing.")
       }
+      return session
+   }
+
+   String getImports(Session session) {
+      String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
+      //log.warn "basePath: $basePath"
+      Statement statement = session.jdbcConnection().createStatement()
+      String sql = "LIST $basePath pattern='(.)*(-all)\\.jar'; select * from table(result_scan(last_query_id())) order by 'last_modified' asc;"
+      statement.unwrap(SnowflakeStatement.class).setParameter(
+              "MULTI_STATEMENT_COUNT", 2)
+      ResultSet rs = statement.executeQuery(sql)
+      String fileName
+      String filePath
+      try {
+         while (rs.next()) {
+            filePath = rs.getString(1)
+         }
+         fileName = filePath.replaceAll(/(.*)($project.version)(\/)(.*)/) { all, first, version, slash, filename ->
+            filename
+         }
+      } catch (Exception e) {
+         throw new Exception("Unable to detect the correct JAR in stage '${stage}'.")
+      }
+      rs.close()
+      statement.close()
+      "'$basePath/$fileName'"
+   }
+
+   @TaskAction
+   def publish() {
+      // keep the session
+      Session session = this.session
 
       // ensure that the stage and the publishUrl are aligned
       Statement statement = session.jdbcConnection().createStatement()
-      String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_type='External Named'"
+      String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
       ResultSet rs = statement.executeQuery(sql)
       String selectStage
-      if(rs.next()){ selectStage = rs.getString(1)}
+      if (rs.next()) {
+         selectStage = rs.getString(1)
+      }
       assert selectStage == publishUrl
 
       // create snowflake application
-      String imports = project.extensions."$PLUGIN".imports
 
       // automatically create application spec objects
       project."$PLUGIN".applications.each { ApplicationContainer app ->
-         String createText = app.getCreate(imports)
-         log.info "Deploying ==> \n$createText"
+         String createText = app.getCreate(getImports(session))
+         log.warn "Deploying ==> \n$createText"
          session.jdbcConnection().createStatement().execute(createText)
       }
+      session.close()
    }
 }

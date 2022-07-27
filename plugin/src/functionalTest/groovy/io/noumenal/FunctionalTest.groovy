@@ -31,7 +31,6 @@ class FunctionalTest extends Specification {
    String account = System.getProperty("account"),
           user = System.getProperty("user"),
           password = System.getProperty("password"),
-          schema = System.getProperty("schema"),
           publishUrl = System.getProperty("publishUrl")
 
    def setupSpec() {
@@ -45,6 +44,8 @@ class FunctionalTest extends Specification {
                     |  artifactId = 'test-gradle-snowflake'
                     |  role = 'devops'
                     |  database = 'devops'
+                    |  schema = 'gradle'
+                    |  publishUrl = 's3://nio-maven-test'
                     |version='0.1.0'
                     |}
                     |""".stripMargin())
@@ -56,7 +57,6 @@ class FunctionalTest extends Specification {
               "-Psnowflake.account=$account".toString(),
               "-Psnowflake.user=$user".toString(),
               "-Psnowflake.password=$password".toString(),
-              "-Psnowflake.schema=$schema".toString(),
               "-Psnowflake.publishUrl=$publishUrl".toString()
       ]
       args.add(0, taskName)
