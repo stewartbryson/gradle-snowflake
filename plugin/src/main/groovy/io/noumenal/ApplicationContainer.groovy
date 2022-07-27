@@ -28,5 +28,4 @@ class ApplicationContainer {
                  |  handler = '$handler'
                  |  imports = ($imports)""".stripMargin()
    }
-
 }

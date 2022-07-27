@@ -11,15 +11,15 @@ import spock.lang.Specification
  * A simple unit test for the 'io.noumenal.gradle.snowflake' plugin.
  */
 class PluginTest extends Specification {
-    def "plugin registers task"() {
-        given:
-        def project = ProjectBuilder.builder().build()
+   def "plugin registers task"() {
+      given:
+      def project = ProjectBuilder.builder().build()
 
-        when:
-        project.plugins.apply("io.noumenal.gradle.snowflake")
+      when:
+      project.plugins.apply("io.noumenal.gradle.snowflake")
 
-        then:
-        //project.tasks.findByName("snowflakePublish") != null
-        1==1
-    }
+      then:
+      //project.tasks.findByName("snowflakePublish") != null
+      1 == 1
+   }
 }

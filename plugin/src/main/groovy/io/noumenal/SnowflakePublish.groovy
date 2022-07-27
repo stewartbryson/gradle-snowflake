@@ -122,11 +122,10 @@ class SnowflakePublish extends DefaultTask {
       statement.unwrap(SnowflakeStatement.class).setParameter(
               "MULTI_STATEMENT_COUNT", 2)
       ResultSet rs = statement.executeQuery(sql)
-      //def rsl = rs.getArray('NAME')
       String fileName
       String filePath
       try {
-         if (rs.next()) {
+         while (rs.next()) {
             filePath = rs.getString(1)
          }
          fileName = filePath.replaceAll(/(.*)($project.version)(\/)(.*)/) { all, first, version, slash, filename ->
@@ -135,6 +134,8 @@ class SnowflakePublish extends DefaultTask {
       } catch (Exception e) {
          throw new Exception("Unable to detect the correct JAR in stage '${stage}'.")
       }
+      rs.close()
+      statement.close()
       "'$basePath/$fileName'"
    }
 
