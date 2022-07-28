@@ -23,6 +23,7 @@ scmVersion {
    }
    ignoreUncommittedChanges = true
    localOnly = true
+   useHighestVersion = true
 }
 
 

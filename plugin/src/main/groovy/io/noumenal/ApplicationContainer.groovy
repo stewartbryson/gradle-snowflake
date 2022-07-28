@@ -10,6 +10,8 @@ class ApplicationContainer {
    String name
    List inputs
    String returns
+   String type = 'function'
+   String language = 'JAVA'
    String handler
    Boolean hasReplace = true
 
@@ -22,10 +24,11 @@ class ApplicationContainer {
    }
 
    String getCreate(String imports) {
-      "CREATE ${hasReplace ? 'OR REPLACE' : ''} $objectType $name (${inputs.join(', ')})\n" +
-              (isFunction() ? "  returns ${returns}\n" : "") +
-              """|  language JAVA
-                 |  handler = '$handler'
-                 |  imports = ($imports)""".stripMargin()
+      """|CREATE OR REPLACE $type $name (${inputs.join(', ')})
+         |  returns $returns
+         |  language $language
+         |  handler = '$handler'
+         |  imports = ($imports)
+         |""".stripMargin()
    }
 }
