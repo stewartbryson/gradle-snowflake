@@ -36,7 +36,7 @@ githubRelease {
    owner 'noumenalio'
    repo rootProject.name
    overwrite true
-   releaseAssets.from("plugin/build/libs")
+   //releaseAssets.from("plugin/build/libs")
    generateReleaseNotes true
    //dryRun true
 }
