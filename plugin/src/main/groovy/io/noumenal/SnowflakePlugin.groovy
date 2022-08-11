@@ -49,6 +49,7 @@ class SnowflakePlugin implements Plugin<Project> {
          // set dependency
          if (!project.extensions.snowflake.useCustomMaven) {
             project.tasks.snowflakePublish.dependsOn project.extensions."$PLUGIN".publishTask, project.tasks.test
+            project.tasks.getByName(project.extensions."$PLUGIN".publishTask).mustRunAfter project.tasks.test
          }
 
          // for debugging

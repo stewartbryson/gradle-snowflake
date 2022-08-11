@@ -33,4 +33,12 @@ jobs:
       - name: Gradle publish
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build publish githubRelease -PgithubToken=${{secrets.GITHUB_TOKEN}}
+          arguments: build publish githubRelease buildDashboard -PgithubToken=${{secrets.GITHUB_TOKEN}}
+
+      - name: Upload build reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-reports
+          path:|
+          build/reports/buildDashboard/
+          plugin/build/reports/
