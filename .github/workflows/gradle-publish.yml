@@ -40,5 +40,5 @@ jobs:
         with:
           name: build-reports
           path: |
-          build/reports/buildDashboard/
-          plugin/build/reports/
+            build/reports/buildDashboard/
+            plugin/build/reports/
