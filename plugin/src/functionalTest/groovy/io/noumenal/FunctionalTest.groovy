@@ -46,8 +46,8 @@ class FunctionalTest extends Specification {
                     |  database = 'devops'
                     |  schema = 'gradle'
                     |  publishUrl = 's3://nio-maven-test'
-                    |version='0.1.0'
                     |}
+                    |version='0.1.0'
                     |""".stripMargin())
    }
 
@@ -81,12 +81,6 @@ class FunctionalTest extends Specification {
    def "snowflakePublish task"() {
       given:
       taskName = 'snowflakePublish'
-//      settingsFile << ""
-//      buildFile << """
-//                    |plugins {
-//                    |    id('io.noumenal.gradle.snowflake')
-//                    |}
-//                    |""".stripMargin()
 
       when:
       result = executeSingleTask(taskName, ['-Si'])
