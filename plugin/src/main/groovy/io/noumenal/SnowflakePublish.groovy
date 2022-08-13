@@ -8,6 +8,7 @@ import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 
@@ -114,6 +115,9 @@ class SnowflakePublish extends DefaultTask {
       return session
    }
 
+   @OutputFile
+   File output = project.file("${project.buildDir}/${PLUGIN}/output.txt")
+
    String getImports(Session session) {
       String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
       //log.warn "basePath: $basePath"
@@ -157,9 +161,12 @@ class SnowflakePublish extends DefaultTask {
       // create snowflake application
 
       // automatically create application spec objects
+      output.write("Snowflake Application:\n\n")
       project."$PLUGIN".applications.each { ApplicationContainer app ->
          String createText = app.getCreate(getImports(session))
-         log.warn "Deploying ==> \n$createText"
+         String message = "Deploying ==> \n$createText"
+         log.warn message
+         output.append("$message\n")
          session.jdbcConnection().createStatement().execute(createText)
       }
       session.close()

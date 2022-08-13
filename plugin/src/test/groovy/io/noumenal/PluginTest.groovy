@@ -19,7 +19,6 @@ class PluginTest extends Specification {
       project.plugins.apply("io.noumenal.gradle.snowflake")
 
       then:
-      //project.tasks.findByName("snowflakePublish") != null
-      1 == 1
+      project.tasks.findByName("shadowJar") != null
    }
 }
