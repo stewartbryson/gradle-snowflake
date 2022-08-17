@@ -5,11 +5,16 @@ import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.aws.AwsImAuthentication
-
+/**
+ * The Gradle plugin.
+ */
 @Slf4j
 class SnowflakePlugin implements Plugin<Project> {
    private static String PLUGIN = 'snowflake'
 
+   /**
+    * Apply the gradle-snowflake plugin to a Gradle project. Also applies the 'com.github.johnrengelman.shadow' and 'java-library' plugins. Supporting the 'scala' plugin instead is on the roadmap.
+    */
    void apply(Project project) {
       project.extensions.create(PLUGIN, SnowflakeExtension)
 
