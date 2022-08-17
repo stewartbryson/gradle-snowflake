@@ -12,22 +12,28 @@ class SnowflakePlugin implements Plugin<Project> {
 
    void apply(Project project) {
       project.extensions.create(PLUGIN, SnowflakeExtension)
+
+      // shorthand
+      def extension = project.extensions."$PLUGIN"
+
       project."$PLUGIN".extensions.applications = project.container(ApplicationContainer)
       project.apply plugin: 'com.redpillanalytics.gradle-properties'
-      project.apply plugin: 'maven-publish'
       project.apply plugin: 'java-library'
       project.apply plugin: 'com.github.johnrengelman.shadow'
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
          // create maven publishing
-         if (!project.extensions."$PLUGIN".useCustomMaven) {
+         if (!extension.useCustomMaven && extension.publishUrl) {
+
+            // apply the maven-publish plugin for the user
+            project.apply plugin: 'maven-publish'
 
             // create publication
             project.publishing.publications {
                snowflake(MavenPublication) {
-                  groupId = project.extensions."$PLUGIN".groupId
-                  artifactId = project.extensions."$PLUGIN".artifactId
+                  groupId = extension.groupId
+                  artifactId = extension.artifactId
                   //from project.components.java
                   artifact project.shadowJar
                }
@@ -35,8 +41,8 @@ class SnowflakePlugin implements Plugin<Project> {
             // create repository
             project.publishing.repositories {
                maven {
-                  name project.extensions."$PLUGIN".stage
-                  url project.extensions."$PLUGIN".publishUrl
+                  name extension.stage
+                  url extension.publishUrl
                   authentication {
                      awsIm(AwsImAuthentication)
                   }
@@ -47,17 +53,12 @@ class SnowflakePlugin implements Plugin<Project> {
          // Register a task
          project.tasks.register("snowflakePublish", SnowflakePublish)
          // set dependency
-         if (!project.extensions.snowflake.useCustomMaven) {
-            project.tasks.snowflakePublish.dependsOn project.extensions."$PLUGIN".publishTask, project.tasks.test
-            project.tasks.getByName(project.extensions."$PLUGIN".publishTask).mustRunAfter project.tasks.test
+         if (!extension.useCustomMaven && extension.publishUrl) {
+            project.tasks.snowflakePublish.dependsOn extension.publishTask
+            project.tasks.getByName(extension.publishTask).mustRunAfter project.tasks.test
          }
 
-         // for debugging
-         def snowflake = project.extensions."$PLUGIN"
-         def pubs = project.publishing.publications
-         def repos = project.publishing.repositories
-         def pubTask = project.extensions."$PLUGIN".publishTask
-         def text = "text"
+         project.tasks.snowflakePublish.dependsOn project.tasks.test
       }
    }
 }
