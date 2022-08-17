@@ -5,10 +5,8 @@ import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import net.snowflake.client.jdbc.SnowflakeStatement
 import org.gradle.api.DefaultTask
-import org.gradle.api.PathValidation
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
@@ -18,67 +16,104 @@ import org.gradle.api.tasks.options.Option
 import java.sql.ResultSet
 import java.sql.Statement
 
+/**
+ * A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
+ */
 @Slf4j
 @CacheableTask
 class SnowflakePublish extends DefaultTask {
    private static String PLUGIN = 'snowflake'
 
+   /**
+    * A helper for getting the plugin extension.
+    *
+    * @return A reference to the plugin extension.
+    */
    @Internal
    def getExtension() {
       project.extensions."$PLUGIN"
    }
 
+   /**
+    * The task Constructor with 'description' and 'group'.
+    *
+    * @return A custom task class.
+    */
    SnowflakePublish() {
       description = "Publish a Java artifact to an external stage and create Snowflake Functions and Procedures."
       group = "publishing"
    }
 
+   /**
+    * The Snowflake account URL, for instance: https://gradle-snowflake.us-east-1.snowflakecomputing.com:443. Overrides {@link SnowflakeExtension#account}.
+    */
    @Optional
    @Input
    @Option(option = "account",
-           description = "The URL of the Snowflake account."
+           description = "Override the URL of the Snowflake account."
    )
    String account = extension.account
 
+   /**
+    * The Snowflake user to connect as. Overrides {@link SnowflakeExtension#user}.
+    */
    @Optional
    @Input
    @Option(option = "user",
-           description = "The user to connect to Snowflake."
+           description = "Override the Snowflake user to connect as."
    )
    String user = extension.user
 
+   /**
+    * The Snowflake password to connect with. Overrides {@link SnowflakeExtension#password}.
+    */
    @Optional
    @Input
    @Option(option = "password",
-           description = "The password to connect to Snowflake."
+           description = "Override the Snowflake password to connect with."
    )
    String password = extension.password
 
+   /**
+    * The Snowflake database to connect to. Overrides {@link SnowflakeExtension#database}.
+    */
    @Optional
    @Input
    @Option(option = "database",
-           description = "The Snowflake database to use."
+           description = "Override the Snowflake database to connect to."
    )
    String database = extension.database
 
+   /**
+    * The Snowflake schema to connect with. Overrides {@link SnowflakeExtension#schema}.
+    */
    @Input
    @Option(option = "schema",
-           description = "The Snowflake schema to use."
+           description = "Override the Snowflake schema to connect with."
    )
    String schema = extension.schema
 
+   /**
+    * The Snowflake role to connect with. Overrides {@link SnowflakeExtension#warehouse}.
+    */
    @Input
    @Option(option = "warehouse",
-           description = "The Snowflake warehouse to use."
+           description = "Override the Snowflake role to connect with."
    )
    String warehouse = extension.warehouse
 
+   /**
+    * The Snowflake warehouse to connect with. Overrides {@link SnowflakeExtension#role}.
+    */
    @Input
    @Option(option = "role",
            description = "The Snowflake role to use."
    )
    String role = extension.role
 
+   /**
+    * The Snowflake stage to upload to. Overrides {@link SnowflakeExtension#stage}.
+    */
    @Optional
    @Input
    @Option(option = "stage",
@@ -86,16 +121,19 @@ class SnowflakePublish extends DefaultTask {
    )
    String stage = extension.stage
 
+   /**
+    * Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.
+    */
    @Optional
    @Input
-   @Option(option = "jar", description = "Manually pass a JAR file path to upload instead of relying on Gradle metadata.")
+   @Option(option = "jar", description = "Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.")
    String jar = project.tasks.shadowJar.archiveFile.get()
 
-//   @InputFile
-//   def getJarFile() {
-//      project.file(jar, PathValidation.NONE)
-//   }
-
+   /**
+    * Create a Snowflake session.
+    *
+    * @return a Snowflake session.
+    */
    @Internal
    Session getSession() {
       Map props = [
@@ -121,9 +159,17 @@ class SnowflakePublish extends DefaultTask {
       return session
    }
 
+   /**
+    * A simple text output file for the Snowflake applications create statements. Mainly for making the class Cacheable.
+    */
    @OutputFile
    File output = project.file("${project.buildDir}/${PLUGIN}/output.txt")
 
+   /**
+    * Get the 'import' property for the UDF.
+    *
+    * @return the 'import' property.
+    */
    String getImports(Session session) {
 
       String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
@@ -150,6 +196,9 @@ class SnowflakePublish extends DefaultTask {
       "'$basePath/$fileName'"
    }
 
+   /**
+    * The Gradle TaskAction method. Publish the Snowflake Application.
+    */
    @TaskAction
    def publish() {
       // keep the session
