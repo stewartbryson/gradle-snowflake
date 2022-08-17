@@ -1,11 +1,14 @@
 package io.noumenal
 
+import com.snowflake.snowpark_java.PutResult
 import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import net.snowflake.client.jdbc.SnowflakeStatement
 import org.gradle.api.DefaultTask
+import org.gradle.api.PathValidation
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputFile
@@ -85,10 +88,13 @@ class SnowflakePublish extends DefaultTask {
 
    @Optional
    @Input
-   @Option(option = "publishUrl",
-           description = "The url of the Snowflake external stage to publish to."
-   )
-   String publishUrl = extension.publishUrl
+   @Option(option = "jar", description = "Manually pass a JAR file path to upload instead of relying on Gradle metadata.")
+   String jar = project.tasks.shadowJar.archiveFile.get()
+
+//   @InputFile
+//   def getJarFile() {
+//      project.file(jar, PathValidation.NONE)
+//   }
 
    @Internal
    Session getSession() {
@@ -119,6 +125,7 @@ class SnowflakePublish extends DefaultTask {
    File output = project.file("${project.buildDir}/${PLUGIN}/output.txt")
 
    String getImports(Session session) {
+
       String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
       //log.warn "basePath: $basePath"
       Statement statement = session.jdbcConnection().createStatement()
@@ -147,23 +154,31 @@ class SnowflakePublish extends DefaultTask {
    def publish() {
       // keep the session
       Session session = this.session
+      String jar = project.tasks.shadowJar.archiveFile.get()
 
-      // ensure that the stage and the publishUrl are aligned
-      Statement statement = session.jdbcConnection().createStatement()
-      String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
-      ResultSet rs = statement.executeQuery(sql)
-      String selectStage
-      if (rs.next()) {
-         selectStage = rs.getString(1)
+      if (!extension.publishUrl) {
+         def options = [
+                 AUTO_COMPRESS: 'false',
+                 PARALLEL     : '4'
+         ]
+         PutResult[] putResults = session.file().put(jar, "$stage/libs", options)
+      } else {
+         // ensure that the stage and the publishUrl are aligned
+         Statement statement = session.jdbcConnection().createStatement()
+         String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
+         ResultSet rs = statement.executeQuery(sql)
+         String selectStage
+         if (rs.next()) {
+            selectStage = rs.getString(1)
+         }
+         // ensure we are matching our stage with our url
+         assert selectStage == extension.publishUrl
       }
-      assert selectStage == publishUrl
-
-      // create snowflake application
 
       // automatically create application spec objects
       output.write("Snowflake Application:\n\n")
       project."$PLUGIN".applications.each { ApplicationContainer app ->
-         String createText = app.getCreate(getImports(session))
+         String createText = app.getCreate(extension.publishUrl ? getImports(session) : "@$stage/libs/$jar")
          String message = "Deploying ==> \n$createText"
          log.warn message
          output.append("$message\n")

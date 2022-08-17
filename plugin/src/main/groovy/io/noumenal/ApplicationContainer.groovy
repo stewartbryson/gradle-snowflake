@@ -13,7 +13,6 @@ class ApplicationContainer {
    String type = 'function'
    String language = 'JAVA'
    String handler
-   Boolean hasReplace = true
 
    String getObjectType() {
       returns ? 'function' : 'procedure'

@@ -34,7 +34,9 @@ class FunctionalTest extends Specification {
           publishUrl = System.getProperty("publishUrl")
 
    def setupSpec() {
-      settingsFile = new File(projectDir, 'settings.gradle').write("")
+      settingsFile = new File(projectDir, 'settings.gradle').write("""
+                     |rootProject.name = 'unit-test'
+                     |""".stripMargin())
       buildFile = new File(projectDir, 'build.gradle').write("""
                     |plugins {
                     |    id('io.noumenal.gradle.snowflake')
@@ -45,7 +47,6 @@ class FunctionalTest extends Specification {
                     |  role = 'devops'
                     |  database = 'devops'
                     |  schema = 'gradle'
-                    |  publishUrl = 's3://nio-maven-test'
                     |}
                     |version='0.1.0'
                     |""".stripMargin())
@@ -56,8 +57,7 @@ class FunctionalTest extends Specification {
       List systemArgs = [
               "-Psnowflake.account=$account".toString(),
               "-Psnowflake.user=$user".toString(),
-              "-Psnowflake.password=$password".toString(),
-              "-Psnowflake.publishUrl=$publishUrl".toString()
+              "-Psnowflake.password=$password".toString()
       ]
       args.add(0, taskName)
       args.addAll(systemArgs)
@@ -78,12 +78,34 @@ class FunctionalTest extends Specification {
       return result
    }
 
-   def "snowflakePublish task"() {
+   def "snowflakePublish with publishUrl option"() {
       given:
       taskName = 'snowflakePublish'
 
       when:
-      result = executeSingleTask(taskName, ['-Si'])
+      result = executeSingleTask(taskName, ['-Psnowflake.publishUrl=s3://nio-maven-test', '-Si'])
+
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
+
+   def "snowflakePublish without publishUrl option"() {
+      given:
+      taskName = 'snowflakePublish'
+
+      when:
+      result = executeSingleTask(taskName, ['-Psnowflake.stage=upload', '-Si'])
+
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
+
+   def "snowflakePublish with custom JAR"() {
+      given:
+      taskName = 'snowflakePublish'
+
+      when:
+      result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar','-Psnowflake.stage=upload', '-Si'])
 
       then:
       !result.tasks.collect { it.outcome }.contains('FAILURE')
