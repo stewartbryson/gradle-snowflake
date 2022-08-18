@@ -210,7 +210,10 @@ class SnowflakePublish extends DefaultTask {
                  AUTO_COMPRESS: 'false',
                  PARALLEL     : '4'
          ]
-         PutResult[] putResults = session.file().put(jar, "$stage/libs", options)
+         PutResult[] pr = session.file().put(jar, "$stage/libs", options)
+         pr.each {
+            log.warn "File ${it.sourceFileName}: ${it.status}"
+         }
       } else {
          // ensure that the stage and the publishUrl are aligned
          Statement statement = session.jdbcConnection().createStatement()
@@ -227,7 +230,8 @@ class SnowflakePublish extends DefaultTask {
       // automatically create application spec objects
       output.write("Snowflake Application:\n\n")
       project."$PLUGIN".applications.each { ApplicationContainer app ->
-         String createText = app.getCreate(extension.publishUrl ? getImports(session) : "@$stage/libs/$jar")
+         File jarFile = project.file(jar)
+         String createText = app.getCreate(extension.publishUrl ? getImports(session) : "'@$stage/libs/${jarFile.name}'")
          String message = "Deploying ==> \n$createText"
          log.warn message
          output.append("$message\n")
