@@ -87,6 +87,7 @@ publishing {
 
 s3 {
    bucket = 'docs.noumenal.io'
+   region = 'us-east-1'
 }
 
 tasks.register("publishLatestDocs", com.fuseanalytics.gradle.s3.S3Upload) {
