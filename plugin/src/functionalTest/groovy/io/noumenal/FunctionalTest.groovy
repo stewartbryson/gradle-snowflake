@@ -25,7 +25,7 @@ class FunctionalTest extends Specification {
    private File projectDir
 
    @Shared
-   File buildFile, settingsFile
+   File buildFile, settingsFile, javaFile
 
    @Shared
    String account = System.getProperty("account"),
@@ -41,15 +41,46 @@ class FunctionalTest extends Specification {
                     |plugins {
                     |    id('io.noumenal.gradle.snowflake')
                     |}
+                    |java {
+                    |    toolchain {
+                    |        languageVersion = JavaLanguageVersion.of(11)
+                    |    }
+                    |}
                     |snowflake {
                     |  groupId = 'io.noumenal'
                     |  artifactId = 'test-gradle-snowflake'
                     |  role = 'devops'
                     |  database = 'devops'
                     |  schema = 'gradle'
+                    |  applications {
+                    |      add_numbers {
+                    |         inputs = ["a integer", "b integer"]
+                    |         returns = "string"
+                    |         handler = "AddNumbers.addNum"
+                    |      }
+                    |   }
                     |}
                     |version='0.1.0'
                     |""".stripMargin())
+      javaFile = new File("${projectDir}/src/main/java", 'AddNumbers.java')
+      javaFile.parentFile.mkdirs()
+      javaFile.write("""
+                  |public class AddNumbers
+                  |{
+                  |  public String addNum(int num1, int num2) {
+                  |    try {
+                  |      int sum = num1 + num2;
+                  |      return ("Sum is: " + sum);
+                  |    } catch (Exception e) {
+                  |      return e.toString();
+                  |      }
+                  |    }
+                  |
+                  |    public static void main(String[] args){
+                  |      System.out.println("Hello World");
+                  |  }
+                  |}
+                  |""".stripMargin())
    }
 
    // helper method
@@ -105,7 +136,7 @@ class FunctionalTest extends Specification {
       taskName = 'snowflakePublish'
 
       when:
-      result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar','-Psnowflake.stage=upload', '-Si'])
+      result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '-Psnowflake.stage=upload', '-Si'])
 
       then:
       !result.tasks.collect { it.outcome }.contains('FAILURE')
