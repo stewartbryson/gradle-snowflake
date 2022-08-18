@@ -41,6 +41,3 @@ githubRelease {
    generateReleaseNotes true
    //dryRun true
 }
-
-
-
