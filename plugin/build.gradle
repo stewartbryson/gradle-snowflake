@@ -4,6 +4,7 @@ plugins {
    id 'maven-publish'
    id 'com.adarshr.test-logger' version '3.2.0'
    id "com.redpillanalytics.gradle-properties" version "1.0.7"
+   id 'com.fuseanalytics.gradle.s3' version '1.2.0'
 }
 
 dependencies {
@@ -82,4 +83,27 @@ publishing {
          }
       }
    }
+}
+
+s3 {
+   bucket = 'docs.noumenal.io'
+}
+
+tasks.register("publishLatestDocs", com.fuseanalytics.gradle.s3.S3Upload) {
+   description = "Publish the latest docs to S3."
+   keyPrefix = "${rootProject.name}/latest"
+   sourceDir = tasks.groovydoc.destinationDir
+   dependsOn groovydoc
+}
+
+tasks.register("publishVersionDocs", com.fuseanalytics.gradle.s3.S3Upload) {
+   description = "Publish the version docs to S3."
+   keyPrefix = "${rootProject.name}/$version"
+   sourceDir = tasks.groovydoc.destinationDir
+   dependsOn groovydoc
+}
+
+tasks.register("publishDocs") {
+   dependsOn tasks.publishLatestDocs, tasks.publishVersionDocs
+   mustRunAfter tasks.publish
 }

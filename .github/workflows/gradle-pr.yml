@@ -22,12 +22,10 @@ jobs:
       - name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build functionalTest buildDashboard
+          arguments: build validatePlugin functionalTest buildDashboard
 
-      - name: Upload build reports
-        uses: actions/upload-artifact@v3
+      - name: Publish tests
+        uses: mikepenz/action-junit-report@v3
+        if: always()
         with:
-          name: build-reports
-          path: |
-            build/reports/buildDashboard/
-            plugin/build/reports/
+          report_paths: '**/build/test-results/**/TEST-*.xml'
