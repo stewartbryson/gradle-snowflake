@@ -37,6 +37,7 @@ githubRelease {
    owner 'noumenalio'
    repo rootProject.name
    overwrite true
+   //releaseAssets.from(project(':plugin').tasks.jar.destinationDirectory.files())
    //releaseAssets.from("plugin/build/libs")
    generateReleaseNotes true
    //dryRun true
