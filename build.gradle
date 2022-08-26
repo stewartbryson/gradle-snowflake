@@ -5,7 +5,7 @@ plugins {
    id "build-dashboard"
 }
 
-subprojects {
+allprojects {
    group = 'io.noumenal'
 
    repositories {
@@ -31,24 +31,11 @@ allprojects {
    project.version = scmVersion.version
 }
 
-configurations {
-   assets {
-      canBeConsumed = false
-      canBeResolved = true
-   }
-}
-dependencies {
-   subprojects {
-      assets(it)
-   }
-}
-
 githubRelease {
    token project.findProperty('githubToken').toString()
    owner 'noumenalio'
    repo rootProject.name
    overwrite true
-   releaseAssets configurations.assets
    generateReleaseNotes true
    //dryRun true
 }
