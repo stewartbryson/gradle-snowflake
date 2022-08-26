@@ -27,9 +27,20 @@ scmVersion {
    useHighestVersion = true
 }
 
-
 allprojects {
    project.version = scmVersion.version
+}
+
+configurations {
+   assets {
+      canBeConsumed = false
+      canBeResolved = true
+   }
+}
+dependencies {
+   subprojects {
+      assets(it)
+   }
 }
 
 githubRelease {
@@ -37,7 +48,7 @@ githubRelease {
    owner 'noumenalio'
    repo rootProject.name
    overwrite true
-   //releaseAssets.from("plugin/build/libs")
+   releaseAssets configurations.assets
    generateReleaseNotes true
    //dryRun true
 }

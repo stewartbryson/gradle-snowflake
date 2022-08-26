@@ -34,12 +34,16 @@ class FunctionalTest extends Specification {
           publishUrl = System.getProperty("publishUrl")
 
    def setupSpec() {
-      settingsFile = new File(projectDir, 'settings.gradle').write("""
+      settingsFile = new File(projectDir, 'settings.gradle')
+      settingsFile.write("""
                      |rootProject.name = 'unit-test'
                      |""".stripMargin())
-      buildFile = new File(projectDir, 'build.gradle').write("""
+
+      buildFile = new File(projectDir, 'build.gradle')
+      buildFile.write("""
                     |plugins {
-                    |    id('io.noumenal.gradle.snowflake')
+                    |    id 'io.noumenal.gradle.snowflake'
+                    |    id 'java'
                     |}
                     |java {
                     |    toolchain {
@@ -62,6 +66,7 @@ class FunctionalTest extends Specification {
                     |}
                     |version='0.1.0'
                     |""".stripMargin())
+
       javaFile = new File("${projectDir}/src/main/java", 'AddNumbers.java')
       javaFile.parentFile.mkdirs()
       javaFile.write("""
