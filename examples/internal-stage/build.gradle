@@ -1,5 +1,4 @@
 plugins {
-    id 'io.noumenal.gradle.snowflake' version '0.1.9'
     id 'java'
 }
 
@@ -15,21 +14,6 @@ dependencies {
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
-    }
-}
-
-snowflake {
-    // groupId = 'io.noumenal'
-    // artifactId = 'test-gradle-snowflake'
-    role = 'devops'
-    database = 'devops'
-    schema = 'gradle'
-    applications {
-        add_numbers {
-            inputs = ["a integer", "b integer"]
-            returns = "string"
-            handler = "AddNumbers.addNum"
-        }
     }
 }
 

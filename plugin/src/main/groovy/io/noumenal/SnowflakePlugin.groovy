@@ -28,6 +28,9 @@ class SnowflakePlugin implements Plugin<Project> {
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
+         // add shadowJar to build
+         project.tasks.build.dependsOn project.tasks.shadowJar
+
          // create maven publishing
          if (!extension.useCustomMaven && extension.publishUrl) {
 

@@ -36,7 +36,12 @@ testing {
          targets {
             all {
                // This test suite should run after the built-in test suite has run its tests
-               testTask.configure { shouldRunAfter(test) }
+               testTask.configure {
+                  shouldRunAfter(test)
+                  systemProperties project.properties.findAll { it.key.startsWith "snowflake."}
+                  failFast true
+                  testLogging.showStandardStreams true
+               }
             }
          }
       }
@@ -60,18 +65,7 @@ gradlePlugin {
 }
 
 gradlePlugin.testSourceSets(sourceSets.functionalTest)
-
 build.dependsOn validatePlugins
-
-tasks.withType(Test) {
-   failFast true
-   testLogging.showStandardStreams true
-   systemProperty "account", findProperty("snowflake.account")
-   systemProperty "user", findProperty("snowflake.user")
-   systemProperty "password", findProperty("snowflake.password")
-   systemProperty "schema", findProperty("snowflake.schema")
-   systemProperty "publishUrl", findProperty("snowflake.publishUrl")
-}
 
 publishing {
    repositories {

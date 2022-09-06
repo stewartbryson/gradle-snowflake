@@ -28,10 +28,13 @@ class FunctionalTest extends Specification {
    File buildFile, settingsFile, javaFile
 
    @Shared
-   String account = System.getProperty("account"),
-          user = System.getProperty("user"),
-          password = System.getProperty("password"),
-          publishUrl = System.getProperty("publishUrl")
+   String account = System.getProperty("snowflake.account"),
+          user = System.getProperty("snowflake.user"),
+          password = System.getProperty("snowflake.password"),
+          publishUrl = System.getProperty("snowflake.publishUrl"),
+          role = System.getProperty("snowflake.role"),
+          database = System.getProperty("snowflake.database"),
+          schema = System.getProperty("snowflake.schema")
 
    def setupSpec() {
       settingsFile = new File(projectDir, 'settings.gradle')
@@ -53,9 +56,9 @@ class FunctionalTest extends Specification {
                     |snowflake {
                     |  groupId = 'io.noumenal'
                     |  artifactId = 'test-gradle-snowflake'
-                    |  role = 'devops'
-                    |  database = 'devops'
-                    |  schema = 'gradle'
+                    |  role = '$role'
+                    |  database = '$database'
+                    |  schema = '$schema'
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -90,6 +93,7 @@ class FunctionalTest extends Specification {
 
    // helper method
    def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
+      // ultra secure handling
       List systemArgs = [
               "-Psnowflake.account=$account".toString(),
               "-Psnowflake.user=$user".toString(),
@@ -112,6 +116,17 @@ class FunctionalTest extends Specification {
       // log the results
       if (logOutput) log.warn result.getOutput()
       return result
+   }
+
+   def "shadowJar"() {
+      given:
+      taskName = 'shadowJar'
+
+      when:
+      result = executeSingleTask(taskName, ['-Si'])
+
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
    }
 
    def "snowflakePublish with publishUrl option"() {

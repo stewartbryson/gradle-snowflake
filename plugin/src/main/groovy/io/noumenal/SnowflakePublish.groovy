@@ -1,5 +1,6 @@
 package io.noumenal
 
+import com.snowflake.snowpark.SnowparkClientException
 import com.snowflake.snowpark_java.PutResult
 import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
@@ -154,7 +155,9 @@ class SnowflakePublish extends DefaultTask {
       try {
          session = Session.builder().configs(props).create()
       } catch (NullPointerException npe) {
-         throw new Exception("Snowflake connection details are missing.")
+         throw new Exception("Snowflake connection details are missing.", npe)
+      } catch (SnowparkClientException sce) {
+         throw new Exception("Snowflake connection details are incorrect.", sce)
       }
       return session
    }
