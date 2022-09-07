@@ -28,6 +28,9 @@ class SnowflakePlugin implements Plugin<Project> {
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
+         // add shadowJar to build
+         project.tasks.build.dependsOn project.tasks.shadowJar
+
          // create maven publishing
          if (!extension.useCustomMaven && extension.publishUrl) {
 
@@ -63,7 +66,7 @@ class SnowflakePlugin implements Plugin<Project> {
             project.tasks.getByName(extension.publishTask).mustRunAfter project.tasks.test
          }
 
-         project.tasks.snowflakePublish.dependsOn project.tasks.test
+         project.tasks.snowflakePublish.dependsOn project.tasks.test, project.tasks.shadowJar
       }
    }
 }
