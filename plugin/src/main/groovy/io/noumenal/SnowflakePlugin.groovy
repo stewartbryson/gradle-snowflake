@@ -66,7 +66,7 @@ class SnowflakePlugin implements Plugin<Project> {
             project.tasks.getByName(extension.publishTask).mustRunAfter project.tasks.test
          }
 
-         project.tasks.snowflakePublish.dependsOn project.tasks.test
+         project.tasks.snowflakePublish.dependsOn project.tasks.test, project.tasks.shadowJar
       }
    }
 }

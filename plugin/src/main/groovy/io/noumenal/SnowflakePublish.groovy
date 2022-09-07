@@ -1,6 +1,5 @@
 package io.noumenal
 
-import com.snowflake.snowpark.SnowparkClientException
 import com.snowflake.snowpark_java.PutResult
 import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
@@ -22,224 +21,241 @@ import java.sql.Statement
  */
 @Slf4j
 @CacheableTask
-class SnowflakePublish extends DefaultTask {
-   private static String PLUGIN = 'snowflake'
+abstract class SnowflakePublish extends DefaultTask {
 
-   /**
-    * A helper for getting the plugin extension.
-    *
-    * @return A reference to the plugin extension.
-    */
-   @Internal
-   def getExtension() {
-      project.extensions."$PLUGIN"
-   }
+    private static String PLUGIN = 'snowflake'
 
-   /**
-    * The task Constructor with 'description' and 'group'.
-    *
-    * @return A custom task class.
-    */
-   SnowflakePublish() {
-      description = "Publish a Java artifact to an external stage and create Snowflake Functions and Procedures."
-      group = "publishing"
-   }
+    /**
+     * A helper for getting the plugin extension.
+     *
+     * @return A reference to the plugin extension.
+     */
+    @Internal
+    def getExtension() {
+        project.extensions."$PLUGIN"
+    }
 
-   /**
-    * The Snowflake account URL, for instance: https://gradle-snowflake.us-east-1.snowflakecomputing.com:443. Overrides {@link SnowflakeExtension#account}.
-    */
-   @Optional
-   @Input
-   @Option(option = "account",
-           description = "Override the URL of the Snowflake account."
-   )
-   String account = extension.account
+    /**
+     * The task Constructor with 'description' and 'group'.
+     *
+     * @return A custom task class.
+     */
+    SnowflakePublish() {
+        description = "Publish a Java artifact to an external stage and create Snowflake Functions and Procedures."
+        group = "publishing"
+    }
 
-   /**
-    * The Snowflake user to connect as. Overrides {@link SnowflakeExtension#user}.
-    */
-   @Optional
-   @Input
-   @Option(option = "user",
-           description = "Override the Snowflake user to connect as."
-   )
-   String user = extension.user
+    /**
+     * The Snowflake account URL, for instance: https://gradle-snowflake.us-east-1.snowflakecomputing.com:443. Overrides {@link SnowflakeExtension#account}.
+     */
+    @Optional
+    @Input
+    @Option(option = "account",
+            description = "Override the URL of the Snowflake account."
+    )
+    String account = extension.account
 
-   /**
-    * The Snowflake password to connect with. Overrides {@link SnowflakeExtension#password}.
-    */
-   @Optional
-   @Input
-   @Option(option = "password",
-           description = "Override the Snowflake password to connect with."
-   )
-   String password = extension.password
+    /**
+     * The Snowflake user to connect as. Overrides {@link SnowflakeExtension#user}.
+     */
+    @Optional
+    @Input
+    @Option(option = "user",
+            description = "Override the Snowflake user to connect as."
+    )
+    String user = extension.user
 
-   /**
-    * The Snowflake database to connect to. Overrides {@link SnowflakeExtension#database}.
-    */
-   @Optional
-   @Input
-   @Option(option = "database",
-           description = "Override the Snowflake database to connect to."
-   )
-   String database = extension.database
+    /**
+     * The Snowflake password to connect with. Overrides {@link SnowflakeExtension#password}.
+     */
+    @Optional
+    @Input
+    @Option(option = "password",
+            description = "Override the Snowflake password to connect with."
+    )
+    String password = extension.password
 
-   /**
-    * The Snowflake schema to connect with. Overrides {@link SnowflakeExtension#schema}.
-    */
-   @Input
-   @Option(option = "schema",
-           description = "Override the Snowflake schema to connect with."
-   )
-   String schema = extension.schema
+    /**
+     * The Snowflake database to connect to. Overrides {@link SnowflakeExtension#database}.
+     */
+    @Optional
+    @Input
+    @Option(option = "database",
+            description = "Override the Snowflake database to connect to."
+    )
+    String database = extension.database
 
-   /**
-    * The Snowflake role to connect with. Overrides {@link SnowflakeExtension#warehouse}.
-    */
-   @Input
-   @Option(option = "warehouse",
-           description = "Override the Snowflake role to connect with."
-   )
-   String warehouse = extension.warehouse
+    /**
+     * The Snowflake schema to connect with. Overrides {@link SnowflakeExtension#schema}.
+     */
+    @Input
+    @Option(option = "schema",
+            description = "Override the Snowflake schema to connect with."
+    )
+    String schema = extension.schema
 
-   /**
-    * The Snowflake warehouse to connect with. Overrides {@link SnowflakeExtension#role}.
-    */
-   @Input
-   @Option(option = "role",
-           description = "The Snowflake role to use."
-   )
-   String role = extension.role
+    /**
+     * The Snowflake role to connect with. Overrides {@link SnowflakeExtension#warehouse}.
+     */
+    @Input
+    @Option(option = "warehouse",
+            description = "Override the Snowflake role to connect with."
+    )
+    String warehouse = extension.warehouse
 
-   /**
-    * The Snowflake stage to upload to. Overrides {@link SnowflakeExtension#stage}.
-    */
-   @Optional
-   @Input
-   @Option(option = "stage",
-           description = "The Snowflake external stage to publish to."
-   )
-   String stage = extension.stage
+    /**
+     * The Snowflake warehouse to connect with. Overrides {@link SnowflakeExtension#role}.
+     */
+    @Input
+    @Option(option = "role",
+            description = "The Snowflake role to use."
+    )
+    String role = extension.role
 
-   /**
-    * Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.
-    */
-   @Optional
-   @Input
-   @Option(option = "jar", description = "Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.")
-   String jar = project.tasks.shadowJar.archiveFile.get()
+    /**
+     * The Snowflake stage to upload to. Overrides {@link SnowflakeExtension#stage}.
+     */
+    @Optional
+    @Input
+    @Option(option = "stage",
+            description = "The Snowflake external stage to publish to."
+    )
+    String stage = extension.stage
 
-   /**
-    * Create a Snowflake session.
-    *
-    * @return a Snowflake session.
-    */
-   @Internal
-   Session getSession() {
-      Map props = [
-              url      : account,
-              user     : user,
-              password : password,
-              role     : role,
-              warehouse: warehouse,
-              db       : database,
-              schema   : schema
-      ]
-      Map printable = props.clone()
-      printable.password = "*********"
-      log.info "Snowflake config: $printable"
+    /**
+     * Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.
+     */
+    @Optional
+    @Input
+    @Option(option = "jar", description = "Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.")
+    String jar = project.tasks.shadowJar.archiveFile.get()
 
-      Session session
-      // get a Snowflake session
-      try {
-         session = Session.builder().configs(props).create()
-      } catch (NullPointerException npe) {
-         throw new Exception("Snowflake connection details are missing.", npe)
-      } catch (SnowparkClientException sce) {
-         throw new Exception("Snowflake connection details are incorrect.", sce)
-      }
-      return session
-   }
+    /**
+     * Create a Snowflake object
+     *
+     * @return Snowflake object
+     */
+    @Internal
+    Snowflake snowflake = new Snowflake([
+            url      : account,
+            user     : user,
+            password : password,
+            role     : role,
+            warehouse: warehouse,
+            db       : database,
+            schema   : schema
+    ])
 
-   /**
-    * A simple text output file for the Snowflake applications create statements. Mainly for making the class Cacheable.
-    */
-   @OutputFile
-   File output = project.file("${project.buildDir}/${PLUGIN}/output.txt")
+//    /**
+//     * Create a Snowflake session.
+//     *
+//     * @return a Snowflake session.
+//     */
+//    @Internal
+//    Session getSession() {
+//        Map props = [
+//                url      : account,
+//                user     : user,
+//                password : password,
+//                role     : role,
+//                warehouse: warehouse,
+//                db       : database,
+//                schema   : schema
+//        ]
+//        Map printable = props.clone()
+//        printable.password = "*********"
+//        log.info "Snowflake config: $printable"
+//
+//        Session session
+//        // get a Snowflake session
+//        try {
+//            session = Session.builder().configs(props).create()
+//        } catch (NullPointerException npe) {
+//            throw new Exception("Snowflake connection details are missing.", npe)
+//        }
+//        return session
+//    }
 
-   /**
-    * Get the 'import' property for the UDF.
-    *
-    * @return the 'import' property.
-    */
-   String getImports(Session session) {
+    /**
+     * A simple text output file for the Snowflake applications create statements. Mainly for making the class Cacheable.
+     */
+    @OutputFile
+    File output = project.file("${project.buildDir}/${PLUGIN}/output.txt")
 
-      String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
-      //log.warn "basePath: $basePath"
-      Statement statement = session.jdbcConnection().createStatement()
-      String sql = "LIST $basePath pattern='(.)*(-all)\\.jar'; select * from table(result_scan(last_query_id())) order by 'last_modified' asc;"
-      statement.unwrap(SnowflakeStatement.class).setParameter(
-              "MULTI_STATEMENT_COUNT", 2)
-      ResultSet rs = statement.executeQuery(sql)
-      String fileName
-      String filePath
-      try {
-         while (rs.next()) {
-            filePath = rs.getString(1)
-         }
-         fileName = filePath.replaceAll(/(.*)($project.version)(\/)(.*)/) { all, first, version, slash, filename ->
-            filename
-         }
-      } catch (Exception e) {
-         throw new Exception("Unable to detect the correct JAR in stage '${stage}'.")
-      }
-      rs.close()
-      statement.close()
-      "'$basePath/$fileName'"
-   }
+    /**
+     * Get the 'import' property for the UDF.
+     *
+     * @return the 'import' property.
+     */
+    @Internal
+    String getImports() {
 
-   /**
-    * The Gradle TaskAction method. Publish the Snowflake Application.
-    */
-   @TaskAction
-   def publish() {
-      // keep the session
-      Session session = this.session
-      String jar = project.tasks.shadowJar.archiveFile.get()
+        String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
+        //log.warn "basePath: $basePath"
+        Statement statement = snowflake.session.jdbcConnection().createStatement()
+        String sql = "LIST $basePath pattern='(.)*(-all)\\.jar'; select * from table(result_scan(last_query_id())) order by 'last_modified' asc;"
+        statement.unwrap(SnowflakeStatement.class).setParameter(
+                "MULTI_STATEMENT_COUNT", 2)
+        ResultSet rs = statement.executeQuery(sql)
+        String fileName
+        String filePath
+        try {
+            while (rs.next()) {
+                filePath = rs.getString(1)
+            }
+            fileName = filePath.replaceAll(/(.*)($project.version)(\/)(.*)/) { all, first, version, slash, filename ->
+                filename
+            }
+        } catch (Exception e) {
+            throw new Exception("Unable to detect the correct JAR in stage '${stage}'.")
+        }
+        rs.close()
+        statement.close()
+        "'$basePath/$fileName'"
+    }
 
-      if (!extension.publishUrl) {
-         def options = [
-                 AUTO_COMPRESS: 'false',
-                 PARALLEL     : '4'
-         ]
-         PutResult[] pr = session.file().put(jar, "$stage/libs", options)
-         pr.each {
-            log.warn "File ${it.sourceFileName}: ${it.status}"
-         }
-      } else {
-         // ensure that the stage and the publishUrl are aligned
-         Statement statement = session.jdbcConnection().createStatement()
-         String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
-         ResultSet rs = statement.executeQuery(sql)
-         String selectStage
-         if (rs.next()) {
-            selectStage = rs.getString(1)
-         }
-         // ensure we are matching our stage with our url
-         assert selectStage == extension.publishUrl
-      }
+    /**
+     * The Gradle TaskAction method. Publish the Snowflake Application.
+     */
+    @TaskAction
+    def publish() {
+        // keep the session
+        //Session session = this.session
+        String jar = project.tasks.shadowJar.archiveFile.get()
 
-      // automatically create application spec objects
-      output.write("Snowflake Application:\n\n")
-      project."$PLUGIN".applications.each { ApplicationContainer app ->
-         File jarFile = project.file(jar)
-         String createText = app.getCreate(extension.publishUrl ? getImports(session) : "'@$stage/libs/${jarFile.name}'")
-         String message = "Deploying ==> \n$createText"
-         log.warn message
-         output.append("$message\n")
-         session.jdbcConnection().createStatement().execute(createText)
-      }
-      session.close()
-   }
+        if (!extension.publishUrl) {
+            def options = [
+                    AUTO_COMPRESS: 'false',
+                    PARALLEL     : '4'
+            ]
+            PutResult[] pr = snowflake.session.file().put(jar, "$stage/libs", options)
+            pr.each {
+                log.warn "File ${it.sourceFileName}: ${it.status}"
+            }
+        } else {
+            // ensure that the stage and the publishUrl are aligned
+            assert snowflake.assertStage(stage, schema, extension.publishUrl.toString())
+//            Statement statement = snowflake.session.jdbcConnection().createStatement()
+//            String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
+//            ResultSet rs = statement.executeQuery(sql)
+//            String selectStage
+//            if (rs.next()) {
+//                selectStage = rs.getString(1)
+//            }
+//            // ensure we are matching our stage with our url
+//            assert selectStage == extension.publishUrl
+        }
+
+        // automatically create application spec objects
+        output.write("Snowflake Application:\n\n")
+        project."$PLUGIN".applications.each { ApplicationContainer app ->
+            File jarFile = project.file(jar)
+            String createText = app.getCreate(extension.publishUrl ? getImports() : "'@$stage/libs/${jarFile.name}'")
+            String message = "Deploying ==> \n$createText"
+            log.warn message
+            output.append("$message\n")
+            snowflake.session.jdbcConnection().createStatement().execute(createText)
+        }
+        snowflake.session.close()
+    }
 }

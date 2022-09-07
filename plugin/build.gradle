@@ -1,51 +1,59 @@
 plugins {
-   id 'java-gradle-plugin'
-   id 'groovy'
-   id 'maven-publish'
-   id 'com.adarshr.test-logger' version '3.2.0'
-   id "com.redpillanalytics.gradle-properties" version "1.0.7"
-   id 'com.fuseanalytics.gradle.s3' version '1.2.0'
+    id 'java-gradle-plugin'
+    id 'groovy'
+    id 'maven-publish'
+    id 'com.adarshr.test-logger' version '3.2.0'
+    id "com.redpillanalytics.gradle-properties" version "1.0.7"
+    id 'com.fuseanalytics.gradle.s3' version '1.2.0'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
 }
 
 dependencies {
-   implementation 'org.codehaus.groovy:groovy:3.0.12'
-   implementation 'org.slf4j:slf4j-simple:1.7.36'
-   implementation 'com.snowflake:snowpark:1.5.0'
-   implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
-   implementation 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
+    implementation 'org.codehaus.groovy:groovy:3.0.12'
+    implementation 'org.slf4j:slf4j-simple:2.0.0'
+    implementation 'com.snowflake:snowpark:1.6.0'
+    implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
+    implementation 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
 }
 
 testing {
-   suites {
-      // Configure the built-in test suite
-      test {
-         // Use Spock test framework
-         useSpock('2.1-groovy-3.0')
-      }
+    suites {
+        // Configure the built-in test suite
+        test {
+            // Use Spock test framework
+            useSpock('2.1-groovy-3.0')
+        }
 
-      // Create a new test suite
-      functionalTest(JvmTestSuite) {
-         // Use Spock test framework
-         useSpock('2.1-groovy-3.0')
+        // Create a new test suite
+        functionalTest(JvmTestSuite) {
+            // Use Spock test framework
+            useSpock('2.1-groovy-3.0')
 
-         dependencies {
-            // functionalTest test suite depends on the production code in tests
-            implementation project
-         }
-
-         targets {
-            all {
-               // This test suite should run after the built-in test suite has run its tests
-               testTask.configure {
-                  shouldRunAfter(test)
-                  systemProperties project.properties.findAll { it.key.startsWith "snowflake."}
-                  failFast true
-                  testLogging.showStandardStreams true
-               }
+            dependencies {
+                // functionalTest test suite depends on the production code in tests
+                implementation project
             }
-         }
-      }
-   }
+
+            targets {
+                all {
+                    // This test suite should run after the built-in test suite has run its tests
+                    testTask.configure {
+                        shouldRunAfter(test)
+                        systemProperties project.properties.findAll { it.key.startsWith "snowflake." }
+                        systemProperty 'internalStage', findProperty('internalStage')
+                        systemProperty 'externalStage', findProperty('externalStage')
+                        failFast true
+                        testLogging.showStandardStreams true
+                    }
+                }
+            }
+        }
+    }
 }
 
 //pluginBundle {
@@ -55,50 +63,50 @@ testing {
 //}
 
 gradlePlugin {
-   // Define the plugin
-   plugins {
-      snowflake {
-         id = 'io.noumenal.gradle.snowflake'
-         implementationClass = 'io.noumenal.SnowflakePlugin'
-      }
-   }
+    // Define the plugin
+    plugins {
+        snowflake {
+            id = 'io.noumenal.gradle.snowflake'
+            implementationClass = 'io.noumenal.SnowflakePlugin'
+        }
+    }
 }
 
 gradlePlugin.testSourceSets(sourceSets.functionalTest)
 build.dependsOn validatePlugins
 
 publishing {
-   repositories {
-      maven {
-         name 's3'
-         url 's3://nio-maven'
-         authentication {
-            awsIm(AwsImAuthentication)
-         }
-      }
-   }
+    repositories {
+        maven {
+            name 's3'
+            url 's3://nio-maven'
+            authentication {
+                awsIm(AwsImAuthentication)
+            }
+        }
+    }
 }
 
 s3 {
-   bucket = 'docs.noumenal.io'
-   region = 'us-east-1'
+    bucket = 'docs.noumenal.io'
+    region = 'us-east-1'
 }
 
 tasks.register("publishLatestDocs", com.fuseanalytics.gradle.s3.S3Upload) {
-   description = "Publish the latest docs to S3."
-   keyPrefix = "${rootProject.name}/latest"
-   sourceDir = tasks.groovydoc.destinationDir
-   dependsOn groovydoc
+    description = "Publish the latest docs to S3."
+    keyPrefix = "${rootProject.name}/latest"
+    sourceDir = tasks.groovydoc.destinationDir
+    dependsOn groovydoc
 }
 
 tasks.register("publishVersionDocs", com.fuseanalytics.gradle.s3.S3Upload) {
-   description = "Publish the version docs to S3."
-   keyPrefix = "${rootProject.name}/$version"
-   sourceDir = tasks.groovydoc.destinationDir
-   dependsOn groovydoc
+    description = "Publish the version docs to S3."
+    keyPrefix = "${rootProject.name}/$version"
+    sourceDir = tasks.groovydoc.destinationDir
+    dependsOn groovydoc
 }
 
 tasks.register("publishDocs") {
-   dependsOn tasks.publishLatestDocs, tasks.publishVersionDocs
-   mustRunAfter tasks.publish
+    dependsOn tasks.publishLatestDocs, tasks.publishVersionDocs
+    mustRunAfter tasks.publish
 }
