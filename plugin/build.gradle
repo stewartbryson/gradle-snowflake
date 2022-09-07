@@ -1,7 +1,6 @@
 plugins {
-    id 'java-gradle-plugin'
+    id 'com.gradle.plugin-publish' version '1.0.0'
     id 'groovy'
-    id 'maven-publish'
     id 'com.adarshr.test-logger' version '3.2.0'
     id "com.redpillanalytics.gradle-properties" version "1.0.7"
     id 'com.fuseanalytics.gradle.s3' version '1.2.0'
@@ -56,11 +55,12 @@ testing {
     }
 }
 
-//pluginBundle {
-//   website = 'http://noumenal.io/'
-//   vcsUrl = 'https://github.com/noumenalio/gradle-snowflake'
-//   tags = ['snowflake', 'snowpark', 'dataops']
-//}
+pluginBundle {
+    description = 'Simplifies publishing UDFs to Snowflake. Supports internal stages using Snowpark, or external stages with maven-publish.'
+    website = 'http://noumenal.io/'
+    vcsUrl = 'https://github.com/noumenalio/gradle-snowflake'
+    tags = ['snowflake', 'snowpark', 'dataops', 'udf']
+}
 
 gradlePlugin {
     // Define the plugin
