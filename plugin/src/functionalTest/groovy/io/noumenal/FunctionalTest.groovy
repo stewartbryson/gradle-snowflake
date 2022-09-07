@@ -4,7 +4,6 @@
 package io.noumenal
 
 import groovy.util.logging.Slf4j
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.TempDir

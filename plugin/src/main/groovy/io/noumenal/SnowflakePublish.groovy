@@ -131,50 +131,34 @@ abstract class SnowflakePublish extends DefaultTask {
     String jar = project.tasks.shadowJar.archiveFile.get()
 
     /**
-     * Create a Snowflake object
+     * Create a Snowflake session.
      *
-     * @return Snowflake object
+     * @return a Snowflake session.
      */
     @Internal
-    Snowflake snowflake = new Snowflake([
-            url      : account,
-            user     : user,
-            password : password,
-            role     : role,
-            warehouse: warehouse,
-            db       : database,
-            schema   : schema
-    ])
+    Session getSession() {
+        Map props = [
+                url      : account,
+                user     : user,
+                password : password,
+                role     : role,
+                warehouse: warehouse,
+                db       : database,
+                schema   : schema
+        ]
+        Map printable = props.clone()
+        printable.password = "*********"
+        log.info "Snowflake config: $printable"
 
-//    /**
-//     * Create a Snowflake session.
-//     *
-//     * @return a Snowflake session.
-//     */
-//    @Internal
-//    Session getSession() {
-//        Map props = [
-//                url      : account,
-//                user     : user,
-//                password : password,
-//                role     : role,
-//                warehouse: warehouse,
-//                db       : database,
-//                schema   : schema
-//        ]
-//        Map printable = props.clone()
-//        printable.password = "*********"
-//        log.info "Snowflake config: $printable"
-//
-//        Session session
-//        // get a Snowflake session
-//        try {
-//            session = Session.builder().configs(props).create()
-//        } catch (NullPointerException npe) {
-//            throw new Exception("Snowflake connection details are missing.", npe)
-//        }
-//        return session
-//    }
+        Session session
+        // get a Snowflake session
+        try {
+            session = Session.builder().configs(props).create()
+        } catch (NullPointerException npe) {
+            throw new Exception("Snowflake connection details are missing.", npe)
+        }
+        return session
+    }
 
     /**
      * A simple text output file for the Snowflake applications create statements. Mainly for making the class Cacheable.
@@ -192,7 +176,7 @@ abstract class SnowflakePublish extends DefaultTask {
 
         String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
         //log.warn "basePath: $basePath"
-        Statement statement = snowflake.session.jdbcConnection().createStatement()
+        Statement statement = session.jdbcConnection().createStatement()
         String sql = "LIST $basePath pattern='(.)*(-all)\\.jar'; select * from table(result_scan(last_query_id())) order by 'last_modified' asc;"
         statement.unwrap(SnowflakeStatement.class).setParameter(
                 "MULTI_STATEMENT_COUNT", 2)
@@ -228,22 +212,24 @@ abstract class SnowflakePublish extends DefaultTask {
                     AUTO_COMPRESS: 'false',
                     PARALLEL     : '4'
             ]
-            PutResult[] pr = snowflake.session.file().put(jar, "$stage/libs", options)
+            PutResult[] pr = session.file().put(jar, "$stage/libs", options)
             pr.each {
                 log.warn "File ${it.sourceFileName}: ${it.status}"
             }
         } else {
             // ensure that the stage and the publishUrl are aligned
-            assert snowflake.assertStage(stage, schema, extension.publishUrl.toString())
-//            Statement statement = snowflake.session.jdbcConnection().createStatement()
-//            String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
-//            ResultSet rs = statement.executeQuery(sql)
-//            String selectStage
-//            if (rs.next()) {
-//                selectStage = rs.getString(1)
-//            }
-//            // ensure we are matching our stage with our url
-//            assert selectStage == extension.publishUrl
+            //assert snowflake.assertStage(stage, schema, extension.publishUrl.toString())
+            Statement statement = session.jdbcConnection().createStatement()
+            String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
+            ResultSet rs = statement.executeQuery(sql)
+            String selectStage
+            if (rs.next()) {
+                selectStage = rs.getString(1)
+            }
+            // ensure we are matching our stage with our url
+            rs.close()
+            statement.close()
+            assert selectStage == extension.publishUrl
         }
 
         // automatically create application spec objects
@@ -254,8 +240,8 @@ abstract class SnowflakePublish extends DefaultTask {
             String message = "Deploying ==> \n$createText"
             log.warn message
             output.append("$message\n")
-            snowflake.session.jdbcConnection().createStatement().execute(createText)
+            session.jdbcConnection().createStatement().execute(createText)
         }
-        snowflake.session.close()
+        session.close()
     }
 }
