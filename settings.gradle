@@ -13,8 +13,8 @@ buildCache {
       enabled = false
    }
    remote(com.github.burrunan.s3cache.AwsS3BuildCache) {
-      region = 'us-east-1'
-      bucket = 'nio-gradle-cache'
+      region = 'us-west-2'
+      bucket = 'coalesce.gradle.cache'
       prefix = "${rootProject.name}/"
       push = isCiServer
       lookupDefaultAwsCredentials = true
