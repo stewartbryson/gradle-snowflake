@@ -4,7 +4,7 @@ Using [Apache Gradle](www.gradle.org), we can easily build shaded JAR files with
 
 ```
 cd examples/simple-jar
-./gradlew shadowJar
+./gradlew build
 ```
 
 But this JAR would still have to be uploaded to a stage in Snowflake, and the UDF would have to be created or possibly recreated if it's signature changed.
@@ -34,7 +34,51 @@ plugins {
 }
 ```
 
-The plugin provides a configuration closure called `snowflake` that we can now use.
+When the plugin is added, we now get a new task in our Gradle project:
+
+```
+❯ ./gradlew help --task snowflakePublish
+
+> Task :help
+Detailed task information for snowflakePublish
+
+Path
+     :snowflakePublish
+
+Type
+     SnowflakePublish (io.noumenal.SnowflakePublish)
+
+Options
+     --account     Override the URL of the Snowflake account.
+
+     --database     Override the Snowflake database to connect to.
+
+     --jar     Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.
+
+     --password     Override the Snowflake password to connect with.
+
+     --role     The Snowflake role to use.
+
+     --schema     Override the Snowflake schema to connect with.
+
+     --stage     The Snowflake external stage to publish to.
+
+     --user     Override the Snowflake user to connect as.
+
+     --warehouse     Override the Snowflake role to connect with.
+
+Description
+     Publish a Java artifact to an external stage and create Snowflake Functions and Procedures.
+
+Group
+     publishing
+
+BUILD SUCCESSFUL in 597ms
+1 actionable task: 1 executed
+```
+
+There are a number of command-line options that mention *overriding* other configuration values.
+This is because the plugin also provides a configuration closure called `snowflake` that we can now use to set all these values in our build file.
 The specific options for this closure are documented in the [API docs](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/SnowflakeExtension.html):
 
 ```
@@ -57,16 +101,135 @@ snowflake {
 }
 ```
 
-The first thing you'll notice is that I'm not hard-coding the sensitive credentials.
-Instead, they are in my local `gradle.properties` file, and it's worth mentioning that any of the plugin configs can be provided this way, or any [number of ways](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) using Gradle project properties:
+Notice that I'm not hard-coding sensitive credentials.
+Instead, they are in my local `gradle.properties` file, and any of the plugin configs can be provided this way, or any [number of ways](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) using Gradle project properties:
 
 ```
-snowflake.url = https://my-org.snowflakecomputing.com:443
+snowflake.url = https://myorg.snowflakecomputing.com:443
 snowflake.user = myusername
+snowflake.password = mypassword
 ```
 
 The nested `applications` closure might seem a bit more daunting.
-This is simply a way to configure using DSL all the different UDFs we want to automatically create (or recreate) each time we publish the JAR file.
+This is a simple way to use DSL to configure all the different UDFs we want to automatically create (or recreate) each time we publish the JAR file.
 This example will generate the command:
 
 ```
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA
+  handler = 'Sample.addNum'
+  imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
+```
+
+With our configuration complete, we can execute the `snowflakePublish` command, which will run any unit tests and then publish our JAR and create our function:
+
+```
+❯ ./gradlew snowflakePublish --rerun-tasks
+
+> Task :snowflakePublish
+File internal-stage-0.1.0-all.jar: UPLOADED
+Deploying ==> 
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA
+  handler = 'Sample.addNum'
+  imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
+
+
+BUILD SUCCESSFUL in 10s
+3 actionable tasks: 3 executed
+```
+
+Our function now exists in Snowflake:
+
+```
+select add_numbers(1,2);
+```
+
+The `snowflakePublish` task was also written to be [incremental](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks) and [*cacheable*](https://docs.gradle.org/current/userguide/build_cache.html#sec:task_output_caching_details).
+If I run the task again without making any changes to my code, then the execution is avoided, which we know because of the *up-to-date* keyworld.
+
+```
+❯ ./gradlew snowflakePublish              
+
+BUILD SUCCESSFUL in 624ms
+3 actionable tasks: 3 up-to-date
+```
+
+# Auto-configuration of `maven-plugin` with External Stages
+This option is useful when you want to make your artifacts availablle to more consumers than just Snowflake and you aren't interested in publishing them to a bunch of disparate locations.
+Gradle has [built-in support](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:s3-repositories) for S3 as a Maven repository, and Snowflake has support for S3 external stages.
+If you look at the [sample project](examples/external-stage-auto/), you will notice we've populated a few additional properties:
+
+```
+groupId = 'io.noumenal'
+artifactId = 'sample-udfs'
+```
+
+These, plus the built-in `version` property that exists for all Gradle builds, provide the [Maven coordinates](https://maven.apache.org/pom.html#Maven_Coordinates) for publishing externally to S3.
+I've also created a property in my local `gradle.properties` file for the bucket:
+
+```
+snowflake.publishUrl = 's3://myrepo/release'
+```
+
+The plugin doesn't create the stage, but it does do a check to ensure that the Snowflake stage metadata matches the value in `publishUrl`. We get a few new tasks added to our project:
+
+```
+❯ gradle tasks --group publishing
+
+> Task :tasks
+
+------------------------------------------------------------
+Tasks runnable from root project 'external-stage-auto'
+------------------------------------------------------------
+
+Publishing tasks
+----------------
+generateMetadataFileForSnowflakePublication - Generates the Gradle metadata file for publication 'snowflake'.
+generatePomFileForSnowflakePublication - Generates the Maven POM file for publication 'snowflake'.
+publish - Publishes all publications produced by this project.
+publishAllPublicationsToMavenRepository - Publishes all Maven publications produced by this project to the maven repository.
+publishSnowflakePublicationToMavenLocal - Publishes Maven publication 'snowflake' to the local Maven repository.
+publishSnowflakePublicationToMavenRepository - Publishes Maven publication 'snowflake' to Maven repository 'maven'.
+publishToMavenLocal - Publishes all Maven publications produced by this project to the local Maven cache.
+snowflakePublish - Publish a Java artifact to an external stage and create Snowflake Functions and Procedures.
+
+To see all tasks and more detail, run gradle tasks --all
+
+To see more detail about a task, run gradle help --task <task>
+
+BUILD SUCCESSFUL in 600ms
+1 actionable task: 1 executed
+```
+
+These are a bunch of granular tasks for building metadata and POM files, and publishing that along with the artifacts to S3.
+But the `snowflakePublish` task manages initating all these dependent tasks, including `publishSnowflakePublicationToMavenRepository` which actually uploads the artifact:
+
+```
+❯ gradle snowflakePublish --console=plain
+> Task :compileJava
+> Task :processResources NO-SOURCE
+> Task :classes
+> Task :shadowJar
+> Task :compileTestJava NO-SOURCE
+> Task :processTestResources NO-SOURCE
+> Task :testClasses UP-TO-DATE
+> Task :test NO-SOURCE
+> Task :generatePomFileForSnowflakePublication
+> Task :publishSnowflakePublicationToMavenRepository
+
+> Task :snowflakePublish
+Deploying ==> 
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA
+  handler = 'Sample.addNum'
+  imports = ('@maven/io/noumenal/sample-udfs/0.1.0/sample-udfs-0.1.0-all.jar')
+
+
+BUILD SUCCESSFUL in 12s
+5 actionable tasks: 5 executed
+```
+
