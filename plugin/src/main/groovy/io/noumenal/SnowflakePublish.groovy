@@ -209,8 +209,9 @@ abstract class SnowflakePublish extends DefaultTask {
 
         if (!extension.publishUrl) {
             def options = [
-                    AUTO_COMPRESS: 'false',
-                    PARALLEL     : '4'
+                    AUTO_COMPRESS: 'FALSE',
+                    PARALLEL     : '4',
+                    OVERWRITE: 'TRUE'
             ]
             PutResult[] pr = session.file().put(jar, "$stage/libs", options)
             pr.each {

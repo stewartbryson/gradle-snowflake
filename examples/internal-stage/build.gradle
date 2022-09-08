@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'com.github.ben-manes.versions' version '0.42.0'
+    id 'io.noumenal.gradle.snowflake' version '0.1.11'
 }
 
 repositories {
@@ -14,6 +16,24 @@ dependencies {
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+snowflake {
+    // All the following options are provided in my local gradle.properties file
+    // url = <snowflake account url>
+    // user = <snowflake user>
+    // password = <snowflake password>
+    role = 'stewart_role'
+    database = 'stewart_db'
+    schema = 'developer'
+    stage = 'upload'
+    applications {
+        add_numbers {
+            inputs = ["a integer", "b integer"]
+            returns = "string"
+            handler = "Sample.addNum"
+        }
     }
 }
 

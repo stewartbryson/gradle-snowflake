@@ -1,16 +1,16 @@
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.LogManager;
+// import org.apache.logging.log4j.Logger;
 
-public class AddNumbers {
+public class Sample {
 
-  private static final Logger logger = LogManager.getLogger();
+  //private static final Logger logger = LogManager.getLogger();
 
   public String addNum(int num1, int num2) {
     try {
       int sum = num1 + num2;
       return ("Sum is: " + sum);
     } catch (Exception e) {
-      logger.warn("Error: " + e.toString());
+      //logger.warn("Error: " + e.toString());
       return null;
     }
   }

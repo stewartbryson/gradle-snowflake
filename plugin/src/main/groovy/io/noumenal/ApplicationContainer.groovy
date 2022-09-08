@@ -36,24 +36,6 @@ class ApplicationContainer {
    String handler
 
    /**
-    * A getter for the objectType of the UDF.
-    *
-    * @return The objectType
-    */
-   String getObjectType() {
-      returns ? 'function' : 'procedure'
-   }
-
-   /**
-    * A getter for whether the UDF is a function.
-    *
-    * @return Is the UDF a function?
-    */
-   Boolean isFunction() {
-      objectType == 'function'
-   }
-
-   /**
     * A getter for the create statement for the UDF. The imports are passed in as the only property.
     *
     * @return The complete UDF create statement.
