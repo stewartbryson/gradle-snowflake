@@ -207,19 +207,18 @@ abstract class SnowflakePublish extends DefaultTask {
         //Session session = this.session
         String jar = project.tasks.shadowJar.archiveFile.get()
 
-        if (!extension.publishUrl) {
+        if (!extension.publishUrl && !extension.useCustomMaven) {
             def options = [
                     AUTO_COMPRESS: 'FALSE',
                     PARALLEL     : '4',
-                    OVERWRITE: 'TRUE'
+                    OVERWRITE    : 'TRUE'
             ]
             PutResult[] pr = session.file().put(jar, "$stage/libs", options)
             pr.each {
                 log.warn "File ${it.sourceFileName}: ${it.status}"
             }
-        } else {
+        } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned
-            //assert snowflake.assertStage(stage, schema, extension.publishUrl.toString())
             Statement statement = session.jdbcConnection().createStatement()
             String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
             ResultSet rs = statement.executeQuery(sql)
