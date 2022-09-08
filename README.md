@@ -160,7 +160,7 @@ BUILD SUCCESSFUL in 624ms
 # Auto-configuration of `maven-plugin` with External Stages
 This option is useful when you want to make your artifacts availablle to more consumers than just Snowflake and you aren't interested in publishing them to a bunch of disparate locations.
 Gradle has [built-in support](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:s3-repositories) for S3 as a Maven repository, and Snowflake has support for S3 external stages.
-If you look at the [sample project](examples/external-stage-auto/), you will notice we've populated a few additional properties:
+If you look at the [sample project](examples/external-stage/), you will notice we've populated a few additional properties:
 
 ```
 groupId = 'io.noumenal'
@@ -182,7 +182,7 @@ The plugin doesn't create the stage, but it does do a check to ensure that the S
 > Task :tasks
 
 ------------------------------------------------------------
-Tasks runnable from root project 'external-stage-auto'
+Tasks runnable from root project 'external-stage'
 ------------------------------------------------------------
 
 Publishing tasks
@@ -233,3 +233,7 @@ BUILD SUCCESSFUL in 12s
 5 actionable tasks: 5 executed
 ```
 
+ # Manual configuration of `maven-plugin` with External Stages
+This use case is for organizations that already use the `maven-publish` plugin extensively, and prefer to do all the manual configuration required to use it, or have customizations that are outside the scope of auto-configuration.
+In this case, we have to configure `publications` and `repositories` as described in the [`maven-publish` documentation](https://docs.gradle.org/current/userguide/publishing_maven.html), and add [task dependencies](https://docs.gradle.org/current/userguide/publishing_maven.html) for the `snowflakePublish` task.
+We no longer have to provide a `publishUrl` to the plugin because we are configuring that location ourselves now, but we still have to provide `artifactId` and `groupId` so that `snowflakePublish` can correctly autogenerate the `imports` portion of the `CREATE OR REPLACE` command.
