@@ -34,6 +34,9 @@ class SnowflakePlugin implements Plugin<Project> {
          // create maven publishing
          if (!extension.useCustomMaven && extension.publishUrl) {
 
+            // assert that we have artifact and group
+            assert (extension.artifactId && extension.groupId)
+
             // apply the maven-publish plugin for the user
             project.apply plugin: 'maven-publish'
 
