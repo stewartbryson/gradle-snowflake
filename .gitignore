@@ -1,6 +1,7 @@
 Thumbs.db
 .DS_Store
 .gradle
+.metals
 
 # Ignore Gradle GUI config
 gradle-app.setting
