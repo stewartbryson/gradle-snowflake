@@ -1,5 +1,5 @@
 # Motivation
-It needs to be easy to develop, test and deploy Java and Scala applications, even if they are being deployed to Snowflake using Snowpark and UDFs.
+It needs to be easy to develop and test Java applications even if they are being deployed to Snowflake using Snowpark and UDFs.
 Using [Apache Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
 
 ```
@@ -7,12 +7,11 @@ cd examples/simple-jar
 ./gradlew build
 ```
 
-But this JAR would still have to be uploaded to a stage in Snowflake, and the UDF would have to be created or possibly recreated if it's signature changed.
-
-I wanted an easy test and deploy framework that was as natural to developers in IntelliJ as any other deployment target.
+But this JAR would still have to be uploaded to a stage in Snowflake, and the UDF would have to be created or possibly recreated if its signature changed.
+I wanted an experience as natural to developers in IntelliJ as any other deployment target.
 
 # The gradle-snowflake Plugin
-This plugin provides easy configuration options for those getting started using Gradle to build software, but also provides advanced features for teams already using Gradle in other areas of the organization.
+This plugin provides easy configuration options for those getting started with Gradle but also provides advanced features for teams already using Gradle in other areas of the organization.
 It has three basic modes:
 
 1. Lightweight publishing to internal Snowflake stages using Snowpark.
@@ -24,7 +23,7 @@ Have a look at the [API docs](https://s3.amazonaws.com/docs.noumenal.io/gradle-s
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
 Additionally, if you plan on *sharing* UDFs across Snowflake accounts, this is the option you *have* to use, as JARs need to be in named internal stages.
-Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We have applied the `io.noumenal.gradle.snowflake` plugin, and we are no longer applying the `com.github.johnrengelman.shadow` plugin. That's because this plugin automatically adds the `shadow` plugin:
+Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `io.noumenal.gradle.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake`:
 
 ```
 plugins {
@@ -34,7 +33,7 @@ plugins {
 }
 ```
 
-When the plugin is added, we now get a new task in our Gradle project:
+We now have the `snowflakePublish` task available:
 
 ```
 ❯ ./gradlew help --task snowflakePublish
@@ -77,9 +76,8 @@ BUILD SUCCESSFUL in 597ms
 1 actionable task: 1 executed
 ```
 
-There are a number of command-line options that mention *overriding* other configuration values.
-This is because the plugin also provides a configuration closure called `snowflake` that we can now use to set all these values in our build file.
-The specific options for this closure are documented in the [API docs](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/SnowflakeExtension.html):
+Several command-line options mention _overriding_ other configuration values.
+This is because the plugin also provides a configuration closure called `snowflake` that we can use to configure our build, all of which are documented in the [class API](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/SnowflakeExtension.html):
 
 ```
 snowflake {
@@ -102,17 +100,18 @@ snowflake {
 ```
 
 Notice that I'm not hard-coding sensitive credentials.
-Instead, they are in my local `gradle.properties` file, and any of the plugin configs can be provided this way, or any [number of ways](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) using Gradle project properties:
+Instead, they are in my local `gradle.properties` file, and any of the plugin configs can be provided this way or [other ways](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) using Gradle project properties:
 
 ```
+# local file in ~/.gradle/gradle.properties
 snowflake.url = https://myorg.snowflakecomputing.com:443
 snowflake.user = myusername
 snowflake.password = mypassword
 ```
 
-The nested `applications` closure might seem a bit more daunting.
+The nested [`applications` closure](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/ApplicationContainer.html) might seem a bit more daunting.
 This is a simple way to use DSL to configure all the different UDFs we want to automatically create (or recreate) each time we publish the JAR file.
-This example will generate the command:
+The example above will generate and execute the command:
 
 ```
 CREATE OR REPLACE function add_numbers (a integer, b integer)
@@ -122,7 +121,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
 ```
 
-With our configuration complete, we can execute the `snowflakePublish` command, which will run any unit tests and then publish our JAR and create our function:
+With our configuration complete, we can execute the `snowflakePublish` task, which will run any unit tests and then publish our JAR and create our function:
 
 ```
 ❯ ./gradlew snowflakePublish
@@ -147,8 +146,8 @@ Our function now exists in Snowflake:
 select add_numbers(1,2);
 ```
 
-The `snowflakePublish` task was also written to be [*incremental*](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks) and [*cacheable*](https://docs.gradle.org/current/userguide/build_cache.html#sec:task_output_caching_details).
-If I run the task again without making any changes to my code, then the execution is avoided, which we know because of the *up-to-date* keyworld.
+The `snowflakePublish` task was written to be [*incremental*](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks) and [*cacheable*](https://docs.gradle.org/current/userguide/build_cache.html#sec:task_output_caching_details).
+If we run the task again without making any changes to task inputs (our code) or outputs, then the execution is avoided, which we know because of the *up-to-date* keyword.
 
 ```
 ❯ ./gradlew snowflakePublish              
@@ -158,19 +157,20 @@ BUILD SUCCESSFUL in 624ms
 ```
 
 # Auto-configuration of `maven-plugin` with External Stages
-This option is useful when you want to make your artifacts availablle to more consumers than just Snowflake and you aren't interested in publishing them to a bunch of disparate locations.
+This option is useful when you want your artifacts available to consumers other than just Snowflake without publishing them to disparate locations.
 Gradle has [built-in support](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:s3-repositories) for S3 as a Maven repository, and Snowflake has support for S3 external stages.
-If you look at the [sample project](examples/external-stage/), you will notice we've populated a few additional properties:
+Looking at the [sample project](examples/external-stage/), notice we've populated a few additional properties:
 
 ```
 groupId = 'io.noumenal'
 artifactId = 'sample-udfs'
 ```
 
-These, plus the built-in `version` property that exists for all Gradle builds, provide the [Maven coordinates](https://maven.apache.org/pom.html#Maven_Coordinates) for publishing externally to S3.
+The `groupId` and `artifactId`, plus the built-in `version` property that exists for all Gradle builds, provide the [Maven coordinates](https://maven.apache.org/pom.html#Maven_Coordinates) for publishing externally to S3.
 I've also created a property in my local `gradle.properties` file for the bucket:
 
 ```
+# local file in ~/.gradle/gradle.properties
 snowflake.publishUrl = 's3://myrepo/release'
 ```
 
@@ -204,8 +204,8 @@ BUILD SUCCESSFUL in 600ms
 1 actionable task: 1 executed
 ```
 
-These are a bunch of granular tasks for building metadata and POM files, and publishing that along with the artifacts to S3.
-But the `snowflakePublish` task manages initating all these dependent tasks, including `publishSnowflakePublicationToMavenRepository` which actually uploads the artifact:
+These are granular tasks for building metadata and POM files and publishing that along with the artifacts to S3.
+But the `snowflakePublish` task initiates all these dependent tasks, including `publishSnowflakePublicationToMavenRepository` which uploads the artifact:
 
 ```
 ❯ gradle snowflakePublish --console=plain
@@ -234,6 +234,13 @@ BUILD SUCCESSFUL in 12s
 ```
 
  # Manual configuration of `maven-plugin` with External Stages
-This use case is for organizations that already use the `maven-publish` plugin extensively, and prefer to do all the manual configuration required to use it, or have customizations that are outside the scope of auto-configuration.
-In this case, we have to configure `publications` and `repositories` as described in the [`maven-publish` documentation](https://docs.gradle.org/current/userguide/publishing_maven.html), and add [task dependencies](https://docs.gradle.org/current/userguide/publishing_maven.html) for the `snowflakePublish` task.
-We no longer have to provide a `publishUrl` to the plugin because we are configuring that location ourselves now, but we still have to provide `artifactId` and `groupId` so that `snowflakePublish` can correctly autogenerate the `imports` portion of the `CREATE OR REPLACE` command.
+For organizations that already use `maven-publish` extensively, or have customizations outside the scope of auto-configuration, the plugin supports disabling auto-configuration:
+
+```
+useCustomMaven = true
+```
+
+
+We then configure `publications` and `repositories` as described in the [`maven-publish` documentation](https://docs.gradle.org/current/userguide/publishing_maven.html), and add [task dependencies](https://docs.gradle.org/current/userguide/publishing_maven.html) for the `snowflakePublish` task.
+The `publishUrl` property is no longer required because it's configured in the `publications` closure, but if provided, the plugin will ensure it matches the metadata for the `stage` property.
+`groupId` and `artifactId` are still required so that `snowflakePublish` can autogenerate the `imports` section of the `CREATE OR REPLACE...` statement.
