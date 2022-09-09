@@ -68,6 +68,7 @@ gradlePlugin {
     plugins {
         snowflake {
             id = 'io.noumenal.gradle.snowflake'
+            displayName = 'Snowflake Plugin'
             implementationClass = 'io.noumenal.SnowflakePlugin'
         }
     }
