@@ -23,7 +23,7 @@ Have a look at the [API docs](https://s3.amazonaws.com/docs.noumenal.io/gradle-s
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
 Additionally, if you plan on *sharing* UDFs across Snowflake accounts, this is the option you *have* to use, as JARs need to be in named internal stages.
-Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `io.noumenal.gradle.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake`:
+Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `io.noumenal.gradle.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake` plugin:
 
 ```
 plugins {
@@ -67,7 +67,7 @@ Options
      --warehouse     Override the Snowflake role to connect with.
 
 Description
-     Publish a Java artifact to an external stage and create Snowflake Functions and Procedures.
+     A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
 
 Group
      publishing
@@ -111,7 +111,7 @@ snowflake.password = mypassword
 
 The nested [`applications` closure](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/ApplicationContainer.html) might seem a bit more daunting.
 This is a simple way to use DSL to configure all the different UDFs we want to automatically create (or recreate) each time we publish the JAR file.
-The example above will generate and execute the command:
+The example above will generate and execute the statement:
 
 ```
 CREATE OR REPLACE function add_numbers (a integer, b integer)
@@ -194,7 +194,7 @@ publishAllPublicationsToMavenRepository - Publishes all Maven publications produ
 publishSnowflakePublicationToMavenLocal - Publishes Maven publication 'snowflake' to the local Maven repository.
 publishSnowflakePublicationToMavenRepository - Publishes Maven publication 'snowflake' to Maven repository 'maven'.
 publishToMavenLocal - Publishes all Maven publications produced by this project to the local Maven cache.
-snowflakePublish - Publish a Java artifact to an external stage and create Snowflake Functions and Procedures.
+snowflakePublish - A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
 
 To see all tasks and more detail, run gradle tasks --all
 
@@ -205,7 +205,7 @@ BUILD SUCCESSFUL in 600ms
 ```
 
 These are granular tasks for building metadata and POM files and publishing that along with the artifacts to S3.
-But the `snowflakePublish` task initiates all these dependent tasks, including `publishSnowflakePublicationToMavenRepository` which uploads the artifact:
+But the `snowflakePublish` task initiates all these dependent tasks, including `publishSnowflakePublicationToMavenRepository` which uploads the artifact but unfortunately doesn't provide console output to that effect:
 
 ```
 ❯ gradle snowflakePublish --console=plain

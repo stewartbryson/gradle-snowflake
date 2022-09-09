@@ -41,7 +41,7 @@ abstract class SnowflakePublish extends DefaultTask {
      * @return A custom task class.
      */
     SnowflakePublish() {
-        description = "Publish a Java artifact to an external stage and create Snowflake Functions and Procedures."
+        description = "A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake."
         group = "publishing"
     }
 
