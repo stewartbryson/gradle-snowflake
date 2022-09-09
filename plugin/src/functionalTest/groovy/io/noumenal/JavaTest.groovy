@@ -13,7 +13,7 @@ import org.gradle.testkit.runner.GradleRunner
  * A simple functional test for the 'io.noumenal.gradle.snowflake' plugin.
  */
 @Slf4j
-class FunctionalTest extends Specification {
+class JavaTest extends Specification {
     @Shared
     def result
 

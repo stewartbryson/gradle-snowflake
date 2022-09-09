@@ -15,6 +15,7 @@ allprojects {
          url "https://plugins.gradle.org/m2/"
       }
    }
+   project.version = scmVersion.version
 }
 
 scmVersion {
@@ -25,10 +26,6 @@ scmVersion {
    ignoreUncommittedChanges = true
    localOnly = true
    useHighestVersion = true
-}
-
-allprojects {
-   project.version = scmVersion.version
 }
 
 githubRelease {
