@@ -56,15 +56,15 @@ Options
 
      --password     Override the Snowflake password to connect with.
 
-     --role     The Snowflake role to use.
+     --role     Override the Snowflake role to connect with.
 
      --schema     Override the Snowflake schema to connect with.
 
-     --stage     The Snowflake external stage to publish to.
+     --stage     Override the Snowflake stage to publish to.
 
      --user     Override the Snowflake user to connect as.
 
-     --warehouse     Override the Snowflake role to connect with.
+     --warehouse     Override the Snowflake warehouse to use.
 
 Description
      A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.

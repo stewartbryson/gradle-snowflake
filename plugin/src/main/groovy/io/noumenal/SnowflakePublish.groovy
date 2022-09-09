@@ -95,30 +95,30 @@ abstract class SnowflakePublish extends DefaultTask {
     String schema = extension.schema
 
     /**
-     * The Snowflake role to connect with. Overrides {@link SnowflakeExtension#warehouse}.
+     * The Snowflake warehouse to use. Overrides {@link SnowflakeExtension#warehouse}.
      */
     @Input
     @Option(option = "warehouse",
-            description = "Override the Snowflake role to connect with."
+            description = "Override the Snowflake warehouse to use."
     )
     String warehouse = extension.warehouse
 
     /**
-     * The Snowflake warehouse to connect with. Overrides {@link SnowflakeExtension#role}.
+     * The Snowflake role to connect with. Overrides {@link SnowflakeExtension#role}.
      */
     @Input
     @Option(option = "role",
-            description = "The Snowflake role to use."
+            description = "Override the Snowflake role to connect with."
     )
     String role = extension.role
 
     /**
-     * The Snowflake stage to upload to. Overrides {@link SnowflakeExtension#stage}.
+     * The Snowflake stage to publish to. Overrides {@link SnowflakeExtension#stage}.
      */
     @Optional
     @Input
     @Option(option = "stage",
-            description = "The Snowflake external stage to publish to."
+            description = "Override the Snowflake stage to publish to."
     )
     String stage = extension.stage
 
