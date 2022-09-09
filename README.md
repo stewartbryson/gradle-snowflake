@@ -1,6 +1,6 @@
 # Motivation
 It needs to be easy to develop, test and deploy Java and Scala applications, even if they are being deployed to Snowflake using Snowpark and UDFs.
-Using [Apache Gradle](www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
+Using [Apache Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
 
 ```
 cd examples/simple-jar
@@ -24,7 +24,7 @@ Have a look at the [API docs](https://s3.amazonaws.com/docs.noumenal.io/gradle-s
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
 Additionally, if you plan on *sharing* UDFs across Snowflake accounts, this is the option you *have* to use, as JARs need to be in named internal stages.
-Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We have applied the `io.noumenal.gradle.snowflake` plugin, and we are no longer applying the `com.github.johnrengelman.shadow` plugin:
+Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We have applied the `io.noumenal.gradle.snowflake` plugin, and we are no longer applying the `com.github.johnrengelman.shadow` plugin. That's because this plugin automatically adds the `shadow` plugin:
 
 ```
 plugins {
@@ -95,7 +95,7 @@ snowflake {
         add_numbers {
             inputs = ["a integer", "b integer"]
             returns = "string"
-            handler = "AddNumbers.addNum"
+            handler = "Sample.addNum"
         }
     }
 }
@@ -125,7 +125,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
 With our configuration complete, we can execute the `snowflakePublish` command, which will run any unit tests and then publish our JAR and create our function:
 
 ```
-❯ ./gradlew snowflakePublish --rerun-tasks
+❯ ./gradlew snowflakePublish
 
 > Task :snowflakePublish
 File internal-stage-0.1.0-all.jar: UPLOADED
@@ -147,7 +147,7 @@ Our function now exists in Snowflake:
 select add_numbers(1,2);
 ```
 
-The `snowflakePublish` task was also written to be [incremental](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks) and [*cacheable*](https://docs.gradle.org/current/userguide/build_cache.html#sec:task_output_caching_details).
+The `snowflakePublish` task was also written to be [*incremental*](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks) and [*cacheable*](https://docs.gradle.org/current/userguide/build_cache.html#sec:task_output_caching_details).
 If I run the task again without making any changes to my code, then the execution is avoided, which we know because of the *up-to-date* keyworld.
 
 ```
