@@ -23,7 +23,7 @@ Have a look at the [API docs](https://s3.amazonaws.com/docs.noumenal.io/gradle-s
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
 Additionally, if you plan on *sharing* UDFs across Snowflake accounts, this is the option you *have* to use, as JARs need to be in named internal stages.
-Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `io.noumenal.gradle.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake`:
+Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `io.noumenal.gradle.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake` plugin:
 
 ```
 plugins {
@@ -67,7 +67,7 @@ Options
      --warehouse     Override the Snowflake role to connect with.
 
 Description
-     Publish a Java artifact to an external stage and create Snowflake Functions and Procedures.
+     A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
 
 Group
      publishing
