@@ -1,4 +1,4 @@
-package com.github.stewartbryson
+package io.github.stewartbryson
 
 import org.gradle.api.Project
 /**

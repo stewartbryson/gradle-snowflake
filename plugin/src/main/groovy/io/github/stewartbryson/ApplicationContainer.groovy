@@ -1,4 +1,4 @@
-package com.github.stewartbryson
+package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
 

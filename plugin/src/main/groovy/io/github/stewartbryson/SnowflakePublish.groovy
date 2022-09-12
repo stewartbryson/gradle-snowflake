@@ -1,4 +1,4 @@
-package com.github.stewartbryson
+package io.github.stewartbryson
 
 import com.snowflake.snowpark_java.PutResult
 import com.snowflake.snowpark_java.Session
