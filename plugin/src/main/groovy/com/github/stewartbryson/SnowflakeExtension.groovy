@@ -1,4 +1,4 @@
-package io.noumenal
+package com.github.stewartbryson
 
 import org.gradle.api.Project
 /**

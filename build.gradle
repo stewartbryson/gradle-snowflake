@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-   group = 'io.noumenal'
+   group = 'com.github.stewartbryson'
 
    repositories {
       mavenCentral()
@@ -30,7 +30,7 @@ scmVersion {
 
 githubRelease {
    token project.findProperty('githubToken').toString()
-   owner 'noumenalio'
+   owner 'stewartbryson'
    repo rootProject.name
    overwrite true
    generateReleaseNotes true

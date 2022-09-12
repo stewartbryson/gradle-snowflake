@@ -1,4 +1,4 @@
-package io.noumenal
+package com.github.stewartbryson
 
 import com.snowflake.snowpark_java.PutResult
 import com.snowflake.snowpark_java.Session

@@ -58,8 +58,8 @@ testing {
 
 pluginBundle {
     description = 'Simplifies publishing UDFs to Snowflake. Supports internal stages using Snowpark, or external stages with maven-publish.'
-    website = 'http://noumenal.io/'
-    vcsUrl = 'https://github.com/noumenalio/gradle-snowflake'
+    website = 'https://github.com/stewartbryson/gradle-snowflake'
+    vcsUrl = 'https://github.com/stewartbryson/gradle-snowflake'
     tags = ['snowflake', 'snowpark', 'dataops', 'udf']
 }
 
@@ -67,9 +67,9 @@ gradlePlugin {
     // Define the plugin
     plugins {
         snowflake {
-            id = 'io.noumenal.gradle.snowflake'
+            id = 'com.github.stewartbryson.snowflake'
             displayName = 'Snowflake Plugin'
-            implementationClass = 'io.noumenal.SnowflakePlugin'
+            implementationClass = 'com.github.stewartbryson.SnowflakePlugin'
         }
     }
 }
@@ -81,7 +81,7 @@ publishing {
     repositories {
         maven {
             name 's3'
-            url 's3://nio-maven'
+            url 's3://stewartbryson.maven'
             authentication {
                 awsIm(AwsImAuthentication)
             }
@@ -90,7 +90,7 @@ publishing {
 }
 
 s3 {
-    bucket = 'docs.noumenal.io'
+    bucket = 'stewartbryson.docs'
     region = 'us-east-1'
 }
 
