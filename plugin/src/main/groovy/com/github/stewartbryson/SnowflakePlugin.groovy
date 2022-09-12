@@ -6,7 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.aws.AwsImAuthentication
 /**
- * The Gradle plugin.
+ * A Gradle plugin for publishing Java-based applications as UDFs to Snowflake.
  */
 @Slf4j
 class SnowflakePlugin implements Plugin<Project> {
