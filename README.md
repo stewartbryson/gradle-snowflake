@@ -29,7 +29,7 @@ Look at the [sample project](examples/internal-stage/) and you'll notice a few d
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '0.1.11'
+    id 'io.github.stewartbryson.snowflake' version '0.2.10'
 }
 ```
 
@@ -162,8 +162,26 @@ Gradle has [built-in support](https://docs.gradle.org/current/userguide/declarin
 Looking at the [sample project](examples/external-stage/), notice we've populated a few additional properties:
 
 ```
-groupId = 'io.github.stewartbryson'
-artifactId = 'sample-udfs'
+snowflake {
+    // All the following options are provided in my local gradle.properties file
+    // url = <snowflake account url>
+    // user = <snowflake user>
+    // password = <snowflake password>
+    // publishUrl = <S3 bucket and path>
+    role = 'stewart_role'
+    database = 'stewart_db'
+    schema = 'developer'
+    stage = 'maven'
+    groupId = 'io.github.stewartbryson'
+    artifactId = 'sample-udfs'
+    applications {
+        add_numbers {
+            inputs = ["a integer", "b integer"]
+            returns = "string"
+            handler = "Sample.addNum"
+        }
+    }
+}
 ```
 
 The `groupId` and `artifactId`, plus the built-in `version` property that exists for all Gradle builds, provide the [Maven coordinates](https://maven.apache.org/pom.html#Maven_Coordinates) for publishing externally to S3.
