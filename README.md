@@ -18,7 +18,7 @@ It has three basic modes:
 2. Slightly heavier publishing using external Snowflake stages and auto-configuration of the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 3. Publishing to Snowflake using external stages and custom configuration of the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 
-Have a look at the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/com/github/stewartbryson/package-summary.html).
+Have a look at the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/package-summary.html).
 
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
@@ -77,7 +77,7 @@ BUILD SUCCESSFUL in 597ms
 ```
 
 Several command-line options mention _overriding_ other configuration values.
-This is because the plugin also provides a configuration closure called `snowflake` that we can use to configure our build, all of which are documented in the [class API](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/com/github/stewartbryson/SnowflakeExtension.html):
+This is because the plugin also provides a configuration closure called `snowflake` that we can use to configure our build, all of which are documented in the [class API](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/SnowflakeExtension.html):
 
 ```
 snowflake {
@@ -109,7 +109,7 @@ snowflake.user = myusername
 snowflake.password = mypassword
 ```
 
-The nested [`applications` closure](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/com/github/stewartbryson/ApplicationContainer.html) might seem a bit more daunting.
+The nested [`applications` closure](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/ApplicationContainer.html) might seem a bit more daunting.
 This is a simple way to use DSL to configure all the different UDFs we want to automatically create (or recreate) each time we publish the JAR file.
 The example above will generate and execute the statement:
 
@@ -226,7 +226,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
-  imports = ('@maven/com/github/stewartbryson/sample-udfs/0.1.0/sample-udfs-0.1.0-all.jar')
+  imports = ('@maven/io/github/stewartbryson/sample-udfs/0.1.0/sample-udfs-0.1.0-all.jar')
 
 
 BUILD SUCCESSFUL in 12s
