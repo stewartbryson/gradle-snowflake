@@ -10,7 +10,7 @@ cd examples/simple-jar
 But this JAR would still have to be uploaded to a stage in Snowflake, and the UDF would have to be created or possibly recreated if its signature changed.
 I wanted an experience as natural to developers in IntelliJ as any other deployment target.
 
-# The gradle-snowflake Plugin
+# The Snowflake Plugin
 This plugin provides easy configuration options for those getting started with Gradle but also provides advanced features for teams already using Gradle in other areas of the organization.
 It has three basic modes:
 
