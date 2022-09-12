@@ -67,9 +67,9 @@ gradlePlugin {
     // Define the plugin
     plugins {
         snowflake {
-            id = 'com.github.stewartbryson.snowflake'
+            id = 'io.github.stewartbryson.snowflake'
             displayName = 'Snowflake Plugin'
-            implementationClass = 'com.github.stewartbryson.SnowflakePlugin'
+            implementationClass = 'io.github.stewartbryson.SnowflakePlugin'
         }
     }
 }

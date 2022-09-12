@@ -23,13 +23,13 @@ Have a look at the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
 Additionally, if you plan on *sharing* UDFs across Snowflake accounts, this is the option you *have* to use, as JARs need to be in named internal stages.
-Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `com.github.stewartbryson.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake` plugin:
+Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake` plugin:
 
 ```
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'com.github.stewartbryson.snowflake' version '0.1.11'
+    id 'io.github.stewartbryson.snowflake' version '0.1.11'
 }
 ```
 
@@ -45,7 +45,7 @@ Path
      :snowflakePublish
 
 Type
-     SnowflakePublish (com.github.stewartbryson.SnowflakePublish)
+     SnowflakePublish (io.github.stewartbryson.SnowflakePublish)
 
 Options
      --account     Override the URL of the Snowflake account.
@@ -162,7 +162,7 @@ Gradle has [built-in support](https://docs.gradle.org/current/userguide/declarin
 Looking at the [sample project](examples/external-stage/), notice we've populated a few additional properties:
 
 ```
-groupId = 'com.github.stewartbryson'
+groupId = 'io.github.stewartbryson'
 artifactId = 'sample-udfs'
 ```
 
