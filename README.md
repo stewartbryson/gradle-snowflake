@@ -156,7 +156,7 @@ BUILD SUCCESSFUL in 624ms
 3 actionable tasks: 3 up-to-date
 ```
 
-# Auto-configuration of `maven-plugin` with External Stages
+# Auto-configuration of `maven-publish` with External Stages
 This option is useful when you want your artifacts available to consumers other than just Snowflake without publishing them to disparate locations.
 Gradle has [built-in support](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:s3-repositories) for S3 as a Maven repository, and Snowflake has support for S3 external stages.
 Looking at the [sample project](examples/external-stage/), notice we've populated a few additional properties:
@@ -233,7 +233,7 @@ BUILD SUCCESSFUL in 12s
 5 actionable tasks: 5 executed
 ```
 
- # Manual configuration of `maven-plugin` with External Stages
+ # Manual configuration of `maven-publish` with External Stages
 For organizations that already use `maven-publish` extensively, or have customizations outside the scope of auto-configuration, the plugin supports disabling auto-configuration:
 
 ```
