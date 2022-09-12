@@ -1,7 +1,7 @@
 pluginManagement {
    repositories {
       maven {
-         url "s3://nio-maven"
+         url "s3://stewartbryson.maven"
          authentication {
             awsIm(AwsImAuthentication)
          }

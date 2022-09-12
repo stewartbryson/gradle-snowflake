@@ -18,18 +18,18 @@ It has three basic modes:
 2. Slightly heavier publishing using external Snowflake stages and auto-configuration of the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 3. Publishing to Snowflake using external stages and custom configuration of the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 
-Have a look at the [API docs](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/package-summary.html).
+Have a look at the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/com/github/stewartbryson/package-summary.html).
 
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
 Additionally, if you plan on *sharing* UDFs across Snowflake accounts, this is the option you *have* to use, as JARs need to be in named internal stages.
-Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `io.noumenal.gradle.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake` plugin:
+Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle). We applied `com.github.stewartbryson.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake` plugin:
 
 ```
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.noumenal.gradle.snowflake' version '0.1.11'
+    id 'com.github.stewartbryson.snowflake' version '0.1.11'
 }
 ```
 
@@ -45,7 +45,7 @@ Path
      :snowflakePublish
 
 Type
-     SnowflakePublish (io.noumenal.SnowflakePublish)
+     SnowflakePublish (com.github.stewartbryson.SnowflakePublish)
 
 Options
      --account     Override the URL of the Snowflake account.
@@ -77,7 +77,7 @@ BUILD SUCCESSFUL in 597ms
 ```
 
 Several command-line options mention _overriding_ other configuration values.
-This is because the plugin also provides a configuration closure called `snowflake` that we can use to configure our build, all of which are documented in the [class API](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/SnowflakeExtension.html):
+This is because the plugin also provides a configuration closure called `snowflake` that we can use to configure our build, all of which are documented in the [class API](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/com/github/stewartbryson/SnowflakeExtension.html):
 
 ```
 snowflake {
@@ -109,7 +109,7 @@ snowflake.user = myusername
 snowflake.password = mypassword
 ```
 
-The nested [`applications` closure](https://s3.amazonaws.com/docs.noumenal.io/gradle-snowflake/latest/io/noumenal/ApplicationContainer.html) might seem a bit more daunting.
+The nested [`applications` closure](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/com/github/stewartbryson/ApplicationContainer.html) might seem a bit more daunting.
 This is a simple way to use DSL to configure all the different UDFs we want to automatically create (or recreate) each time we publish the JAR file.
 The example above will generate and execute the statement:
 
@@ -162,7 +162,7 @@ Gradle has [built-in support](https://docs.gradle.org/current/userguide/declarin
 Looking at the [sample project](examples/external-stage/), notice we've populated a few additional properties:
 
 ```
-groupId = 'io.noumenal'
+groupId = 'com.github.stewartbryson'
 artifactId = 'sample-udfs'
 ```
 
@@ -226,7 +226,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
-  imports = ('@maven/io/noumenal/sample-udfs/0.1.0/sample-udfs-0.1.0-all.jar')
+  imports = ('@maven/com/github/stewartbryson/sample-udfs/0.1.0/sample-udfs-0.1.0-all.jar')
 
 
 BUILD SUCCESSFUL in 12s

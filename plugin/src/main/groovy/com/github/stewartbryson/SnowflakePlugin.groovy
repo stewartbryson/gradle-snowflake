@@ -1,4 +1,4 @@
-package io.noumenal
+package com.github.stewartbryson
 
 import groovy.util.logging.Slf4j
 import org.gradle.api.Project
