@@ -1,12 +1,1 @@
-pluginManagement {
-   repositories {
-      maven {
-         url "s3://stewartbryson.maven"
-         authentication {
-            awsIm(AwsImAuthentication)
-         }
-      }
-      gradlePluginPortal()
-   }
-}
 rootProject.name = 'internal-stage'

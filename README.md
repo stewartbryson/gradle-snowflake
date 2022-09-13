@@ -1,3 +1,6 @@
+# Limitation
+In my tests, the `com.snowflake:snowpark:1.6.0` library used in this plugin has runtime issues on any JDK higher than 13. It has to do with new security enhancements in later versions. I have not isolated the exact issue, and whether it's specific to this plugin.
+
 # Motivation
 It needs to be easy to develop and test Java applications even if they are being deployed to Snowflake using Snowpark and UDFs.
 Using [Apache Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
