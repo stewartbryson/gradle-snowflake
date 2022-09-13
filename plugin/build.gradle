@@ -75,19 +75,7 @@ gradlePlugin {
 }
 
 gradlePlugin.testSourceSets(sourceSets.functionalTest)
-build.dependsOn validatePlugins
-
-publishing {
-    repositories {
-        maven {
-            name 's3'
-            url 's3://stewartbryson.maven'
-            authentication {
-                awsIm(AwsImAuthentication)
-            }
-        }
-    }
-}
+tasks.build.dependsOn validatePlugins
 
 s3 {
     bucket = 'stewartbryson.docs'
@@ -110,5 +98,7 @@ tasks.register("publishVersionDocs", com.fuseanalytics.gradle.s3.S3Upload) {
 
 tasks.register("publishDocs") {
     dependsOn tasks.publishLatestDocs, tasks.publishVersionDocs
-    mustRunAfter tasks.publish
+    mustRunAfter tasks.publishPlugins
 }
+
+tasks.publish.dependsOn tasks.publishPlugins
