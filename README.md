@@ -32,7 +32,7 @@ Look at the [sample project](examples/internal-stage/) and you'll notice a few d
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '0.2.11'
+    id 'io.github.stewartbryson.snowflake' version '0.2.12'
 }
 ```
 
