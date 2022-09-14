@@ -36,3 +36,13 @@ githubRelease {
    generateReleaseNotes true
    //dryRun true
 }
+
+tasks.register('copyReadme', Copy) {
+   group 'markdown'
+   description 'Update README.md file with current version.'
+   from ('src/markdown') {
+      include 'README.md'
+      expand(version: version)
+   }
+   into '.'
+}
