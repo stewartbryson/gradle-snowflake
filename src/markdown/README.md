@@ -5,7 +5,7 @@ I have not isolated the exact issue, and whether it's specific to this plugin.
 
 # Motivation
 It needs to be easy to develop and test Java applications even if they are being deployed to Snowflake using Snowpark and UDFs.
-Using [Apache Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
+Using [Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
 
 ```
 cd examples/simple-jar
@@ -164,7 +164,7 @@ BUILD SUCCESSFUL in 624ms
 
 # Auto-configuration of `maven-publish` with External Stages
 This option is useful when you want your artifacts available to consumers other than just Snowflake without publishing them to disparate locations.
-Gradle has [built-in support](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:s3-repositories) for S3 as a Maven repository, and Snowflake has support for S3 external stages.
+Gradle has [built-in support](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:s3-repositories) for S3 or GCS as a Maven repository, and Snowflake has support for S3 or GCS external stages, so we simply marry the two in a single location.
 Looking at the [sample project](examples/external-stage/), notice we've populated a few additional properties:
 
 ```
