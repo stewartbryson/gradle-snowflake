@@ -31,12 +31,14 @@ class JavaTest extends Specification {
     String account = System.getProperty("snowflake.account"),
            user = System.getProperty("snowflake.user"),
            password = System.getProperty("snowflake.password"),
-           publishUrl = System.getProperty("snowflake.publishUrl"),
+           s3PublishUrl = System.getProperty("snowflake.s3PublishUrl"),
+           gcsPublishUrl = System.getProperty("snowflake.gcsPublishUrl"),
            role = System.getProperty("snowflake.role"),
            database = System.getProperty("snowflake.database"),
            schema = System.getProperty("snowflake.schema"),
            internalStage = System.getProperty("internalStage"),
-           externalStage = System.getProperty("externalStage")
+           s3Stage = System.getProperty("s3Stage"),
+           gcsStage = System.getProperty("gcsStage")
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -131,17 +133,6 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "tasks with publishUrl"() {
-        given:
-        taskName = 'tasks'
-
-        when:
-        result = executeSingleTask(taskName, ["-Psnowflake.stage=$externalStage".toString(), "-Psnowflake.publishUrl=$publishUrl".toString(), '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
     def "shadowJar"() {
         given:
         taskName = 'shadowJar'
@@ -153,12 +144,23 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakePublish with publishUrl option"() {
+    def "snowflakePublish with S3 publishUrl option"() {
         given:
         taskName = 'snowflakePublish'
 
         when:
-        result = executeSingleTask(taskName, ["-Psnowflake.publishUrl=${publishUrl}".toString(), "-Psnowflake.stage=$externalStage".toString(), '-Si'])
+        result = executeSingleTask(taskName, ["--stage", s3Stage, "-Psnowflake.publishUrl=$s3PublishUrl".toString(), '-Si'])
+
+        then:
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+    }
+
+    def "snowflakePublish with GCS publishUrl option"() {
+        given:
+        taskName = 'snowflakePublish'
+
+        when:
+        result = executeSingleTask(taskName, ["--stage", gcsStage, "-Psnowflake.publishUrl=$gcsPublishUrl".toString(), '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -169,7 +171,7 @@ class JavaTest extends Specification {
         taskName = 'snowflakePublish'
 
         when:
-        result = executeSingleTask(taskName, ["-Psnowflake.stage=$internalStage".toString(), '-Si'])
+        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -180,7 +182,7 @@ class JavaTest extends Specification {
         taskName = 'snowflakePublish'
 
         when:
-        result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '-Psnowflake.stage=upload', '-Si'])
+        result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '--stage', 'upload', '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

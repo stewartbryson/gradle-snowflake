@@ -46,7 +46,8 @@ testing {
                         shouldRunAfter(test)
                         systemProperties project.properties.findAll { it.key.startsWith "snowflake." }
                         systemProperty 'internalStage', findProperty('internalStage')
-                        systemProperty 'externalStage', findProperty('externalStage')
+                        systemProperty 's3Stage', findProperty('s3Stage')
+                        systemProperty 'gcsStage', findProperty('gcsStage')
                         failFast true
                         testLogging.showStandardStreams true
                     }

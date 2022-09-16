@@ -13,7 +13,7 @@ class SnowflakePlugin implements Plugin<Project> {
    private static String PLUGIN = 'snowflake'
 
    /**
-    * Apply the gradle-snowflake plugin to a Gradle project. Also applies the 'com.github.johnrengelman.shadow' and 'java-library' plugins. Supporting the 'scala' plugin instead is on the roadmap.
+    * Apply the snowflake plugin to a Gradle project. Also applies the 'com.github.johnrengelman.shadow' plugin. Supporting the 'scala' plugin as well is on the roadmap.
     */
    void apply(Project project) {
       project.extensions.create(PLUGIN, SnowflakeExtension)
@@ -51,12 +51,22 @@ class SnowflakePlugin implements Plugin<Project> {
                }
             }
             // create repository
-            project.publishing.repositories {
-               maven {
-                  name extension.stage
-                  url extension.publishUrl
-                  authentication {
-                     awsIm(AwsImAuthentication)
+            // check and see if we are AWS or GCS
+            if (extension.publishUrl ==~ /(?i)(s3:\/\/)(.+)/) {
+               project.publishing.repositories {
+                  maven {
+                     name extension.stage
+                     url extension.publishUrl
+                     authentication {
+                        awsIm(AwsImAuthentication)
+                     }
+                  }
+               }
+            } else {
+               project.publishing.repositories {
+                  maven {
+                     name extension.stage
+                     url extension.publishUrl
                   }
                }
             }
