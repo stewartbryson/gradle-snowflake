@@ -5,7 +5,7 @@ I have not isolated the exact issue, and whether it's specific to this plugin.
 
 # Motivation
 It needs to be easy to develop and test Java applications even if they are being deployed to Snowflake using Snowpark and UDFs.
-Using [Apache Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
+Using [Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
 
 ```
 cd examples/simple-jar
