@@ -34,6 +34,10 @@ class ApplicationContainer {
     * The 'handler' property of the UDF.
     */
    String handler
+   /**
+    * Is the UDF immutable? DEFAULT: false
+    */
+   Boolean immutable = false
 
    /**
     * A getter for the create statement for the UDF. The imports are passed in as the only property.
@@ -43,7 +47,7 @@ class ApplicationContainer {
    String getCreate(String imports) {
       """|CREATE OR REPLACE $type $name (${inputs.join(', ')})
          |  returns $returns
-         |  language $language
+         |  language $language ${immutable ? "\n  IMMUTABLE" : ""}
          |  handler = '$handler'
          |  imports = ($imports)
          |""".stripMargin()

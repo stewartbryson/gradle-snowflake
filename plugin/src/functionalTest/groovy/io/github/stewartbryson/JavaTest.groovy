@@ -187,4 +187,42 @@ class JavaTest extends Specification {
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
+
+    def "snowflakePublish with immutable function"() {
+        given:
+        buildFile.write("""
+                    |plugins {
+                    |    id 'io.github.stewartbryson.snowflake'
+                    |    id 'java'
+                    |}
+                    |java {
+                    |    toolchain {
+                    |        languageVersion = JavaLanguageVersion.of(11)
+                    |    }
+                    |}
+                    |snowflake {
+                    |  groupId = 'io.github.stewartbryson'
+                    |  artifactId = 'test-gradle-snowflake'
+                    |  role = '$role'
+                    |  database = '$database'
+                    |  schema = '$schema'
+                    |  applications {
+                    |      add_numbers {
+                    |         inputs = ["a integer", "b integer"]
+                    |         returns = "string"
+                    |         handler = "AddNumbers.addNum"
+                    |         immutable = true
+                    |      }
+                    |   }
+                    |}
+                    |version='0.1.0'
+                    |""".stripMargin())
+        taskName = 'snowflakePublish'
+
+        when:
+        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
+
+        then:
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+    }
 }
