@@ -38,7 +38,7 @@ githubRelease {
 }
 
 tasks.register('copyReadme', Copy) {
-   group 'markdown'
+   group 'documentation'
    description 'Update README.md file with current version.'
    from ('src/markdown') {
       include 'README.md'
