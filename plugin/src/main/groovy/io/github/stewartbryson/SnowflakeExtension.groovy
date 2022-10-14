@@ -1,6 +1,8 @@
 package io.github.stewartbryson
 
 import org.gradle.api.Project
+import org.gradle.internal.impldep.org.apache.commons.lang.RandomStringUtils
+
 /**
  * The plugin configuration extension that is applied to the Gradle project as 'snowflake'.
  */
@@ -58,13 +60,25 @@ class SnowflakeExtension {
     * Optional: do not automatically apply 'maven-publish' and allow the user to apply that plugin in the 'build.gradle' file.
     */
    Boolean useCustomMaven = false
-
    /**
-    * Convert names to be Snake Case.
+    * Create and use an ephemeral Snowflake clone for the entire build. Useful for CI/CD processes. Default: false
     */
-   private static String toSnakeCase( String text ) {
-      text.replaceAll( /([A-Z])/, /_$1/ ).toLowerCase().replaceAll( /^_/, '' )
-   }
+   Boolean useClone = false
+   /**
+    * Automatically drop ephemeral Snowflake clone at the end of the build. Default: false
+    */
+   Boolean dropClone = false
+   /**
+    * Optional: specify an artifact groupId when using the 'maven-publish' plugin.
+    */
+   String cloneName = System.getenv('GITHUB_ACTIONS') ? System.getenv('GITHUB_REF_NAME') : RandomStringUtils.randomAlphanumeric(9)
+
+//   /**
+//    * Convert names to be Snake Case.
+//    */
+//   private static String toSnakeCase( String text ) {
+//      text.replaceAll( /([A-Z])/, /_$1/ ).toLowerCase().replaceAll( /^_/, '' )
+//   }
 
 //   /**
 //    * Convert names to be Camel Case.
