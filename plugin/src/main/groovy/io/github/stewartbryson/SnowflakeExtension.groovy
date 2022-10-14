@@ -70,9 +70,11 @@ class SnowflakeExtension {
     */
    Boolean dropClone = false
    /**
-    * Optional: specify an artifact groupId when using the 'maven-publish' plugin.
+    * The name of the cloned Snowflake database. Default: auto-generated.
+    *
+    * When GitHub Actions environment variables are available, then an intelligent name is generated based on the type of event. When GitHub actions environment variables are not available, a simple unique name is generated.
     */
-   String cloneName = System.getenv('GITHUB_ACTIONS') ? System.getenv('GITHUB_REF_NAME') : RandomStringUtils.randomAlphanumeric(9)
+   String cloneName = snowflakeCloneName
 
 //   /**
 //    * Convert names to be Snake Case.
@@ -95,5 +97,15 @@ class SnowflakeExtension {
    String getPublishTask() {
       //toCamelCase("publish_snowflake_publication_to_${stage}Repository")
       "publishSnowflakePublicationTo${stage.capitalize()}Repository"
+   }
+
+   /**
+    * Return the database clone name based on GitHub actions when available.
+    */
+   String getSnowflakeCloneName() {
+      String refName = System.getenv('GITHUB_REF_NAME')
+      String refType = refName.endsWith('/merge') ? 'pr' : System.getenv('$GITHUB_REF_TYPE')
+      String baseName = refName.replaceAll(/\/\w+/,'')
+      String cloneName = System.getenv('GITHUB_ACTIONS') ? "${refType}_${baseName}" : "gradle_${RandomStringUtils.randomAlphanumeric(9)}"
    }
 }

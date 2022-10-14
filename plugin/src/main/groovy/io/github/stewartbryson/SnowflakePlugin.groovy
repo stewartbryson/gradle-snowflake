@@ -27,6 +27,7 @@ class SnowflakePlugin implements Plugin<Project> {
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
+         log.warn "Clone: ${extension.cloneName}"
          // add shadowJar to build
          project.tasks.build.dependsOn project.tasks.shadowJar
 
