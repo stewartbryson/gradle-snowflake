@@ -131,7 +131,6 @@ abstract class SnowflakeTask extends DefaultTask {
      *
      * @return a scalar column value.
      */
-    @Internal
     def getColumnValue(String sql) {
         Statement statement = session.jdbcConnection().createStatement()
         ResultSet rs = statement.executeQuery(sql)
