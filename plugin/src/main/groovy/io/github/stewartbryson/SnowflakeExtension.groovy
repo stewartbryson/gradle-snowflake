@@ -1,7 +1,8 @@
 package io.github.stewartbryson
 
+import org.apache.commons.lang3.RandomStringUtils
 import org.gradle.api.Project
-import org.gradle.internal.impldep.org.apache.commons.lang.RandomStringUtils
+
 
 /**
  * The plugin configuration extension that is applied to the Gradle project as 'snowflake'.

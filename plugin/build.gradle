@@ -19,7 +19,7 @@ dependencies {
     implementation 'com.snowflake:snowpark:1.6.1'
     implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
     implementation 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-    implementation 'commons-lang:commons-lang:2.6'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
 
 testing {
