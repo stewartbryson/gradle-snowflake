@@ -27,7 +27,7 @@ class SnowflakePlugin implements Plugin<Project> {
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
-         log.warn "Clone: ${extension.cloneName}"
+         log.info "Emphemeral clone name: ${extension.cloneName}"
          // add shadowJar to build
          project.tasks.build.dependsOn project.tasks.shadowJar
 
@@ -73,14 +73,17 @@ class SnowflakePlugin implements Plugin<Project> {
             }
          }
 
-         // Register a task
+         // Register createClone and dropClone tasks
+         project.tasks.register("createClone", CreateClone)
+         project.tasks.register("dropClone", DropClone)
+
+         // Register snowflakePublish task
          project.tasks.register("snowflakePublish", SnowflakePublish)
          // set dependency
          if (!extension.useCustomMaven && extension.publishUrl) {
             project.tasks.snowflakePublish.dependsOn extension.publishTask
             project.tasks.getByName(extension.publishTask).mustRunAfter project.tasks.test
          }
-
          project.tasks.snowflakePublish.dependsOn project.tasks.test, project.tasks.shadowJar
       }
    }

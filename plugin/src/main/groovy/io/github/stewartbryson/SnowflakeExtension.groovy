@@ -76,26 +76,10 @@ class SnowflakeExtension {
     */
    String cloneName = snowflakeCloneName
 
-//   /**
-//    * Convert names to be Snake Case.
-//    */
-//   private static String toSnakeCase( String text ) {
-//      text.replaceAll( /([A-Z])/, /_$1/ ).toLowerCase().replaceAll( /^_/, '' )
-//   }
-
-//   /**
-//    * Convert names to be Camel Case.
-//    */
-//   private static String toCamelCase( String text, boolean capitalized = false ) {
-//      text = text.replaceAll( "(_)([A-Za-z0-9])", { Object[] it -> it[2].toUpperCase() } )
-//      return capitalized ? capitalize(text) : text
-//   }
-
    /**
     * Return the name of the Maven publication task associated with the external stage.
     */
    String getPublishTask() {
-      //toCamelCase("publish_snowflake_publication_to_${stage}Repository")
       "publishSnowflakePublicationTo${stage.capitalize()}Repository"
    }
 
@@ -104,8 +88,8 @@ class SnowflakeExtension {
     */
    String getSnowflakeCloneName() {
       String refName = System.getenv('GITHUB_REF_NAME')
-      String refType = refName.endsWith('/merge') ? 'pr' : System.getenv('$GITHUB_REF_TYPE')
-      String baseName = refName.replaceAll(/\/\w+/,'')
+      String refType = refName?.endsWith('/merge') ? 'pr' : System?.getenv('$GITHUB_REF_TYPE')
+      String baseName = refName?.replaceAll(/\/\w+/,'')
       String cloneName = "ephemeral_" + (System.getenv('GITHUB_ACTIONS') ? "${refType}_${baseName}" : RandomStringUtils.randomAlphanumeric(9))
    }
 }

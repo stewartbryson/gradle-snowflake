@@ -28,6 +28,9 @@ class JavaTest extends Specification {
     File buildFile, settingsFile, javaFile
 
     @Shared
+    String cloneName = 'ephemeral_unit_test'
+
+    @Shared
     String account = System.getProperty("snowflake.account"),
            user = System.getProperty("snowflake.user"),
            password = System.getProperty("snowflake.password"),
@@ -221,6 +224,28 @@ class JavaTest extends Specification {
 
         when:
         result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
+
+        then:
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+    }
+
+    def "create ephemeral clone"() {
+        given:
+        taskName = 'createClone'
+
+        when:
+        result = executeSingleTask(taskName, ["-Psnowflake.cloneName=$cloneName".toString(),'-Si'])
+
+        then:
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+    }
+
+    def "drop ephemeral clone"() {
+        given:
+        taskName = 'dropClone'
+
+        when:
+        result = executeSingleTask(taskName, ["-Psnowflake.cloneName=$cloneName".toString(),'-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

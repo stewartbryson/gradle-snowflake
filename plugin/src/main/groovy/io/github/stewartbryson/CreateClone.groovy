@@ -2,7 +2,6 @@ package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
 import org.gradle.api.tasks.*
-import org.gradle.api.tasks.options.Option
 
 /**
  * A Gradle task for provisioning a Snowflake clone for ephemeral testing.
@@ -21,34 +20,16 @@ abstract class CreateClone extends SnowflakeTask {
     }
 
     /**
-     * The Snowflake stage to publish to. Overrides {@link SnowflakeExtension#stage}.
-     */
-    @Optional
-    @Input
-    @Option(option = "stage",
-            description = "Override the Snowflake stage to publish to."
-    )
-    String stage = extension.stage
-
-    /**
-     * Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.
-     */
-    @Optional
-    @Input
-    @Option(option = "jar", description = "Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.")
-    String jar = project.tasks.shadowJar.archiveFile.get()
-
-    /**
-     * A simple text output file for the Snowflake applications create statements. Mainly for making the class Cacheable.
-     */
-    @OutputFile
-    File output = project.file("${project.buildDir}/${PLUGIN}/output.txt")
-
-    /**
      * The Gradle TaskAction method. Create the ephemeral clone.
      */
     @TaskAction
-    def clone() {
+    def createClone() {
+        // create the database clone
+        String database = getColumnValue("select current_database()")
+        String role = getColumnValue("select current_role()")
+        session.jdbcConnection().createStatement().execute("create or replace database ${extension.cloneName} clone $database")
+        session.jdbcConnection().createStatement().execute("grant ownership on database ${extension.cloneName} to $role")
+        session.jdbcConnection().createStatement().execute("use database ${extension.cloneName}")
 
         // close the session
         session.close()

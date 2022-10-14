@@ -97,6 +97,10 @@ abstract class SnowflakePublish extends SnowflakeTask {
         String jar = project.tasks.shadowJar.archiveFile.get()
 
         if (!extension.publishUrl && !extension.useCustomMaven) {
+            // create the internal stage if it doesn't exist
+            session.jdbcConnection().createStatement().execute("create stage if not exists ${stage}")
+
+            //
             def options = [
                     AUTO_COMPRESS: 'FALSE',
                     PARALLEL     : '4',
@@ -108,16 +112,7 @@ abstract class SnowflakePublish extends SnowflakeTask {
             }
         } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned
-            Statement statement = session.jdbcConnection().createStatement()
-            String sql = "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'"
-            ResultSet rs = statement.executeQuery(sql)
-            String selectStage
-            if (rs.next()) {
-                selectStage = rs.getString(1)
-            }
-            // ensure we are matching our stage with our url
-            rs.close()
-            statement.close()
+            String selectStage = getColumnValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'")
             assert selectStage == extension.publishUrl
         }
 

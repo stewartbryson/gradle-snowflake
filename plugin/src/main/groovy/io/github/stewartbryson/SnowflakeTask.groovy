@@ -6,6 +6,9 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.options.Option
 
+import java.sql.ResultSet
+import java.sql.Statement
+
 /**
  * A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
  */
@@ -121,5 +124,24 @@ abstract class SnowflakeTask extends DefaultTask {
             throw new Exception("Snowflake connection details are missing.", npe)
         }
         return session
+    }
+
+    /**
+     * Return a scalar column value from a SELECT statement where only one row is returned.
+     *
+     * @return a scalar column value.
+     */
+    @Internal
+    def getColumnValue(String sql) {
+        Statement statement = session.jdbcConnection().createStatement()
+        ResultSet rs = statement.executeQuery(sql)
+        def columnValue
+        if (rs.next()) {
+            columnValue = rs.getString(1)
+        }
+        // ensure we are matching our stage with our url
+        rs.close()
+        statement.close()
+        return columnValue
     }
 }

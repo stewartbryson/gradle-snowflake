@@ -10,9 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: 'echo "ref: $GITHUB_REF, ref_name: $GITHUB_REF_NAME, type: $GITHUB_REF_TYPE"'
-        shell: bash
-
       - run: 'echo "$GRADLE_PROPERTIES" >> gradle.properties'
         shell: bash
         env:
