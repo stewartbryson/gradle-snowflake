@@ -106,6 +106,6 @@ class SnowflakeExtension {
       String refName = System.getenv('GITHUB_REF_NAME')
       String refType = refName.endsWith('/merge') ? 'pr' : System.getenv('$GITHUB_REF_TYPE')
       String baseName = refName.replaceAll(/\/\w+/,'')
-      String cloneName = System.getenv('GITHUB_ACTIONS') ? "${refType}_${baseName}" : "gradle_${RandomStringUtils.randomAlphanumeric(9)}"
+      String cloneName = "ephemeral_" + (System.getenv('GITHUB_ACTIONS') ? "${refType}_${baseName}" : RandomStringUtils.randomAlphanumeric(9))
    }
 }
