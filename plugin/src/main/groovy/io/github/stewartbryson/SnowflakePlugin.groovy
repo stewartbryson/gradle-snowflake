@@ -27,7 +27,8 @@ class SnowflakePlugin implements Plugin<Project> {
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
-         log.info "Emphemeral clone name: ${extension.cloneName}"
+         log.warn "Emphemeral clone name: ${extension.ephemeralName}"
+
          // add shadowJar to build
          project.tasks.build.dependsOn project.tasks.shadowJar
 

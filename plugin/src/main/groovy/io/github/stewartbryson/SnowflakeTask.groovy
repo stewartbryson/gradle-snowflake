@@ -67,7 +67,8 @@ abstract class SnowflakeTask extends DefaultTask {
     @Option(option = "database",
             description = "Override the Snowflake database to connect to."
     )
-    String database = extension.database
+    // all snowflake tasks except createClone should use the cloneName if useClone is true
+    String database = extension.useEphemeral ? extension.ephemeralName : extension.database
 
     /**
      * The Snowflake schema to connect with. Overrides {@link SnowflakeExtension#schema}.

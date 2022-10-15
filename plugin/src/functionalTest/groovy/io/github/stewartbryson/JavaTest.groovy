@@ -28,7 +28,7 @@ class JavaTest extends Specification {
     File buildFile, settingsFile, javaFile
 
     @Shared
-    String cloneName = 'ephemeral_unit_test'
+    String ephemeralName = 'ephemeral_unit_test'
 
     @Shared
     String account = System.getProperty("snowflake.account"),
@@ -234,7 +234,7 @@ class JavaTest extends Specification {
         taskName = 'createClone'
 
         when:
-        result = executeSingleTask(taskName, ["-Psnowflake.cloneName=$cloneName".toString(),'-Si'])
+        result = executeSingleTask(taskName, ["-Psnowflake.ephemeralName=$ephemeralName".toString(), '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -245,7 +245,7 @@ class JavaTest extends Specification {
         taskName = 'dropClone'
 
         when:
-        result = executeSingleTask(taskName, ["-Psnowflake.cloneName=$cloneName".toString(),'-Si'])
+        result = executeSingleTask(taskName, ["-Psnowflake.ephemeralName=$ephemeralName".toString(), '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

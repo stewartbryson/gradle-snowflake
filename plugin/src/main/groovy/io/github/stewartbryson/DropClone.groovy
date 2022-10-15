@@ -20,12 +20,12 @@ abstract class DropClone extends SnowflakeTask {
     }
 
     /**
-     * The Gradle TaskAction method. Drop the ephemeral clone.
+     * The Gradle TaskAction method. Drop the ephemeral database.
      */
     @TaskAction
     def dropClone() {
         // drop the database clone
-        session.jdbcConnection().createStatement().execute("drop database if exists ${extension.cloneName}")
+        session.jdbcConnection().createStatement().execute("drop database if exists ${extension.ephemeralName}")
 
         // close the session
         session.close()
