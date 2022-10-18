@@ -1,6 +1,7 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -17,6 +18,17 @@ abstract class DropClone extends SnowflakeTask {
     DropClone() {
         description = "A Gradle task for dropping a Snowflake clone for ephemeral testing."
         group = "verification"
+    }
+
+    /**
+     * Return the revised database to connect to based on ephemeral database usage.
+     *
+     * @return The revised database to connect to based on ephemeral database usage.
+     */
+    @Internal
+    @Override
+    def getRevisedDatabase() {
+        database
     }
 
     /**
