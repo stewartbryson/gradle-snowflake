@@ -68,7 +68,8 @@ abstract class SnowflakeTask extends DefaultTask {
             description = "Override the Snowflake database to connect to."
     )
     // all snowflake tasks except createClone should use the cloneName if useClone is true
-    String database = extension.useEphemeral ? extension.ephemeralName : extension.database
+    //String database = extension.useEphemeral ? extension.ephemeralName : extension.database
+    String database = extension.database
 
     /**
      * The Snowflake schema to connect with. Overrides {@link SnowflakeExtension#schema}.
@@ -110,7 +111,7 @@ abstract class SnowflakeTask extends DefaultTask {
                 password : password,
                 role     : role,
                 warehouse: warehouse,
-                db       : database,
+                db       : revisedDatabase,
                 schema   : schema
         ]
         Map printable = props.clone()
@@ -143,5 +144,15 @@ abstract class SnowflakeTask extends DefaultTask {
         rs.close()
         statement.close()
         return columnValue
+    }
+
+    /**
+     * Return the revised database to connect to based on ephemeral database usage.
+     *
+     * @return The revised database to connect to based on ephemeral database usage.
+     */
+    @Internal
+    def getRevisedDatabase() {
+        return extension.useEphemeral ? extension.ephemeralName : database
     }
 }

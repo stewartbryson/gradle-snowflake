@@ -27,7 +27,7 @@ class SnowflakePlugin implements Plugin<Project> {
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
-         log.warn "Emphemeral clone name: ${extension.ephemeralName}"
+         log.info "Emphemeral clone name: ${extension.ephemeralName}"
 
          // add shadowJar to build
          project.tasks.build.dependsOn project.tasks.shadowJar
@@ -86,6 +86,13 @@ class SnowflakePlugin implements Plugin<Project> {
             project.tasks.getByName(extension.publishTask).mustRunAfter project.tasks.test
          }
          project.tasks.snowflakePublish.dependsOn project.tasks.test, project.tasks.shadowJar
+
+         if (extension.useEphemeral) {
+            project.tasks.snowflakePublish.dependsOn project.tasks.createClone
+         }
+//         if (extension.dropEphemeral) {
+//            project.tasks.snowflakePlublish.finalizedBy project.tasks.dropClone
+//         }
       }
    }
 }

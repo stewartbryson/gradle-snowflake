@@ -32,6 +32,17 @@ abstract class CreateClone extends SnowflakeTask {
     String database = extension.database
 
     /**
+     * Return the revised database to connect to based on ephemeral database usage.
+     *
+     * @return The revised database to connect to based on ephemeral database usage.
+     */
+    @Internal
+    @Override
+    def getRevisedDatabase() {
+        database
+    }
+
+    /**
      * The Gradle TaskAction method. Create the ephemeral clone.
      */
     @TaskAction

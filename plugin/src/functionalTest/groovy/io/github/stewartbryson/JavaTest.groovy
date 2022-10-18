@@ -250,4 +250,15 @@ class JavaTest extends Specification {
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
+
+    def "snowflakePublish with ephemeral"() {
+        given:
+        taskName = 'snowflakePublish'
+
+        when:
+        result = executeSingleTask(taskName, ["--stage", internalStage, "-Psnowflake.useEphemeral=true", "-Psnowflake.dropEphemeral=true", '-Si'])
+
+        then:
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+    }
 }
