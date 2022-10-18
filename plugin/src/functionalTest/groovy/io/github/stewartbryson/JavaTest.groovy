@@ -256,7 +256,7 @@ class JavaTest extends Specification {
         taskName = 'snowflakePublish'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, "-Psnowflake.useEphemeral=true", "-Psnowflake.dropEphemeral=true", '-Si'])
+        result = executeSingleTask(taskName, ["--stage", internalStage, "-Psnowflake.useEphemeral=true", "-Psnowflake.dropEphemeral=true", '-Si', '--rerun-tasks'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

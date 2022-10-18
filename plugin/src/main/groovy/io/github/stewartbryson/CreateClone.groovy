@@ -28,13 +28,12 @@ abstract class CreateClone extends SnowflakeTask {
     @Option(option = "database",
             description = "Override the Snowflake database to connect to."
     )
-    // should always connect to the database specified
     String database = extension.database
 
     /**
-     * Return the revised database to connect to based on ephemeral database usage.
+     * Override {@link SnowflakeTask#getRevisedDatabase} for creating the database clone.
      *
-     * @return The revised database to connect to based on ephemeral database usage.
+     * @return The database to connect to.
      */
     @Internal
     @Override

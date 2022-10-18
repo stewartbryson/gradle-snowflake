@@ -21,9 +21,9 @@ abstract class DropClone extends SnowflakeTask {
     }
 
     /**
-     * Return the revised database to connect to based on ephemeral database usage.
+     * Override {@link SnowflakeTask#getRevisedDatabase} for creating the database clone.
      *
-     * @return The revised database to connect to based on ephemeral database usage.
+     * @return The database to connect to.
      */
     @Internal
     @Override
