@@ -4,7 +4,6 @@ import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.options.Option
 
@@ -40,6 +39,7 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
         if (useEphemeral) {
             session.jdbcConnection().createStatement().execute("create or replace database ${ephemeralName} clone $database")
             session.jdbcConnection().createStatement().execute("grant ownership on database ${ephemeralName} to $role")
+            log.warn "Ephemeral clone $ephemeralName created."
         }
         return useEphemeral ? createSession(ephemeralName) : session
     }
@@ -53,6 +53,7 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
             session?.close()
             // drop the ephemeral database
             this.session.jdbcConnection().createStatement().execute("drop database if exists ${extension.ephemeralName}")
+            log.warn "Ephemeral clone $ephemeralName dropped."
         }
     }
 }

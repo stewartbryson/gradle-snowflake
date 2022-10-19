@@ -51,7 +51,6 @@ testing {
                         systemProperty 's3Stage', findProperty('s3Stage')
                         systemProperty 'gcsStage', findProperty('gcsStage')
                         failFast true
-                        testLogging.showStandardStreams true
                     }
                 }
             }
@@ -78,7 +77,7 @@ gradlePlugin {
 }
 
 gradlePlugin.testSourceSets(sourceSets.functionalTest)
-tasks.build.dependsOn validatePlugins
+build.dependsOn validatePlugins
 
 s3 {
     bucket = 'stewartbryson.docs'

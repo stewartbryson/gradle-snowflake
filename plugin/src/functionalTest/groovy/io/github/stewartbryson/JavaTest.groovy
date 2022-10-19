@@ -238,5 +238,7 @@ class JavaTest extends Specification {
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
     }
 }
