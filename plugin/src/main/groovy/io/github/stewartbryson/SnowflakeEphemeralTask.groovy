@@ -35,24 +35,23 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
      *
      * @return a session to the ephemeral Snowflake clone.
      */
-    Session createClone() {
+    def createClone() {
         if (useEphemeral) {
             session.jdbcConnection().createStatement().execute("create or replace database ${ephemeralName} clone $database")
             session.jdbcConnection().createStatement().execute("grant ownership on database ${ephemeralName} to $role")
+            session.jdbcConnection().createStatement().execute("use schema ${ephemeralName}.${schema}")
             log.warn "Ephemeral clone $ephemeralName created."
         }
-        return useEphemeral ? createSession(ephemeralName) : session
     }
 
     /**
      * Drop the ephemeral Snowflake clone and return a session to it.
      */
-    def dropClone(Session session) {
+    def dropClone() {
         if (useEphemeral) {
-            // close the ephemeral session
-            session?.close()
             // drop the ephemeral database
-            this.session.jdbcConnection().createStatement().execute("drop database if exists ${extension.ephemeralName}")
+            session.jdbcConnection().createStatement().execute("drop database if exists ${extension.ephemeralName}")
+            session.jdbcConnection().createStatement().execute("use schema ${database}.${schema}")
             log.warn "Ephemeral clone $ephemeralName dropped."
         }
     }
