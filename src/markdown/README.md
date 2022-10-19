@@ -264,3 +264,106 @@ useCustomMaven = true
 We then configure `publications` and `repositories` as described in the [`maven-publish` documentation](https://docs.gradle.org/current/userguide/publishing_maven.html), and add [task dependencies](https://docs.gradle.org/current/userguide/publishing_maven.html) for the `snowflakePublish` task.
 The `publishUrl` property is no longer required because it's configured in the `publications` closure, but if provided, the plugin will ensure it matches the metadata for the `stage` property.
 `groupId` and `artifactId` are still required so that `snowflakePublish` can autogenerate the `imports` section of the `CREATE OR REPLACE...` statement.
+
+# Running tests in ephemeral Snowflake databases
+Running unit tests using static Snowflake databases is boring, especially considering the [zero-copy cloning](https://docs.snowflake.com/en/user-guide/object-clone.html#cloning-considerations) functionality available.
+The `snowflakePublish` task supports cloning an ephemeral database from the database we connect to and publishing to the clone instead.
+This workflow is useful for CI/CD processes testing pull requests and is accessible either through the configuration closure, or as an option passed directly to the Gradle task:
+
+```
+useEphemeral = true
+```
+or
+
+```
+❯ gradle snowflakePublish --use-ephemeral                 
+
+> Task :snowflakePublish
+Ephemeral clone ephemeral_yyuG7AcRF created.
+File internal-stage-0.1.0-all.jar: UPLOADED
+Deploying ==> 
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA 
+  handler = 'Sample.addNum'
+  imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
+
+Ephemeral clone ephemeral_yyuG7AcRF dropped.
+
+BUILD SUCCESSFUL in 19s
+3 actionable tasks: 1 executed, 2 up-to-date
+```
+
+The plugin is aware when it is running in CI/CD environments and currently supports:
+ * [Travis CI](https://travis-ci.org)
+ * [Jenkins](https://jenkins.io)
+ * [GitLab CI](https://about.gitlab.com/product/continuous-integration/)
+ * [GitHub actions](https://github.com/features/actions)
+ * [Appveyor](https://www.appveyor.com)
+
+ When the CI/CD environment is detected, the plugin will name the ephemeral database clone based on the pull request number, the branch name, or the tag name instead of the auto-generated name shown above:
+
+ ```
+ ❯ gradle snowflakePublish --use-ephemeral
+
+> Task :snowflakePublish
+Ephemeral clone ephemeral_pr_46 created.
+File internal-stage-0.1.0-all.jar: UPLOADED
+Deploying ==> 
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA 
+  handler = 'Sample.addNum'
+  imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
+
+Ephemeral clone ephemeral_pr_46 dropped.
+
+BUILD SUCCESSFUL in 29s
+ ```
+
+ If we prefer to simply specify a clone name instead of relying on the plugin to generate it, that is supported as well:
+
+ ```
+ useEphemeral = true
+ ephemeralName = 'testing_db'
+ ```
+ or
+ ```
+ ❯ gradle snowflakePublish --use-ephemeral --ephemeral-name testing_db
+
+> Task :snowflakePublish
+Ephemeral clone testing_db created.
+File internal-stage-0.1.0-all.jar: UPLOADED
+Deploying ==> 
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA 
+  handler = 'Sample.addNum'
+  imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
+
+Ephemeral clone testing_db dropped.
+
+BUILD SUCCESSFUL in 41s
+3 actionable tasks: 1 executed, 2 up-to-date
+```
+
+Finally, if you want to keep the ephemeral database after the build is complete, simply pass the `--keep-ephemeral` option and it won't be dropped.
+This is useful for manual prototyping to ensure our applications are being deployed successfully, but shouldn't be used for automated CI/CD workflows:
+
+```
+❯ gradle snowflakePublish --use-ephemeral --keep-ephemeral           
+
+> Task :snowflakePublish
+Ephemeral clone ephemeral_r0sf0U1ix created.
+File internal-stage-0.1.0-all.jar: UPLOADED
+Deploying ==> 
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA 
+  handler = 'Sample.addNum'
+  imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
+
+
+BUILD SUCCESSFUL in 35s
+3 actionable tasks: 1 executed, 2 up-to-date
+```
