@@ -27,8 +27,10 @@ class SnowflakePlugin implements Plugin<Project> {
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {
+         log.info "Emphemeral clone name: ${extension.ephemeralName}"
+
          // add shadowJar to build
-         project.tasks.build.dependsOn project.tasks.shadowJar
+         project.build.dependsOn project.shadowJar
 
          if (extension.useCustomMaven || extension.publishUrl) {
             // assert that we have artifact and group
@@ -72,15 +74,14 @@ class SnowflakePlugin implements Plugin<Project> {
             }
          }
 
-         // Register a task
+         // Register snowflakePublish task
          project.tasks.register("snowflakePublish", SnowflakePublish)
          // set dependency
          if (!extension.useCustomMaven && extension.publishUrl) {
-            project.tasks.snowflakePublish.dependsOn extension.publishTask
-            project.tasks.getByName(extension.publishTask).mustRunAfter project.tasks.test
+            project.snowflakePublish.dependsOn extension.publishTask
+            project.tasks.getByName(extension.publishTask).mustRunAfter project.test
          }
-
-         project.tasks.snowflakePublish.dependsOn project.tasks.test, project.tasks.shadowJar
+         project.snowflakePublish.dependsOn project.test, project.shadowJar
       }
    }
 }

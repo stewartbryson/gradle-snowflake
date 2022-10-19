@@ -122,7 +122,8 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
 ```
 
-With our configuration complete, we can execute the `snowflakePublish` task, which will run any unit tests and then publish our JAR and create our function:
+With our configuration complete, we can execute the `snowflakePublish` task, which will run any unit tests and then publish our JAR and create our function.
+Note that if the named internal stage does not exist, Snowflake will create it first:
 
 ```
 ❯ ./gradlew snowflakePublish
