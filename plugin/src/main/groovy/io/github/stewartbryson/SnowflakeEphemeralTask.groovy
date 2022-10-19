@@ -58,7 +58,7 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
     def dropClone() {
         if (useEphemeral && !keepEphemeral) {
             // drop the ephemeral database
-            session.jdbcConnection().createStatement().execute("drop database if exists ${extension.ephemeralName}")
+            session.jdbcConnection().createStatement().execute("drop database if exists ${ephemeralName}")
             session.jdbcConnection().createStatement().execute("use schema ${database}.${schema}")
             log.warn "Ephemeral clone $ephemeralName dropped."
         }
