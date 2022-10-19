@@ -95,14 +95,7 @@ abstract class SnowflakePublish extends SnowflakeEphemeralTask {
     def publish() {
         // create the clone and then store the session to the clone
         //todo Make this automatic as part of SnowflakeEphemeralTask
-        Session ephemeralSession
-        if (useEphemeral) {
-            session.jdbcConnection().createStatement().execute("create or replace database ${ephemeralName} clone $database")
-            session.jdbcConnection().createStatement().execute("grant ownership on database ${ephemeralName} to $role")
-            ephemeralSession = createSession(ephemeralName)
-        }
-
-        Session publishSession = useEphemeral ? ephemeralSession : session
+        Session publishSession = createClone()
 
         String jar = project.tasks.shadowJar.archiveFile.get()
 
@@ -138,12 +131,7 @@ abstract class SnowflakePublish extends SnowflakeEphemeralTask {
         }
         // drop the clone
         //todo Make this automatic as part of SnowflakeEphemeralTask
-        if (useEphemeral) {
-            // close the ephemeral session
-            ephemeralSession?.close()
-            // drop the ephemeral database
-            session.jdbcConnection().createStatement().execute("drop database if exists ${extension.ephemeralName}")
-        }
+        dropClone(publishSession)
 
         // close the session
         session.close()
