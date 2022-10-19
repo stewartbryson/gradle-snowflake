@@ -33,7 +33,7 @@ jobs:
           arguments: release -Prelease.disableChecks -Prelease.localOnly
 
       - name: Gradle build and test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: build buildDashboard
         env:
@@ -41,7 +41,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{secrets.CIO_AWS_SECRET_ACCESS_KEY}}
 
       - name: Gradle publish
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: publish githubRelease publishDocs -PgithubToken=${{secrets.GITHUB_TOKEN}}
         env:

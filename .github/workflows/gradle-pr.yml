@@ -22,7 +22,7 @@ jobs:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Gradle build and test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: build validatePlugin functionalTest buildDashboard
         env:
