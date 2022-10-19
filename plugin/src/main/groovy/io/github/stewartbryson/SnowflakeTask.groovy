@@ -101,7 +101,6 @@ abstract class SnowflakeTask extends DefaultTask {
      *
      * @return a Snowflake session.
      */
-    @Internal
     Session createSession(String database) {
         Map props = [
                 url      : account,
