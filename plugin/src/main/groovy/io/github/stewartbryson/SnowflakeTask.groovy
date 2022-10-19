@@ -102,14 +102,14 @@ abstract class SnowflakeTask extends DefaultTask {
      * @return a Snowflake session.
      */
     @Internal
-    Session getSession() {
+    Session createSession(String database) {
         Map props = [
                 url      : account,
                 user     : user,
                 password : password,
                 role     : role,
                 warehouse: warehouse,
-                db       : revisedDatabase,
+                db       : database,
                 schema   : schema
         ]
         Map printable = props.clone()
@@ -120,6 +120,7 @@ abstract class SnowflakeTask extends DefaultTask {
         // get a Snowflake session
         try {
             session = Session.builder().configs(props).create()
+            session.jdbcConnection().createStatement().execute("ALTER SESSION SET JDBC_QUERY_RESULT_FORMAT='JSON'")
         } catch (NullPointerException npe) {
             throw new Exception("Snowflake connection details are missing.", npe)
         }
@@ -127,11 +128,35 @@ abstract class SnowflakeTask extends DefaultTask {
     }
 
     /**
+     * The stored Snowflake session.
+     */
+    @Internal
+    Session session = createSession(database)
+
+    /**
      * Return a scalar column value from a SELECT statement where only one row is returned.
      *
      * @return a scalar column value.
      */
     def getColumnValue(String sql) {
+        Statement statement = session.jdbcConnection().createStatement()
+        ResultSet rs = statement.executeQuery(sql)
+        def columnValue
+        if (rs.next()) {
+            columnValue = rs.getString(1)
+        }
+        // ensure we are matching our stage with our url
+        rs.close()
+        statement.close()
+        return columnValue
+    }
+
+    /**
+     * Return a scalar column value from a SELECT statement where only one row is returned.
+     *
+     * @return a scalar column value.
+     */
+    def getColumnValue(Session session, String sql) {
         Statement statement = session.jdbcConnection().createStatement()
         ResultSet rs = statement.executeQuery(sql)
         def columnValue

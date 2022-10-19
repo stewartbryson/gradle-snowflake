@@ -229,34 +229,12 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "create ephemeral clone"() {
-        given:
-        taskName = 'createClone'
-
-        when:
-        result = executeSingleTask(taskName, ["-Psnowflake.ephemeralName=$ephemeralName".toString(), '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "drop ephemeral clone"() {
-        given:
-        taskName = 'dropClone'
-
-        when:
-        result = executeSingleTask(taskName, ["-Psnowflake.ephemeralName=$ephemeralName".toString(), '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
     def "snowflakePublish with ephemeral"() {
         given:
         taskName = 'snowflakePublish'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, "-Psnowflake.useEphemeral=true", "-Psnowflake.dropEphemeral=true", '-Si', '--rerun-tasks'])
+        result = executeSingleTask(taskName, ["--stage", internalStage, "--use-ephemeral", '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

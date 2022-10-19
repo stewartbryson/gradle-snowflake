@@ -74,10 +74,6 @@ class SnowflakePlugin implements Plugin<Project> {
             }
          }
 
-         // Register createClone and dropClone tasks
-         project.tasks.register("createClone", CreateClone)
-         project.tasks.register("dropClone", DropClone)
-
          // Register snowflakePublish task
          project.tasks.register("snowflakePublish", SnowflakePublish)
          // set dependency
@@ -86,13 +82,6 @@ class SnowflakePlugin implements Plugin<Project> {
             project.tasks.getByName(extension.publishTask).mustRunAfter project.test
          }
          project.snowflakePublish.dependsOn project.test, project.shadowJar
-
-         if (extension.useEphemeral) {
-            project.snowflakePublish.dependsOn project.createClone
-         }
-         if (extension.dropEphemeral) {
-            project.snowflakePublish.finalizedBy project.dropClone
-         }
       }
    }
 }

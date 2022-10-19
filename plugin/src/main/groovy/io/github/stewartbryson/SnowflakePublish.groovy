@@ -1,6 +1,7 @@
 package io.github.stewartbryson
 
 import com.snowflake.snowpark_java.PutResult
+import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import net.snowflake.client.jdbc.SnowflakeStatement
 import org.gradle.api.tasks.CacheableTask
@@ -19,7 +20,7 @@ import java.sql.Statement
  */
 @Slf4j
 @CacheableTask
-abstract class SnowflakePublish extends SnowflakeTask {
+abstract class SnowflakePublish extends SnowflakeEphemeralTask {
 
     /**
      * The task Constructor with 'description' and 'group'.
@@ -92,13 +93,22 @@ abstract class SnowflakePublish extends SnowflakeTask {
      */
     @TaskAction
     def publish() {
-        // keep the session
-        //Session session = this.session
+        // create the clone and then store the session to the clone
+        //todo Make this automatic as part of SnowflakeEphemeralTask
+        Session ephemeralSession
+        if (useEphemeral) {
+            session.jdbcConnection().createStatement().execute("create or replace database ${ephemeralName} clone $database")
+            session.jdbcConnection().createStatement().execute("grant ownership on database ${ephemeralName} to $role")
+            ephemeralSession = createSession(ephemeralName)
+        }
+
+        Session publishSession = useEphemeral ? ephemeralSession : session
+
         String jar = project.tasks.shadowJar.archiveFile.get()
 
         if (!extension.publishUrl && !extension.useCustomMaven) {
             // create the internal stage if it doesn't exist
-            session.jdbcConnection().createStatement().execute("create stage if not exists ${stage}")
+            publishSession.jdbcConnection().createStatement().execute("create stage if not exists ${stage}")
 
             //
             def options = [
@@ -106,13 +116,13 @@ abstract class SnowflakePublish extends SnowflakeTask {
                     PARALLEL     : '4',
                     OVERWRITE    : 'TRUE'
             ]
-            PutResult[] pr = session.file().put(jar, "$stage/libs", options)
+            PutResult[] pr = publishSession.file().put(jar, "$stage/libs", options)
             pr.each {
                 log.warn "File ${it.sourceFileName}: ${it.status}"
             }
         } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned
-            String selectStage = getColumnValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'")
+            String selectStage = getColumnValue(publishSession, "select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'")
             assert selectStage == extension.publishUrl
         }
 
@@ -124,8 +134,18 @@ abstract class SnowflakePublish extends SnowflakeTask {
             String message = "Deploying ==> \n$createText"
             log.warn message
             output.append("$message\n")
-            session.jdbcConnection().createStatement().execute(createText)
+            publishSession.jdbcConnection().createStatement().execute(createText)
         }
+        // drop the clone
+        //todo Make this automatic as part of SnowflakeEphemeralTask
+        if (useEphemeral) {
+            // close the ephemeral session
+            ephemeralSession?.close()
+            // drop the ephemeral database
+            session.jdbcConnection().createStatement().execute("drop database if exists ${extension.ephemeralName}")
+        }
+
+        // close the session
         session.close()
     }
 }

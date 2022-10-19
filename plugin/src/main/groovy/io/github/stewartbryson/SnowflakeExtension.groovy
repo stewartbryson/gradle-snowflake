@@ -68,9 +68,9 @@ class SnowflakeExtension {
      */
     Boolean useEphemeral = false
     /**
-     * Automatically drop ephemeral Snowflake clone at the end of the build. Default: false
+     * Don't drop the ephemeral Snowflake clone at the end of the build. Default: false
      */
-    Boolean dropEphemeral = false
+    Boolean keepEphemeral = false
     /**
      * The name of the cloned Snowflake database. Default: auto-generated.
      *
