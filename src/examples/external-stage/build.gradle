@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'com.github.ben-manes.versions' version '0.43.0'
+    id 'io.github.stewartbryson.snowflake' version '${version}'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+  implementation 'org.apache.logging.log4j:log4j-api:2.18.0'
+  implementation 'org.apache.logging.log4j:log4j-core:2.18.0'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+snowflake {
+    // All the following options are provided in my local gradle.properties file
+    // url = <snowflake account url>
+    // user = <snowflake user>
+    // password = <snowflake password>
+    // publishUrl = <S3 bucket and path>
+    role = 'stewart_role'
+    database = 'stewart_db'
+    schema = 'developer'
+    stage = 'maven'
+    groupId = 'io.github.stewartbryson'
+    artifactId = 'sample-udfs'
+    applications {
+        add_numbers {
+            inputs = ["a integer", "b integer"]
+            returns = "string"
+            handler = "Sample.addNum"
+        }
+    }
+}
+
+version='0.1.0'
