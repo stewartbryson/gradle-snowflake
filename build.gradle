@@ -1,46 +1,75 @@
 plugins {
-   id "com.github.ben-manes.versions" version "0.43.0"
-   id "pl.allegro.tech.build.axion-release" version "1.14.2"
-   id "com.github.breadmoirai.github-release" version "2.4.1"
-   id "build-dashboard"
-   id 'idea'
+    id "com.github.ben-manes.versions" version "0.43.0"
+    id "pl.allegro.tech.build.axion-release" version "1.14.2"
+    id "com.github.breadmoirai.github-release" version "2.4.1"
+    id "build-dashboard"
+    id 'idea'
 }
 
 allprojects {
-   group = 'io.github.stewartbryson'
+    group = 'io.github.stewartbryson'
 
-   repositories {
-      mavenCentral()
-      gradlePluginPortal()
-   }
-   project.version = scmVersion.version
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    project.version = scmVersion.version
 }
 
 scmVersion {
-   tag {
-      prefix = 'v'
-      versionSeparator = ''
-   }
-   ignoreUncommittedChanges = true
-   localOnly = true
-   useHighestVersion = true
+    tag {
+        prefix = 'v'
+        versionSeparator = ''
+    }
+    ignoreUncommittedChanges = true
+    localOnly = true
+    useHighestVersion = true
 }
 
 githubRelease {
-   token project.findProperty('githubToken').toString()
-   owner 'stewartbryson'
-   repo rootProject.name
-   overwrite true
-   generateReleaseNotes true
-   //dryRun true
+    token project.findProperty('githubToken').toString()
+    owner 'stewartbryson'
+    repo rootProject.name
+    overwrite true
+    generateReleaseNotes true
+    //releaseAssets 'plugin/build/libs'
+    //dryRun true
 }
 
 tasks.register('copyReadme', Copy) {
-   group 'documentation'
-   description 'Update README.md file with current version.'
-   from ('src/markdown') {
-      include 'README.md'
-      expand(version: version)
-   }
-   into '.'
+    group 'documentation'
+    description 'Update README.md file with current version.'
+    from('src/markdown') {
+        include 'README.md'
+        expand(version: version)
+    }
+    into '.'
+}
+
+tasks.register('copyInternalStageExample', Copy) {
+    group 'documentation'
+    description 'Update internal-stage example build.gradle file with current version.'
+    from('src/examples/internal-stage') {
+        include 'build.gradle'
+        expand(version: version)
+    }
+    into 'examples/internal-stage'
+    mustRunAfter copyReadme
+}
+
+tasks.register('copyExternalStageExample', Copy) {
+    group 'documentation'
+    description 'Update external-stage example build.gradle file with current version.'
+    from('src/examples/external-stage') {
+        include 'build.gradle'
+        expand(version: version)
+    }
+    into 'examples/external-stage'
+    mustRunAfter copyReadme
+}
+
+tasks.register('examples') {
+    group 'documentation'
+    description 'Update README and example build.gradle files with current version.'
+    dependsOn copyReadme, copyExternalStageExample, copyInternalStageExample
 }

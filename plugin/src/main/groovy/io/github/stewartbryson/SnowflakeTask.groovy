@@ -101,7 +101,7 @@ abstract class SnowflakeTask extends DefaultTask {
      *
      * @return a Snowflake session.
      */
-    Session createSession(String database) {
+    Session createSession() {
         Map props = [
                 url      : account,
                 user     : user,
@@ -130,7 +130,7 @@ abstract class SnowflakeTask extends DefaultTask {
      * The stored Snowflake session.
      */
     @Internal
-    Session session = createSession(database)
+    Session session = createSession()
 
     /**
      * Return a scalar column value from a SELECT statement where only one row is returned.
@@ -148,33 +148,5 @@ abstract class SnowflakeTask extends DefaultTask {
         rs.close()
         statement.close()
         return columnValue
-    }
-
-    /**
-     * Return a scalar column value from a SELECT statement where only one row is returned.
-     *
-     * @return a scalar column value.
-     */
-    def getColumnValue(Session session, String sql) {
-        Statement statement = session.jdbcConnection().createStatement()
-        ResultSet rs = statement.executeQuery(sql)
-        def columnValue
-        if (rs.next()) {
-            columnValue = rs.getString(1)
-        }
-        // ensure we are matching our stage with our url
-        rs.close()
-        statement.close()
-        return columnValue
-    }
-
-    /**
-     * Return the revised database to connect to based on ephemeral database usage.
-     *
-     * @return The revised database to connect to based on ephemeral database usage.
-     */
-    @Internal
-    def getRevisedDatabase() {
-        return extension.useEphemeral ? extension.ephemeralName : database
     }
 }

@@ -92,7 +92,7 @@ abstract class SnowflakePublish extends SnowflakeEphemeralTask {
      */
     @TaskAction
     def publish() {
-        // create the clone and then store the session to the clone
+        // create the clone and set the USE SCHEMA
         //todo Make this automatic as part of SnowflakeEphemeralTask
         createClone()
 
@@ -128,7 +128,7 @@ abstract class SnowflakePublish extends SnowflakeEphemeralTask {
             output.append("$message\n")
             session.jdbcConnection().createStatement().execute(createText)
         }
-        // drop the clone
+        // drop the clone and set the USE SCHEMA
         //todo Make this automatic as part of SnowflakeEphemeralTask
         dropClone()
 
