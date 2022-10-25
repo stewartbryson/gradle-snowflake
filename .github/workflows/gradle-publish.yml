@@ -56,7 +56,8 @@ jobs:
 
       - name: Update Documentation
         uses: stefanzweifel/git-auto-commit-action@v4
-        commit_message: Updating README and examples.
-        branch: main
-        file_pattern: 'README.md examples/*.gradle'
-        status_options: '--untracked-files=no'
+        with:
+          commit_message: Updating README and examples.
+          branch: main
+          file_pattern: 'README.md examples/*.gradle'
+          status_options: '--untracked-files=no'
