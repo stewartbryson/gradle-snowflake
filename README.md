@@ -30,7 +30,7 @@ We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrenge
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '0.2.21'
+    id 'io.github.stewartbryson.snowflake' version '0.2.22'
 }
 ```
 
