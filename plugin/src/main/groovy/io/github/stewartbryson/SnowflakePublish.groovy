@@ -50,7 +50,7 @@ abstract class SnowflakePublish extends SnowflakeEphemeralTask {
     String jar = project.tasks.shadowJar.archiveFile.get()
 
     /**
-     * A simple text output file for the Snowflake applications create statements. Mainly for making the class Cacheable.
+     * A simple text output file for the Snowflake applications create statements. Makes the class Cacheable.
      */
     @OutputFile
     File output = project.file("${project.buildDir}/${PLUGIN}/output.txt")
