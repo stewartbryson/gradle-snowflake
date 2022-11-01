@@ -1,3 +1,11 @@
+# Breaking Changes
+Although I hate to do it, I've introduced breaking changes in version `${version}`.
+In preparation for supporting more languages than just Java, the task `snowflakePublish` has been renamed to `snowflakeJava`.
+I created a [lifecycle task](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) called `snowflakePublish` that depends on `snowflakeJava`, which should alleviate certain build script changes.
+However, the `snowflakeJava` task (previously `snowflakePublish`) does have command-line options.
+In case you are using those options, then you will have to make build script changes.
+This documentation has been updated to reflect these changes.
+
 # Motivation
 It needs to be easy to develop and test Java applications even if they are being deployed to Snowflake using Snowpark and UDFs.
 Using [Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
@@ -34,19 +42,19 @@ plugins {
 }
 ```
 
-We now have the `snowflakePublish` task available:
+We now have the `snowflakeJava` task available:
 
 ```
-❯ ./gradlew help --task snowflakePublish
+❯ ./gradlew help --task snowflakeJava
 
 > Task :help
-Detailed task information for snowflakePublish
+Detailed task information for SnowflakeJava
 
 Path
-     :snowflakePublish
+     :snowflakeJava
 
 Type
-     SnowflakePublish (io.github.stewartbryson.SnowflakePublish)
+     SnowflakeJava (io.github.stewartbryson.SnowflakeJava)
 
 Options
      --account     Override the URL of the Snowflake account.
@@ -78,9 +86,9 @@ Description
 
 Group
      publishing
+:help (Thread[included builds,5,main]) completed. Took 0.027 secs.
 
-BUILD SUCCESSFUL in 1s
-1 actionable task: 1 executed
+BUILD SUCCESSFUL in 3s
 ```
 
 Several command-line options mention _overriding_ other configuration values.
@@ -128,13 +136,13 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
 ```
 
-With our configuration complete, we can execute the `snowflakePublish` task, which will run any unit tests and then publish our JAR and create our function.
+With our configuration complete, we can execute the `snowflakeJava` task, which will run any unit tests and then publish our JAR and create our function.
 Note that if the named internal stage does not exist, Snowflake will create it first:
 
 ```
-❯ ./gradlew snowflakePublish
+❯ ./gradlew snowflakeJava
 
-> Task :snowflakePublish
+> Task :snowflakeJava
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 
 CREATE OR REPLACE function add_numbers (a integer, b integer)
@@ -154,11 +162,11 @@ Our function now exists in Snowflake:
 select add_numbers(1,2);
 ```
 
-The `snowflakePublish` task was written to be [*incremental*](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks) and [*cacheable*](https://docs.gradle.org/current/userguide/build_cache.html#sec:task_output_caching_details).
+The `snowflakeJava` task was written to be [*incremental*](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks) and [*cacheable*](https://docs.gradle.org/current/userguide/build_cache.html#sec:task_output_caching_details).
 If we run the task again without making any changes to task inputs (our code) or outputs, then the execution is avoided, which we know because of the *up-to-date* keyword.
 
 ```
-❯ ./gradlew snowflakePublish              
+❯ ./gradlew snowflakeJava              
 
 BUILD SUCCESSFUL in 624ms
 3 actionable tasks: 3 up-to-date
@@ -208,7 +216,7 @@ The plugin doesn't create the stage, but it does do a check to ensure that the S
 > Task :tasks
 
 ------------------------------------------------------------
-Tasks runnable from root project 'external-stage'
+Tasks runnable from root project 'unit-test'
 ------------------------------------------------------------
 
 Publishing tasks
@@ -220,21 +228,22 @@ publishAllPublicationsToMavenRepository - Publishes all Maven publications produ
 publishSnowflakePublicationToMavenLocal - Publishes Maven publication 'snowflake' to the local Maven repository.
 publishSnowflakePublicationToMavenRepository - Publishes Maven publication 'snowflake' to Maven repository 'maven'.
 publishToMavenLocal - Publishes all Maven publications produced by this project to the local Maven cache.
-snowflakePublish - A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
+snowflakeJava - A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
+snowflakePublish - Lifecycle task for all Snowflake publication tasks.
 
 To see all tasks and more detail, run gradle tasks --all
 
 To see more detail about a task, run gradle help --task <task>
 
-BUILD SUCCESSFUL in 600ms
+BUILD SUCCESSFUL in 4s
 1 actionable task: 1 executed
 ```
 
 These are granular tasks for building metadata and POM files and publishing that along with the artifacts to S3.
-But the `snowflakePublish` task initiates all these dependent tasks, including `publishSnowflakePublicationToMavenRepository` which uploads the artifact but unfortunately doesn't provide console output to that effect:
+But the `snowflakeJava` task initiates all these dependent tasks, including `publishSnowflakePublicationToMavenRepository` which uploads the artifact but unfortunately doesn't provide console output to that effect:
 
 ```
-❯ ./gradlew snowflakePublish --console=plain
+❯ ./gradlew snowflakeJava --console=plain
 > Task :compileJava
 > Task :processResources NO-SOURCE
 > Task :classes
@@ -246,7 +255,7 @@ But the `snowflakePublish` task initiates all these dependent tasks, including `
 > Task :generatePomFileForSnowflakePublication
 > Task :publishSnowflakePublicationToMavenRepository
 
-> Task :snowflakePublish
+> Task :snowflakeJava
 Deploying ==> 
 CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
@@ -267,13 +276,13 @@ useCustomMaven = true
 ```
 
 
-We then configure `publications` and `repositories` as described in the [`maven-publish` documentation](https://docs.gradle.org/current/userguide/publishing_maven.html), and add [task dependencies](https://docs.gradle.org/current/userguide/publishing_maven.html) for the `snowflakePublish` task.
+We then configure `publications` and `repositories` as described in the [`maven-publish` documentation](https://docs.gradle.org/current/userguide/publishing_maven.html), and add [task dependencies](https://docs.gradle.org/current/userguide/publishing_maven.html) for the `snowflakeJava` task.
 The `publishUrl` property is no longer required because it's configured in the `publications` closure, but if provided, the plugin will ensure it matches the metadata for the `stage` property.
-`groupId` and `artifactId` are still required so that `snowflakePublish` can autogenerate the `imports` section of the `CREATE OR REPLACE...` statement.
+`groupId` and `artifactId` are still required so that `snowflakeJava` can autogenerate the `imports` section of the `CREATE OR REPLACE...` statement.
 
 # Running tests in ephemeral Snowflake databases
 Running unit tests using static Snowflake databases is boring, especially considering the [zero-copy cloning](https://docs.snowflake.com/en/user-guide/object-clone.html#cloning-considerations) functionality available.
-The `snowflakePublish` task supports cloning an ephemeral database from the database we connect to and publishing to the clone instead.
+The `snowflakeJava` task supports cloning an ephemeral database from the database we connect to and publishing to the clone instead.
 This workflow is useful for CI/CD processes testing pull requests and is accessible either through the configuration closure, or as an option passed directly to the Gradle task:
 
 ```
@@ -282,9 +291,9 @@ useEphemeral = true
 or
 
 ```
-❯ ./gradlew snowflakePublish --use-ephemeral                 
+❯ ./gradlew snowflakeJava --use-ephemeral                 
 
-> Task :snowflakePublish
+> Task :snowflakeJava
 Ephemeral clone ephemeral_yyuG7AcRF created.
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 
@@ -310,9 +319,9 @@ The plugin is aware when it is running in CI/CD environments and currently suppo
  When the CI/CD environment is detected, the plugin will name the ephemeral database clone based on the pull request number, the branch name, or the tag name instead of the auto-generated name shown above:
 
  ```
- ❯ ./gradlew snowflakePublish --use-ephemeral
+ ❯ ./gradlew snowflakeJava --use-ephemeral
 
-> Task :snowflakePublish
+> Task :snowflakeJava
 Ephemeral clone ephemeral_pr_46 created.
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 
@@ -335,9 +344,9 @@ BUILD SUCCESSFUL in 29s
  ```
  or
  ```
- ❯ ./gradlew snowflakePublish --use-ephemeral --ephemeral-name testing_db
+ ❯ ./gradlew snowflakeJava --use-ephemeral --ephemeral-name testing_db
 
-> Task :snowflakePublish
+> Task :snowflakeJava
 Ephemeral clone testing_db created.
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 
@@ -357,9 +366,9 @@ Finally, if you want to keep the ephemeral database after the build is complete,
 This is useful for manual prototyping to ensure our applications are being deployed successfully, but shouldn't be used for automated CI/CD workflows:
 
 ```
-❯ ./gradlew snowflakePublish --use-ephemeral --keep-ephemeral           
+❯ ./gradlew snowflakeJava --use-ephemeral --keep-ephemeral           
 
-> Task :snowflakePublish
+> Task :snowflakeJava
 Ephemeral clone ephemeral_r0sf0U1ix created.
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 

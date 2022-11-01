@@ -125,9 +125,31 @@ class JavaTest extends Specification {
         return result
     }
 
+    def "help task for SnowflakeJava"() {
+        given:
+        taskName = 'help'
+
+        when:
+        result = executeSingleTask(taskName, ['--task','SnowflakeJava','-S'])
+
+        then:
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+    }
+
+    def "tasks for publishing group with publishUrl"() {
+        given:
+        taskName = 'tasks'
+
+        when:
+        result = executeSingleTask(taskName, ['--group','publishing','-S',"-Psnowflake.publishUrl=$s3PublishUrl".toString()])
+
+        then:
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+    }
+
     def "dry run without publishUrl"() {
         given:
-        taskName = 'snowflakePublish'
+        taskName = 'snowflakeJava'
 
         when:
         result = executeSingleTask(taskName, ['-Sim'])
@@ -147,9 +169,9 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakePublish with S3 publishUrl option"() {
+    def "snowflakeJava with S3 publishUrl option"() {
         given:
-        taskName = 'snowflakePublish'
+        taskName = 'snowflakeJava'
 
         when:
         result = executeSingleTask(taskName, ["--stage", s3Stage, "-Psnowflake.publishUrl=$s3PublishUrl".toString(), '-Si'])
@@ -158,9 +180,9 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakePublish with GCS publishUrl option"() {
+    def "snowflakeJava with GCS publishUrl option"() {
         given:
-        taskName = 'snowflakePublish'
+        taskName = 'snowflakeJava'
 
         when:
         result = executeSingleTask(taskName, ["--stage", gcsStage, "-Psnowflake.publishUrl=$gcsPublishUrl".toString(), '-Si'])
@@ -169,9 +191,9 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakePublish without publishUrl option"() {
+    def "snowflakeJava without publishUrl option"() {
         given:
-        taskName = 'snowflakePublish'
+        taskName = 'snowflakeJava'
 
         when:
         result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
@@ -180,9 +202,9 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakePublish with custom JAR"() {
+    def "snowflakeJava with custom JAR"() {
         given:
-        taskName = 'snowflakePublish'
+        taskName = 'snowflakeJava'
 
         when:
         result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '--stage', 'upload', '-Si'])
@@ -191,7 +213,7 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakePublish with immutable function"() {
+    def "snowflakeJava with immutable function"() {
         given:
         buildFile.write("""
                     |plugins {
@@ -220,7 +242,7 @@ class JavaTest extends Specification {
                     |}
                     |version='0.1.0'
                     |""".stripMargin())
-        taskName = 'snowflakePublish'
+        taskName = 'snowflakeJava'
 
         when:
         result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
@@ -229,9 +251,9 @@ class JavaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakePublish with ephemeral"() {
+    def "snowflakeJava with ephemeral"() {
         given:
-        taskName = 'snowflakePublish'
+        taskName = 'snowflakeJava'
 
         when:
         result = executeSingleTask(taskName, ["--stage", internalStage, "--use-ephemeral", '-Si'])

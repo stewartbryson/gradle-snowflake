@@ -75,13 +75,19 @@ class SnowflakePlugin implements Plugin<Project> {
          }
 
          // Register snowflakePublish task
-         project.tasks.register("snowflakePublish", SnowflakePublish)
+         project.tasks.register("snowflakeJava", SnowflakeJava)
+         // construct the lifecycle task
+         project.tasks.register("snowflakePublish") {
+            description "Lifecycle task for all Snowflake publication tasks."
+            group "publishing"
+            dependsOn project.snowflakeJava
+         }
          // set dependency
          if (!extension.useCustomMaven && extension.publishUrl) {
-            project.snowflakePublish.dependsOn extension.publishTask
+            project.snowflakeJava.dependsOn extension.publishTask
             project.tasks.getByName(extension.publishTask).mustRunAfter project.test
          }
-         project.snowflakePublish.dependsOn project.test, project.shadowJar
+         project.snowflakeJava.dependsOn project.test, project.shadowJar
       }
    }
 }
