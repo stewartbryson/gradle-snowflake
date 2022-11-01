@@ -19,14 +19,14 @@ import java.sql.Statement
  */
 @Slf4j
 @CacheableTask
-abstract class SnowflakePublish extends SnowflakeEphemeralTask {
+abstract class SnowflakeJava extends SnowflakeEphemeralTask {
 
     /**
      * The task Constructor with 'description' and 'group'.
      *
      * @return A custom task class.
      */
-    SnowflakePublish() {
+    SnowflakeJava() {
         description = "A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake."
         group = "publishing"
     }
