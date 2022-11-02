@@ -315,7 +315,7 @@ The plugin is aware when it is running in CI/CD environments and currently suppo
  * [Travis CI](https://travis-ci.org)
  * [Jenkins](https://jenkins.io)
  * [GitLab CI](https://about.gitlab.com/product/continuous-integration/)
- * [GitHub actions](https://github.com/features/actions)
+ * [GitHub Actions](https://github.com/features/actions)
  * [Appveyor](https://www.appveyor.com)
 
  When the CI/CD environment is detected, the plugin will name the ephemeral database clone based on the pull request number, the branch name, or the tag name instead of the auto-generated name shown above:
