@@ -6,7 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.aws.AwsImAuthentication
 /**
- * A Gradle plugin for publishing Java-based applications as UDFs to Snowflake.
+ * A Gradle plugin for publishing UDFs to Snowflake.
  */
 @Slf4j
 class SnowflakePlugin implements Plugin<Project> {
@@ -48,7 +48,6 @@ class SnowflakePlugin implements Plugin<Project> {
                snowflake(MavenPublication) {
                   groupId = extension.groupId
                   artifactId = extension.artifactId
-                  //from project.components.java
                   artifact project.shadowJar
                }
             }
@@ -75,19 +74,19 @@ class SnowflakePlugin implements Plugin<Project> {
          }
 
          // Register snowflakePublish task
-         project.tasks.register("snowflakeJava", SnowflakeJava)
+         project.tasks.register("snowflakeJvm", SnowflakeJvm)
          // construct the lifecycle task
          project.tasks.register("snowflakePublish") {
             description "Lifecycle task for all Snowflake publication tasks."
             group "publishing"
-            dependsOn project.snowflakeJava
+            dependsOn project.snowflakeJvm
          }
          // set dependency
          if (!extension.useCustomMaven && extension.publishUrl) {
-            project.snowflakeJava.dependsOn extension.publishTask
+            project.snowflakeJvm.dependsOn extension.publishTask
             project.tasks.getByName(extension.publishTask).mustRunAfter project.test
          }
-         project.snowflakeJava.dependsOn project.test, project.shadowJar
+         project.snowflakeJvm.dependsOn project.test, project.shadowJar
       }
    }
 }
