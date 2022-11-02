@@ -15,19 +15,19 @@ import java.sql.ResultSet
 import java.sql.Statement
 
 /**
- * A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
+ * A Cacheable Gradle task for publishing UDFs to Snowflake.
  */
 @Slf4j
 @CacheableTask
-abstract class SnowflakeJava extends SnowflakeEphemeralTask {
+abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
 
     /**
      * The task Constructor with 'description' and 'group'.
      *
      * @return A custom task class.
      */
-    SnowflakeJava() {
-        description = "A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake."
+    SnowflakeJvm() {
+        description = "A Cacheable Gradle task for publishing UDFs to Snowflake."
         group = "publishing"
     }
 

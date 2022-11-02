@@ -8,7 +8,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.options.Option
 
 /**
- * A Cacheable Gradle task for publishing Java-based applications as UDFs to Snowflake.
+ * A superclass for creating Gradle tasks that use ephemeral Snowflake clones.
  */
 @Slf4j
 @CacheableTask
