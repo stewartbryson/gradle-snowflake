@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.ben-manes.versions' version '0.43.0'
+    id 'com.github.ben-manes.versions' version '0.44.0'
     id 'io.github.stewartbryson.snowflake' version '${version}'
 }
 

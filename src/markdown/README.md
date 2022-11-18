@@ -139,7 +139,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
 ```
 
 With our configuration complete, we can execute the `snowflakeJvm` task, which will run any unit tests and then publish our JAR and create our function.
-Note that if the named internal stage does not exist, Snowflake will create it first:
+Note that if the named internal stage does not exist, the plugin will create it first:
 
 ```
 ❯ ./gradlew snowflakeJvm

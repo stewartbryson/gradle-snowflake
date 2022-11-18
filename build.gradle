@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.ben-manes.versions" version "0.43.0"
+    id "com.github.ben-manes.versions" version "0.44.0"
     id "pl.allegro.tech.build.axion-release" version "1.14.2"
     id "com.github.breadmoirai.github-release" version "2.4.1"
     id "build-dashboard"
