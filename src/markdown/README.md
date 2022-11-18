@@ -1,5 +1,5 @@
 # Breaking Changes
-I've introduced breaking changes in version `${version}`.
+I've introduced breaking changes in version `1.0.0`.
 In preparation for supporting non-JVM languages, the task `snowflakePublish` has been renamed to `snowflakeJvm`.
 `snowflakeJvm` will be the task for deploying all JVM-based languages, including Java, Groovy, Scala and any others that may be supported by Snowflake in the future.
 
