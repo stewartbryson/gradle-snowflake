@@ -1,6 +1,5 @@
 package io.github.stewartbryson
 
-import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
