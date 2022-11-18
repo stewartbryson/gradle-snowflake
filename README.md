@@ -1,5 +1,5 @@
 # Breaking Changes
-I've introduced breaking changes in version `1.0.1`.
+I've introduced breaking changes in version `1.0.2`.
 In preparation for supporting non-JVM languages, the task `snowflakePublish` has been renamed to `snowflakeJvm`.
 `snowflakeJvm` will be the task for deploying all JVM-based languages, including Java, Groovy, Scala and any others that may be supported by Snowflake in the future.
 
@@ -40,7 +40,7 @@ We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrenge
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '1.0.1'
+    id 'io.github.stewartbryson.snowflake' version '1.0.2'
 }
 ```
 
@@ -139,7 +139,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
 ```
 
 With our configuration complete, we can execute the `snowflakeJvm` task, which will run any unit tests and then publish our JAR and create our function.
-Note that if the named internal stage does not exist, Snowflake will create it first:
+Note that if the named internal stage does not exist, the plugin will create it first:
 
 ```
 ❯ ./gradlew snowflakeJvm
@@ -315,7 +315,7 @@ The plugin is aware when it is running in CI/CD environments and currently suppo
  * [Travis CI](https://travis-ci.org)
  * [Jenkins](https://jenkins.io)
  * [GitLab CI](https://about.gitlab.com/product/continuous-integration/)
- * [GitHub actions](https://github.com/features/actions)
+ * [GitHub Actions](https://github.com/features/actions)
  * [Appveyor](https://www.appveyor.com)
 
  When the CI/CD environment is detected, the plugin will name the ephemeral database clone based on the pull request number, the branch name, or the tag name instead of the auto-generated name shown above:
