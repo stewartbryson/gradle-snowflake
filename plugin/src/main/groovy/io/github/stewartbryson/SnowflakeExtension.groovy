@@ -95,10 +95,5 @@ class SnowflakeExtension {
         // determine the reference type
         String refType = ci.isPullRequest() ? 'pr_' :(ci.isTag()? 'tag_' : (ci.isCi() ? 'branch_' : ''))
         "ephemeral_${refType}${baseName}"
-
-//        String refName = System.getenv('GITHUB_REF_NAME')
-//        String refType = refName?.endsWith('/merge') ? 'pr' : System?.getenv('$GITHUB_REF_TYPE')
-//        String baseName = refName?.replaceAll(/\/\w+/, '')
-//        return "ephemeral_" + (System.getenv('GITHUB_ACTIONS') ? "${refType}_${baseName}" : RandomStringUtils.randomAlphanumeric(9))
     }
 }
