@@ -67,17 +67,17 @@ class JavaTest extends Specification {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
                     |         returns = "string"
-                    |         handler = "AddNumbers.addNum"
+                    |         handler = "Sample.addNum"
                     |      }
                     |   }
                     |}
                     |version='0.1.0'
                     |""".stripMargin())
 
-        javaFile = new File("${projectDir}/src/main/java", 'AddNumbers.java')
+        javaFile = new File("${projectDir}/src/main/java", 'Sample.java')
         javaFile.parentFile.mkdirs()
         javaFile.write("""
-                  |public class AddNumbers
+                  |public class Sample
                   |{
                   |  public String addNum(int num1, int num2) {
                   |    try {
@@ -232,7 +232,7 @@ class JavaTest extends Specification {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
                     |         returns = "string"
-                    |         handler = "AddNumbers.addNum"
+                    |         handler = "Sample.addNum"
                     |         immutable = true
                     |      }
                     |   }
