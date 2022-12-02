@@ -44,7 +44,7 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
      */
     def createClone() {
         if (useEphemeral) {
-            session.jdbcConnection().createStatement().execute("create or replace database ${ephemeralName} clone $database")
+            session.jdbcConnection().createStatement().execute("create database if not exists ${ephemeralName} clone $database")
             session.jdbcConnection().createStatement().execute("grant ownership on database ${ephemeralName} to $role")
             session.jdbcConnection().createStatement().execute("use schema ${ephemeralName}.${schema}")
             log.warn "Ephemeral clone $ephemeralName created."
