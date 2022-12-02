@@ -46,30 +46,18 @@ tasks.register('copyReadme', Copy) {
     into '.'
 }
 
-tasks.register('copyInternalStageExample', Copy) {
+tasks.register('copyExamples', Copy) {
     group 'documentation'
-    description 'Update internal-stage example build.gradle file with current version.'
-    from('src/examples/internal-stage') {
-        include 'build.gradle'
+    description 'Token replacement of current version in examples.'
+    from('src/examples') {
+        include '*/build.gradle'
         expand(version: version)
     }
-    into 'examples/internal-stage'
-    mustRunAfter copyReadme
-}
-
-tasks.register('copyExternalStageExample', Copy) {
-    group 'documentation'
-    description 'Update external-stage example build.gradle file with current version.'
-    from('src/examples/external-stage') {
-        include 'build.gradle'
-        expand(version: version)
-    }
-    into 'examples/external-stage'
-    mustRunAfter copyReadme
+    into 'examples'
 }
 
 tasks.register('examples') {
     group 'documentation'
     description 'Update README and example build.gradle files with current version.'
-    dependsOn copyReadme, copyExternalStageExample, copyInternalStageExample
+    dependsOn copyReadme, copyExamples
 }

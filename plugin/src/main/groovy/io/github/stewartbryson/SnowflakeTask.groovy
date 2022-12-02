@@ -115,7 +115,6 @@ abstract class SnowflakeTask extends DefaultTask {
         printable.password = "*********"
         log.info "Snowflake config: $printable"
 
-        Session session
         // get a Snowflake session
         try {
             session = Session.builder().configs(props).create()
@@ -130,7 +129,7 @@ abstract class SnowflakeTask extends DefaultTask {
      * The stored Snowflake session.
      */
     @Internal
-    Session session = createSession()
+    Session session
 
     /**
      * Return a scalar column value from a SELECT statement where only one row is returned.

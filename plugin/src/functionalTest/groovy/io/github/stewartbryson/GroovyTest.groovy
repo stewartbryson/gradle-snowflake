@@ -22,10 +22,10 @@ class GroovyTest extends Specification {
     private File projectDir
 
     @Shared
-    File buildFile, settingsFile, groovyFile
+    File buildFile, settingsFile, classFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test'
+    String ephemeralName = 'ephemeral_unit_test', language = 'groovy'
 
     @Shared
     String account = System.getProperty("snowflake.account"),
@@ -43,14 +43,14 @@ class GroovyTest extends Specification {
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
         settingsFile.write("""
-                     |rootProject.name = 'unit-test'
+                     |rootProject.name = "$language-test"
                      |""".stripMargin())
 
         buildFile = new File(projectDir, 'build.gradle')
         buildFile.write("""
                     |plugins {
                     |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'groovy'
+                    |    id '$language'
                     |}
                     |java {
                     |    toolchain {
@@ -78,9 +78,9 @@ class GroovyTest extends Specification {
                     |version='0.1.0'
                     |""".stripMargin())
 
-        groovyFile = new File("${projectDir}/src/main/groovy", 'Sample.groovy')
-        groovyFile.parentFile.mkdirs()
-        groovyFile.write('''|
+        classFile = new File("${projectDir}/src/main/$language", "Sample.$language")
+        classFile.parentFile.mkdirs()
+        classFile.write('''|
                             |class Sample {
                             |  String addNum(Integer num1, Integer num2) {
                             |    try {

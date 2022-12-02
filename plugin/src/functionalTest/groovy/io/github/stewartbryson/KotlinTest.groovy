@@ -10,7 +10,7 @@ import spock.lang.TempDir
  * A simple functional test for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class ScalaTest extends Specification {
+class KotlinTest extends Specification {
     @Shared
     def result
 
@@ -25,7 +25,7 @@ class ScalaTest extends Specification {
     File buildFile, settingsFile, classFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test', language = 'scala'
+    String ephemeralName = 'ephemeral_unit_test', language = 'kotlin'
 
     @Shared
     String account = System.getProperty("snowflake.account"),
@@ -50,7 +50,7 @@ class ScalaTest extends Specification {
         buildFile.write("""
                     |plugins {
                     |    id 'io.github.stewartbryson.snowflake'
-                    |    id '$language'
+                    |    id "org.jetbrains.kotlin.jvm" version "1.7.21"
                     |}
                     |java {
                     |    toolchain {
@@ -59,9 +59,6 @@ class ScalaTest extends Specification {
                     |}
                     |repositories {
                     |    mavenCentral()
-                    |}
-                    |dependencies {
-                    |    implementation 'org.scala-lang:scala-library:2.13.10'
                     |}
                     |snowflake {
                     |  role = '$role'
@@ -78,19 +75,20 @@ class ScalaTest extends Specification {
                     |version='0.1.0'
                     |""".stripMargin())
 
-        classFile = new File("${projectDir}/src/main/$language", "Sample.$language")
+        classFile = new File("${projectDir}/src/main/$language", "Sample.kt")
         classFile.parentFile.mkdirs()
-        classFile.write("""|
+        classFile.write('''|
                             |class Sample {
-                            |  def addNum(num1: Integer, num2: Integer): String = {
+                            |  fun addNum(num1: Int, num2: Int): String {
                             |    try {
-                            |      "The sum is: " + (num1 + num2).toString()
-                            |    } catch {
-                            |      case e: Exception => return null
+                            |      return "The sum is: " + (num1 + num2).toString()
+                            |      "The sum is: ${(num1 + num2)}"
+                            |    } catch (e: Exception) {
+                            |      return null.toString()
                             |    }
                             |  }
                             |}
-                  |""".stripMargin())
+                  |'''.stripMargin())
     }
 
     // helper method
@@ -128,7 +126,7 @@ class ScalaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakeJvm for Scala"() {
+    def "snowflakeJvm for Kotlin"() {
         given:
         taskName = 'snowflakeJvm'
 
@@ -139,7 +137,7 @@ class ScalaTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakeJvm for Scala with ephemeral"() {
+    def "snowflakeJvm for Kotlin with ephemeral"() {
         given:
         taskName = 'snowflakeJvm'
 
