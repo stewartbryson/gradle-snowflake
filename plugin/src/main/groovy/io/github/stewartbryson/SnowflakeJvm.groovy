@@ -92,6 +92,8 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
      */
     @TaskAction
     def publish() {
+        // create the session
+        createSession()
         // create the clone and set the USE SCHEMA
         //todo Make this automatic as part of SnowflakeEphemeralTask
         createClone()
