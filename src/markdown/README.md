@@ -1,7 +1,7 @@
 # Breaking Changes
 I've introduced breaking changes in version `1.0.0`.
 In preparation for supporting non-JVM languages, the task `snowflakePublish` has been renamed to `snowflakeJvm`.
-`snowflakeJvm` will be the task for deploying all JVM-based languages, including Java, Groovy, Scala and any others that may be supported by Snowflake in the future.
+`snowflakeJvm` will be the task for deploying all JVM-based languages, including Java, Groovy, Scala and any others that may be supported by Gradle through plugins.
 
 I created a [lifecycle task](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) called `snowflakePublish` that depends on `snowflakeJvm`, which should eliminate many build script changes.
 However, the `snowflakeJvm` task (previously `snowflakePublish`) does have command-line options.
