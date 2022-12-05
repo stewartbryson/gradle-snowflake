@@ -1,16 +1,11 @@
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.44.0'
-    id 'io.github.stewartbryson.snowflake' version '1.0.6'
+    id 'io.github.stewartbryson.snowflake' version '1.0.7'
 }
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-  implementation 'org.apache.logging.log4j:log4j-api:2.18.0'
-  implementation 'org.apache.logging.log4j:log4j-core:2.18.0'
 }
 
 java {
