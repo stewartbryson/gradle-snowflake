@@ -9,8 +9,8 @@ In case you are using those options, then you will have to make build script cha
 This documentation has been updated to reflect these changes.
 
 # Motivation
-It needs to be easy to develop and test Java applications even if they are being deployed to Snowflake using Snowpark and UDFs.
-Using [Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample project](examples/simple-jar/) that demonstrates this basic use case:
+It needs to be easy to develop and test JVM applications even if they are being deployed to Snowflake using Snowpark and UDFs.
+Using [Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample Java project](examples/simple-jar/) that demonstrates this basic use case:
 
 ```
 cd examples/simple-jar
@@ -18,7 +18,7 @@ cd examples/simple-jar
 ```
 
 But this JAR would still have to be uploaded to a stage in Snowflake, and the UDF would have to be created or possibly recreated if its signature changed.
-I wanted an experience as natural to developers in IntelliJ as any other deployment target.
+I wanted an experience using Snowflake that is as natural to developers using IntelliJ or VS Code for standard Java projects.
 
 # The Snowflake Plugin
 This plugin provides easy configuration options for those getting started with Gradle but also provides advanced features for teams already using Gradle in other areas of the organization.
@@ -29,6 +29,9 @@ It has three basic modes:
 3. Publishing to Snowflake using external stages and custom configuration of the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 
 Have a look at the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/package-summary.html).
+
+This plugin can be used to build UDFs in any JVM language supported by Gradle, which currently provides official support for Java, Scala, Kotlin and Groovy.
+See the [examples](examples) directory for examples using different languages.
 
 # Internal Stages using Snowpark
 Unless you have a heavy investment in Gradle as an organization, this is likely the option you want to use.
