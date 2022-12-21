@@ -1,22 +1,30 @@
 package io.github.stewartbryson
 
 import be.vbgn.gradle.cidetect.CiInformation
+import groovy.util.logging.Slf4j
 import org.apache.commons.lang3.ObjectUtils
 import org.apache.commons.lang3.RandomStringUtils
 import org.gradle.api.Project
 
-
 /**
  * The plugin configuration extension that is applied to the Gradle project as 'snowflake'.
  */
+@Slf4j
 class SnowflakeExtension {
+
+    private Project project
+    private String projectName
+    private CiInformation ci
+
     SnowflakeExtension(Project project) {
         this.project = project
+        this.projectName = project.rootProject.name
+        this.ci = CiInformation.detect(project)
+        this.ephemeralName = snowflakeCloneName
     }
-    private Project project
 
     /**
-     * The Snowflake account URL, for instance: https://gradle-snowflake.us-east-1.snowflakecomputing.com:443.
+     * The Snowflake account URL, for instance: https://myaccount.us-east-1.snowflakecomputing.com:443.
      */
     String account
     /**
@@ -76,7 +84,7 @@ class SnowflakeExtension {
      *
      * When GitHub Actions environment variables are available, then an intelligent name is generated based on the type of event. When GitHub actions environment variables are not available, a simple unique name is generated.
      */
-    String ephemeralName = snowflakeCloneName
+    String ephemeralName
 
     /**
      * Return the name of the Maven publication task associated with the external stage.
@@ -89,11 +97,10 @@ class SnowflakeExtension {
      * Return the database clone name based on GitHub actions when available.
      */
     String getSnowflakeCloneName() {
-        def ci = CiInformation.detect(project)
         // determine the base name for the clone
         String baseName = ObjectUtils.firstNonNull(ci.getPullRequest(), ci.reference, RandomStringUtils.randomAlphanumeric(9))
         // determine the reference type
         String refType = ci.isPullRequest() ? 'pr_' :(ci.isTag()? 'tag_' : (ci.isCi() ? 'branch_' : ''))
-        "ephemeral_${refType}${baseName}"
+        "ephemeral_${projectName.replace('-','')}_${refType}${baseName}"
     }
 }
