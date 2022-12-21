@@ -13,10 +13,10 @@ class SnowflakePlugin implements Plugin<Project> {
    private static String PLUGIN = 'snowflake'
 
    /**
-    * Apply the snowflake plugin to a Gradle project. Also applies the 'com.github.johnrengelman.shadow' plugin. Supporting the 'scala' plugin as well is on the roadmap.
+    * Apply the snowflake plugin to a Gradle project. Also applies the 'com.github.johnrengelman.shadow' plugin.
     */
    void apply(Project project) {
-      project.extensions.create(PLUGIN, SnowflakeExtension)
+      project.extensions.create(PLUGIN, SnowflakeExtension, project)
 
       // shorthand
       def extension = project.extensions."$PLUGIN"
