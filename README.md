@@ -43,7 +43,7 @@ We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrenge
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '1.0.9'
+    id 'io.github.stewartbryson.snowflake' version '1.0.10'
 }
 ```
 
@@ -285,10 +285,12 @@ We then configure `publications` and `repositories` as described in the [`maven-
 The `publishUrl` property is no longer required because it's configured in the `publications` closure, but if provided, the plugin will ensure it matches the metadata for the `stage` property.
 `groupId` and `artifactId` are still required so that `snowflakeJvm` can autogenerate the `imports` section of the `CREATE OR REPLACE...` statement.
 
-# Running tests in ephemeral Snowflake databases
+# Testing deployments with ephemeral databases
 Running unit tests using static Snowflake databases is boring, especially considering the [zero-copy cloning](https://docs.snowflake.com/en/user-guide/object-clone.html#cloning-considerations) functionality available.
 The `snowflakeJvm` task supports cloning an ephemeral database from the database we connect to and publishing to the clone instead.
-This workflow is useful for CI/CD processes testing pull requests and is accessible either through the configuration closure, or as an option passed directly to the Gradle task:
+This workflow is useful for CI/CD processes testing pull requests and is accessible either through the configuration closure, or as an option passed directly to the Gradle task.
+To demonstrate, we'll use the `internal-stage` project referenced above.
+We can either of the following:
 
 ```
 useEphemeral = true
@@ -299,7 +301,7 @@ or
 ❯ ./gradlew snowflakeJvm --use-ephemeral                 
 
 > Task :snowflakeJvm
-Ephemeral clone ephemeral_yyuG7AcRF created.
+Ephemeral clone ephemeral_internalstage_yyuG7AcRF created.
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 
 CREATE OR REPLACE function add_numbers (a integer, b integer)
@@ -308,7 +310,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   handler = 'Sample.addNum'
   imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
 
-Ephemeral clone ephemeral_yyuG7AcRF dropped.
+Ephemeral clone ephemeral_internalstage_yyuG7AcRF dropped.
 
 BUILD SUCCESSFUL in 19s
 3 actionable tasks: 1 executed, 2 up-to-date
@@ -327,7 +329,7 @@ The plugin is aware when it is running in CI/CD environments and currently suppo
  ❯ ./gradlew snowflakeJvm --use-ephemeral
 
 > Task :snowflakeJvm
-Ephemeral clone ephemeral_pr_46 created.
+Ephemeral clone ephemeral_internalstage_pr_46 created.
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 
 CREATE OR REPLACE function add_numbers (a integer, b integer)
@@ -336,7 +338,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   handler = 'Sample.addNum'
   imports = ('@upload/libs/internal-stage-0.1.0-all.jar')
 
-Ephemeral clone ephemeral_pr_46 dropped.
+Ephemeral clone ephemeral_internalstage_pr_46 dropped.
 
 BUILD SUCCESSFUL in 29s
  ```
@@ -374,7 +376,7 @@ This is useful for manual prototyping to ensure our applications are being deplo
 ❯ ./gradlew snowflakeJvm --use-ephemeral --keep-ephemeral           
 
 > Task :snowflakeJvm
-Ephemeral clone ephemeral_r0sf0U1ix created.
+Ephemeral clone ephemeral_internalstage_r0sf0U1ix created.
 File internal-stage-0.1.0-all.jar: UPLOADED
 Deploying ==> 
 CREATE OR REPLACE function add_numbers (a integer, b integer)
