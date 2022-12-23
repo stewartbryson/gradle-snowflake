@@ -39,7 +39,7 @@ Additionally, if you plan on *sharing* UDFs across Snowflake accounts, this is t
 Look at the [sample project](examples/internal-stage/) and you'll notice a few differences in the [build file](examples/internal-stage/build.gradle).
 We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrengelman.shadow` because the `shadow` plugin is automatically applied by the `snowflake` plugin:
 
-```
+```groovy
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
@@ -99,7 +99,7 @@ BUILD SUCCESSFUL in 3s
 Several command-line options mention _overriding_ other configuration values.
 This is because the plugin also provides a configuration closure called `snowflake` that we can use to configure our build, all of which are documented in the [class API](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/SnowflakeExtension.html):
 
-```
+```groovy
 snowflake {
     // All the following options are provided in my local gradle.properties file
     // url = <snowflake account url>
@@ -122,7 +122,7 @@ snowflake {
 Notice that I'm not hard-coding sensitive credentials.
 Instead, they are in my local `gradle.properties` file, and any of the plugin configs can be provided this way or [other ways](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties) using Gradle project properties:
 
-```
+```properties
 # local file in ~/.gradle/gradle.properties
 snowflake.url = https://myorg.snowflakecomputing.com:443
 snowflake.user = myusername
@@ -133,7 +133,7 @@ The nested [`applications` closure](https://s3.amazonaws.com/stewartbryson.docs/
 This is a simple way to use DSL to configure all the different UDFs we want to automatically create (or recreate) each time we publish the JAR file.
 The example above will generate and execute the statement:
 
-```
+```roomsql
 CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
@@ -163,7 +163,7 @@ BUILD SUCCESSFUL in 10s
 
 Our function now exists in Snowflake:
 
-```
+```roomsql
 select add_numbers(1,2);
 ```
 
@@ -182,7 +182,7 @@ This option is useful when you want your artifacts available to consumers other 
 Gradle has [built-in support](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:s3-repositories) for S3 or GCS as a Maven repository, and Snowflake has support for S3 or GCS external stages, so we simply marry the two in a single location.
 Looking at the [sample project](examples/external-stage/), notice we've populated a few additional properties:
 
-```
+```groovy
 snowflake {
     // All the following options are provided in my local gradle.properties file
     // url = <snowflake account url>
@@ -205,10 +205,10 @@ snowflake {
 }
 ```
 
-The `groupId` and `artifactId`, plus the built-in `version` property that exists for all Gradle builds, provide the [Maven coordinates](https://maven.apache.org/pom.html#Maven_Coordinates) for publishing externally to S3.
+The `groupId` and `artifactId`, plus the built-in `version` property that exists for all Gradle builds, provide the [Maven coordinates](https://maven.apache.org/pom.html#Maven_Coordinates) for publishing externally to S3 or GCS.
 I've also created a property in my local `gradle.properties` file for the bucket:
 
-```
+```properties
 # local file in ~/.gradle/gradle.properties
 snowflake.publishUrl = 's3://myrepo/release'
 ```
@@ -276,7 +276,7 @@ BUILD SUCCESSFUL in 12s
  # Manual configuration of `maven-publish` with External Stages
 For organizations that already use `maven-publish` extensively, or have customizations outside the scope of auto-configuration, the plugin supports disabling auto-configuration:
 
-```
+```groovy
 useCustomMaven = true
 ```
 
@@ -292,7 +292,7 @@ This workflow is useful for CI/CD processes testing pull requests and is accessi
 To demonstrate, we'll use the `internal-stage` project referenced above.
 We can either of the following:
 
-```
+```groovy
 useEphemeral = true
 ```
 or
@@ -345,7 +345,7 @@ BUILD SUCCESSFUL in 29s
 
  If we prefer to simply specify a clone name instead of relying on the plugin to generate it, that is supported as well:
 
- ```
+ ```groovy
  useEphemeral = true
  ephemeralName = 'testing_db'
  ```
@@ -389,3 +389,47 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
 BUILD SUCCESSFUL in 35s
 3 actionable tasks: 1 executed, 2 up-to-date
 ```
+# Contributing
+To make changes to the `README.md` file, please make them in the [master README file](src/markdown/README.md) instead.
+The version tokens in this file are automatically replaced with the current value before publishing.
+
+Two different unit test tasks are defined:
+```
+❯ ./gradlew tasks --group verification
+
+> Task :tasks
+
+------------------------------------------------------------
+Tasks runnable from root project 'gradle-snowflake'
+------------------------------------------------------------
+
+Verification tasks
+------------------
+check - Runs all checks.
+functionalTest - Runs the functional test suite.
+test - Runs the test suite.
+
+To see all tasks and more detail, run gradle tasks --all
+
+To see more detail about a task, run gradle help --task <task>
+
+BUILD SUCCESSFUL in 1s
+1 actionable task: 1 executed
+```
+The `functionalTest` task contains all the tests that actually make a connection to Snowflake and test a deployment.
+> WARNING: Ensure that the credential you provide below are for a safe development database.
+
+To run `functionalTest`, create the following entries in `~/.gradle/gradle.properties`:
+```properties
+snowflake.account=https://myaccount.snowflakecomputing.com:443
+snowflake.user=myuser
+snowflake.password=mypassword
+snowflake.database=mydatabase
+snowflake.role=myrole
+snowflake.schema=myschema
+snowflake.stage=mystage
+snowflake.warehouse=compute_wh
+```
+
+Open a pull request against the `main` branch.
+The Action that tests the PR won't run until I've reviewed it.

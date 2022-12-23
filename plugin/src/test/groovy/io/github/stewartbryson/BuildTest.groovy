@@ -1,16 +1,16 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
+import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.TempDir
-import org.gradle.testkit.runner.GradleRunner
 
 /**
- * A simple functional test for the 'io.github.stewartbryson.snowflake' plugin.
+ * A simple unit test for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class JavaTest extends Specification {
+class BuildTest extends Specification {
     @Shared
     def result
 
@@ -122,98 +122,47 @@ class JavaTest extends Specification {
         return result
     }
 
-    def "snowflakeJvm with S3 publishUrl option"() {
+    def "help task for SnowflakeJvm"() {
         given:
-        taskName = 'snowflakeJvm'
+        taskName = 'help'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", s3Stage, "-Psnowflake.publishUrl=$s3PublishUrl".toString(), '-Si'])
+        result = executeSingleTask(taskName, ['--task','snowflakeJvm','-S'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakeJvm with GCS publishUrl option"() {
+    def "tasks for publishing group with publishUrl"() {
         given:
-        taskName = 'snowflakeJvm'
+        taskName = 'tasks'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", gcsStage, "-Psnowflake.publishUrl=$gcsPublishUrl".toString(), '-Si'])
+        result = executeSingleTask(taskName, ['--group','publishing','-S',"-Psnowflake.publishUrl=$s3PublishUrl".toString()])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakeJvm without publishUrl option"() {
+    def "dry run without publishUrl"() {
         given:
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
+        result = executeSingleTask(taskName, ['-Sim'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakeJvm with custom JAR"() {
+    def "shadowJar"() {
         given:
-        taskName = 'snowflakeJvm'
+        taskName = 'shadowJar'
 
         when:
-        result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '--stage', 'upload', '-Si'])
+        result = executeSingleTask(taskName, ['-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm with immutable function"() {
-        given:
-        buildFile.write("""
-                    |plugins {
-                    |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'java'
-                    |}
-                    |java {
-                    |    toolchain {
-                    |        languageVersion = JavaLanguageVersion.of(11)
-                    |    }
-                    |}
-                    |snowflake {
-                    |  groupId = 'io.github.stewartbryson'
-                    |  artifactId = 'test-gradle-snowflake'
-                    |  role = '$role'
-                    |  database = '$database'
-                    |  schema = '$schema'
-                    |  applications {
-                    |      add_numbers {
-                    |         inputs = ["a integer", "b integer"]
-                    |         returns = "string"
-                    |         handler = "Sample.addNum"
-                    |         immutable = true
-                    |      }
-                    |   }
-                    |}
-                    |version='0.1.0'
-                    |""".stripMargin())
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm with ephemeral"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, "--use-ephemeral", '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
     }
 }

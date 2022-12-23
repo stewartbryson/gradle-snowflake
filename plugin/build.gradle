@@ -28,13 +28,13 @@ testing {
         // Configure the built-in test suite
         test {
             // Use Spock test framework
-            useSpock('2.1-groovy-3.0')
+            useSpock('2.2-groovy-3.0')
         }
 
         // Create a new test suite
         functionalTest(JvmTestSuite) {
             // Use Spock test framework
-            useSpock('2.1-groovy-3.0')
+            useSpock('2.2-groovy-3.0')
 
             dependencies {
                 // functionalTest test suite depends on the production code in tests
@@ -74,9 +74,9 @@ gradlePlugin {
             implementationClass = 'io.github.stewartbryson.SnowflakePlugin'
         }
     }
+    testSourceSets.add(sourceSets.functionalTest)
 }
 
-gradlePlugin.testSourceSets(sourceSets.functionalTest)
 build.dependsOn validatePlugins
 
 s3 {
