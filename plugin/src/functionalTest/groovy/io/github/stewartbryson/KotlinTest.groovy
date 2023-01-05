@@ -81,8 +81,7 @@ class KotlinTest extends Specification {
                             |class Sample {
                             |  fun addNum(num1: Int, num2: Int): String {
                             |    try {
-                            |      return "The sum is: " + (num1 + num2).toString()
-                            |      "The sum is: ${(num1 + num2)}"
+                            |      return "Sum is: " + (num1 + num2).toString()
                             |    } catch (e: Exception) {
                             |      return null.toString()
                             |    }
