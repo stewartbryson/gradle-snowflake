@@ -290,7 +290,7 @@ Running unit tests using static Snowflake databases is boring, especially consid
 The `snowflakeJvm` task supports cloning an ephemeral database from the database we connect to and publishing to the clone instead.
 This workflow is useful for CI/CD processes testing pull requests and is accessible either through the configuration closure, or as an option passed directly to the Gradle task.
 To demonstrate, we'll use the `internal-stage` project referenced above.
-We can either of the following:
+We can do either of the following:
 
 ```groovy
 useEphemeral = true
@@ -370,7 +370,7 @@ BUILD SUCCESSFUL in 41s
 ```
 
 Finally, if you want to keep the ephemeral database after the build is complete, simply pass the `--keep-ephemeral` option and it won't be dropped.
-This is useful for manual prototyping to ensure our applications are being deployed successfully, but shouldn't be used for automated CI/CD workflows:
+This is useful for manual prototyping to ensure our applications are being deployed successfully, but shouldn't be used for automated CI/CD workflows unless you want to create the clone when a pull request is opened and drop it when it is closed:
 
 ```
 ❯ ./gradlew snowflakeJvm --use-ephemeral --keep-ephemeral           
