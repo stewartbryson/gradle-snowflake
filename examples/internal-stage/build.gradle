@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.45.0'
-    id 'io.github.stewartbryson.snowflake' version '1.0.13'
+    id 'io.github.stewartbryson.snowflake' version '1.0.14'
 }
 
 repositories {
@@ -16,7 +16,7 @@ java {
 
 snowflake {
     // All the following options are provided in my local gradle.properties file
-    // account = <snowflake account url>
+    // url = <snowflake account url>
     // user = <snowflake user>
     // password = <snowflake password>
     role = 'stewart_role'
