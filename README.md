@@ -102,7 +102,7 @@ This is because the plugin also provides a configuration closure called `snowfla
 ```groovy
 snowflake {
     // All the following options are provided in my local gradle.properties file
-    // url = <snowflake account url>
+    // account = <snowflake account url>
     // user = <snowflake user>
     // password = <snowflake password>
     role = 'stewart_role'
@@ -124,7 +124,7 @@ Instead, they are in my local `gradle.properties` file, and any of the plugin co
 
 ```properties
 # local file in ~/.gradle/gradle.properties
-snowflake.url = https://myorg.snowflakecomputing.com:443
+snowflake.account = https://myorg.snowflakecomputing.com:443
 snowflake.user = myusername
 snowflake.password = mypassword
 ```
@@ -185,7 +185,7 @@ Looking at the [sample project](examples/external-stage/), notice we've populate
 ```groovy
 snowflake {
     // All the following options are provided in my local gradle.properties file
-    // url = <snowflake account url>
+    // account = <snowflake account url>
     // user = <snowflake user>
     // password = <snowflake password>
     // publishUrl = <S3 bucket and path>

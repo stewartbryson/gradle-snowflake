@@ -16,7 +16,7 @@ java {
 
 snowflake {
     // All the following options are provided in my local gradle.properties file
-    // url = <snowflake account url>
+    // account = <snowflake account url>
     // user = <snowflake user>
     // password = <snowflake password>
     // publishUrl = <S3 bucket and path>
