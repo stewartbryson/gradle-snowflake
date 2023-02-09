@@ -43,7 +43,7 @@ We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrenge
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '1.0.14'
+    id 'io.github.stewartbryson.snowflake' version '1.0.15'
 }
 ```
 
@@ -431,5 +431,4 @@ snowflake.stage=mystage
 snowflake.warehouse=compute_wh
 ```
 
-Open a pull request against the `main` branch.
-The Action that tests the PR won't run until I've reviewed it.
+Open a pull request against the `develop` branch so that it can be merged and possibly tweaked before I open the PR against the `main` branch.
