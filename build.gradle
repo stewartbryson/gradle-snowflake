@@ -54,6 +54,7 @@ tasks.register('copyExamples', Copy) {
         expand(version: version)
     }
     into 'examples'
+    mustRunAfter copyReadme
 }
 
 tasks.register('examples') {
