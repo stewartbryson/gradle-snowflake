@@ -58,20 +58,17 @@ testing {
     }
 }
 
-pluginBundle {
-    description = 'Simplifies publishing UDFs to Snowflake. Supports internal stages using Snowpark, or external stages with maven-publish.'
+gradlePlugin {
     website = 'https://github.com/stewartbryson/gradle-snowflake'
     vcsUrl = 'https://github.com/stewartbryson/gradle-snowflake'
-    tags = ['snowflake', 'snowpark', 'dataops', 'udf']
-}
-
-gradlePlugin {
     // Define the plugin
     plugins {
         snowflake {
+            description = 'Simplifies publishing UDFs to Snowflake. Supports internal stages using Snowpark, or external stages with maven-publish.'
             id = 'io.github.stewartbryson.snowflake'
             displayName = 'Snowflake Plugin'
             implementationClass = 'io.github.stewartbryson.SnowflakePlugin'
+            tags.set(['snowflake', 'snowpark', 'dataops', 'udf'])
         }
     }
     testSourceSets.add(sourceSets.functionalTest)
