@@ -1,7 +1,7 @@
 plugins {
     id 'groovy'
     id 'com.github.ben-manes.versions' version '0.46.0'
-    id 'io.github.stewartbryson.snowflake' version '1.0.14'
+    id 'io.github.stewartbryson.snowflake' version '1.1.0'
 }
 
 repositories {
