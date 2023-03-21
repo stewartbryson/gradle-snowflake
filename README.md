@@ -1,13 +1,3 @@
-# Breaking Changes
-I've introduced breaking changes in version `1.0.0`.
-In preparation for supporting non-JVM languages, the task `snowflakePublish` has been renamed to `snowflakeJvm`.
-`snowflakeJvm` will be the task for deploying all JVM-based languages, including Java, Groovy, Scala and any others that may be supported by Gradle through plugins.
-
-I created a [lifecycle task](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) called `snowflakePublish` that depends on `snowflakeJvm`, which should eliminate many build script changes.
-However, the `snowflakeJvm` task (previously `snowflakePublish`) does have command-line options.
-In case you are using those options, then you will have to make build script changes.
-This documentation has been updated to reflect these changes.
-
 # Motivation
 It needs to be easy to develop and test JVM applications even if they are being deployed to Snowflake using Snowpark and UDFs.
 Using [Gradle](https://www.gradle.org), we can easily build shaded JAR files with dependencies using the [shadow plugin](https://imperceptiblethoughts.com/shadow/), and I've provided a [sample Java project](examples/simple-jar/) that demonstrates this basic use case:
@@ -43,7 +33,7 @@ We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrenge
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '1.1.2'
+    id 'io.github.stewartbryson.snowflake' version '1.1.3'
 }
 ```
 
@@ -390,11 +380,10 @@ BUILD SUCCESSFUL in 35s
 3 actionable tasks: 1 executed, 2 up-to-date
 ```
 # Contributing
-Anyone can contribute!
 To make changes to the `README.md` file, please make them in the [master README file](src/markdown/README.md) instead.
 The version tokens in this file are automatically replaced with the current value before publishing.
 
-Three different unit test tasks are defined:
+Two different unit test tasks are defined:
 ```
 ❯ ./gradlew tasks --group verification
 
@@ -408,12 +397,11 @@ Verification tasks
 ------------------
 check - Runs all checks.
 functionalTest - Runs the functional test suite.
-integrationTest - Runs the integration test suite.
 test - Runs the test suite.
 
-To see all tasks and more detail, run gradlew tasks --all
+To see all tasks and more detail, run gradle tasks --all
 
-To see more detail about a task, run gradlew help --task <task>
+To see more detail about a task, run gradle help --task <task>
 
 BUILD SUCCESSFUL in 1s
 1 actionable task: 1 executed
@@ -429,16 +417,8 @@ snowflake.password=mypassword
 snowflake.database=mydatabase
 snowflake.role=myrole
 snowflake.schema=myschema
-snowflake.warehouse=mywarehouse
+snowflake.stage=mystage
+snowflake.warehouse=compute_wh
 ```
 
-The `integrationTest` requires the `~/.gradle/gradle.properties` file entries, but also requires the following external stages to exist:
-
-* `gcs_maven`: An external stage in GCS.
-* `s3_maven`: An external stage in S3.
-
-It is understandable if you are unable to test external stages as part of your contribution.
-I segmented them out for this reason.
-
 Open a pull request against the `develop` branch so that it can be merged and possibly tweaked before I open the PR against the `main` branch.
-This will also enable me to test external stages.
