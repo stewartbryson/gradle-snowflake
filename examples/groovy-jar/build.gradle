@@ -1,7 +1,7 @@
 plugins {
     id 'groovy'
     id 'com.github.ben-manes.versions' version '0.46.0'
-    id 'io.github.stewartbryson.snowflake' version '1.1.1'
+    id 'io.github.stewartbryson.snowflake' version '1.1.2'
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.codehaus.groovy:groovy:3.0.15'
+    implementation 'org.codehaus.groovy:groovy:3.0.16'
 }
 
 java {
