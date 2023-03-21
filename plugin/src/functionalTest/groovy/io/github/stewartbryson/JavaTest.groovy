@@ -7,7 +7,7 @@ import spock.lang.TempDir
 import org.gradle.testkit.runner.GradleRunner
 
 /**
- * A simple functional test for the 'io.github.stewartbryson.snowflake' plugin.
+ * Functional Java tests for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
 class JavaTest extends Specification {
@@ -32,14 +32,10 @@ class JavaTest extends Specification {
            warehouse = System.getProperty("snowflake.warehouse"),
            user = System.getProperty("snowflake.user"),
            password = System.getProperty("snowflake.password"),
-           s3PublishUrl = System.getProperty("snowflake.s3PublishUrl"),
-           gcsPublishUrl = System.getProperty("snowflake.gcsPublishUrl"),
            role = System.getProperty("snowflake.role"),
            database = System.getProperty("snowflake.database"),
            schema = System.getProperty("snowflake.schema"),
-           internalStage = System.getProperty("internalStage"),
-           s3Stage = System.getProperty("s3Stage"),
-           gcsStage = System.getProperty("gcsStage")
+           stage = System.getProperty("internalStage")
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -65,6 +61,7 @@ class JavaTest extends Specification {
                     |  database = '$database'
                     |  schema = '$schema'
                     |  warehouse = '$warehouse'
+                    |  stage = '$stage'
                     |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
@@ -125,34 +122,12 @@ class JavaTest extends Specification {
         return result
     }
 
-    def "snowflakeJvm with S3 publishUrl option"() {
+    def "snowflakeJvm with defaults"() {
         given:
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", s3Stage, "-Psnowflake.publishUrl=$s3PublishUrl".toString(), '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm with GCS publishUrl option"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", gcsStage, "-Psnowflake.publishUrl=$gcsPublishUrl".toString(), '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm without publishUrl option"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
+        result = executeSingleTask(taskName, ['-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -163,7 +138,7 @@ class JavaTest extends Specification {
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '--stage', 'upload', '-Si'])
+        result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -188,6 +163,7 @@ class JavaTest extends Specification {
                     |  database = '$database'
                     |  schema = '$schema'
                     |  warehouse = '$warehouse'
+                    |  stage = '$stage'
                     |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
@@ -203,7 +179,7 @@ class JavaTest extends Specification {
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
+        result = executeSingleTask(taskName, ['-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -214,7 +190,7 @@ class JavaTest extends Specification {
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, "--use-ephemeral", '-Si'])
+        result = executeSingleTask(taskName, ["--use-ephemeral", '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
