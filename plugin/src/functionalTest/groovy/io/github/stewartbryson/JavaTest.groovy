@@ -29,6 +29,7 @@ class JavaTest extends Specification {
 
     @Shared
     String account = System.getProperty("snowflake.account"),
+           warehouse = System.getProperty("snowflake.warehouse"),
            user = System.getProperty("snowflake.user"),
            password = System.getProperty("snowflake.password"),
            s3PublishUrl = System.getProperty("snowflake.s3PublishUrl"),
@@ -63,6 +64,8 @@ class JavaTest extends Specification {
                     |  role = '$role'
                     |  database = '$database'
                     |  schema = '$schema'
+                    |  warehouse = '$warehouse'
+                    |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -184,6 +187,8 @@ class JavaTest extends Specification {
                     |  role = '$role'
                     |  database = '$database'
                     |  schema = '$schema'
+                    |  warehouse = '$warehouse'
+                    |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
