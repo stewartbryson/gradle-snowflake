@@ -1,5 +1,5 @@
 plugins {
-   id "com.github.burrunan.s3-build-cache" version "1.3"
+   id "com.github.burrunan.s3-build-cache" version "1.5"
 }
 
 rootProject.name = 'gradle-snowflake'
@@ -13,8 +13,8 @@ buildCache {
       enabled = false
    }
    remote(com.github.burrunan.s3cache.AwsS3BuildCache) {
-      region = 'us-west-2'
-      bucket = 'coalesce.gradle.cache'
+      region = 'us-east-1'
+      bucket = 'nio-gradle-cache'
       prefix = "${rootProject.name}/"
       push = isCiServer
       lookupDefaultAwsCredentials = true

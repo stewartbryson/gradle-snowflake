@@ -6,6 +6,10 @@ on:
       - main
     types: [ closed ]
 
+env:
+  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
 jobs:
   build:
     if: ${{ github.event.pull_request.merged }}
@@ -36,17 +40,11 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build buildDashboard
-        env:
-          AWS_ACCESS_KEY_ID: ${{secrets.CIO_AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.CIO_AWS_SECRET_ACCESS_KEY}}
 
       - name: Gradle publish
         uses: gradle/gradle-build-action@v2
         with:
           arguments: publish githubRelease publishDocs examples -PgithubToken=${{secrets.GITHUB_TOKEN}}
-        env:
-          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
-          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
       - name: Publish tests
         uses: mikepenz/action-junit-report@v3
