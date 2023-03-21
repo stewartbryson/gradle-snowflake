@@ -7,10 +7,10 @@ import spock.lang.Specification
 import spock.lang.TempDir
 
 /**
- * Functional Kotlin tests for the 'io.github.stewartbryson.snowflake' plugin.
+ * Functional Java tests with GCS for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class KotlinTest extends Specification {
+class JavaGoogleTest extends Specification {
     @Shared
     def result
 
@@ -22,46 +22,48 @@ class KotlinTest extends Specification {
     private File projectDir
 
     @Shared
-    File buildFile, settingsFile, classFile
+    File buildFile, settingsFile, javaFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test', language = 'kotlin'
+    String ephemeralName = 'ephemeral_unit_test'
 
     @Shared
     String account = System.getProperty("snowflake.account"),
            warehouse = System.getProperty("snowflake.warehouse"),
            user = System.getProperty("snowflake.user"),
            password = System.getProperty("snowflake.password"),
+           publishUrl = System.getProperty("snowflake.gcsPublishUrl"),
            role = System.getProperty("snowflake.role"),
            database = System.getProperty("snowflake.database"),
            schema = System.getProperty("snowflake.schema"),
-           internalStage = System.getProperty("internalStage")
+           stage = System.getProperty("gcsStage")
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
         settingsFile.write("""
-                     |rootProject.name = "$language-test"
+                     |rootProject.name = 'unit-test'
                      |""".stripMargin())
 
         buildFile = new File(projectDir, 'build.gradle')
         buildFile.write("""
                     |plugins {
                     |    id 'io.github.stewartbryson.snowflake'
-                    |    id "org.jetbrains.kotlin.jvm" version "1.7.21"
+                    |    id 'java'
                     |}
                     |java {
                     |    toolchain {
                     |        languageVersion = JavaLanguageVersion.of(11)
                     |    }
                     |}
-                    |repositories {
-                    |    mavenCentral()
-                    |}
                     |snowflake {
+                    |  groupId = 'io.github.stewartbryson'
+                    |  artifactId = 'test-gradle-snowflake'
                     |  role = '$role'
                     |  database = '$database'
                     |  schema = '$schema'
                     |  warehouse = '$warehouse'
+                    |  stage = '$stage'
+                    |  publishUrl = '$publishUrl'
                     |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
@@ -74,19 +76,25 @@ class KotlinTest extends Specification {
                     |version='0.1.0'
                     |""".stripMargin())
 
-        classFile = new File("${projectDir}/src/main/$language", "Sample.kt")
-        classFile.parentFile.mkdirs()
-        classFile.write('''|
-                            |class Sample {
-                            |  fun addNum(num1: Int, num2: Int): String {
-                            |    try {
-                            |      return "Sum is: " + (num1 + num2).toString()
-                            |    } catch (e: Exception) {
-                            |      return null.toString()
-                            |    }
-                            |  }
-                            |}
-                  |'''.stripMargin())
+        javaFile = new File("${projectDir}/src/main/java", 'Sample.java')
+        javaFile.parentFile.mkdirs()
+        javaFile.write("""
+                  |public class Sample
+                  |{
+                  |  public String addNum(int num1, int num2) {
+                  |    try {
+                  |      int sum = num1 + num2;
+                  |      return ("Sum is: " + sum);
+                  |    } catch (Exception e) {
+                  |      return e.toString();
+                  |      }
+                  |    }
+                  |
+                  |    public static void main(String[] args){
+                  |      System.out.println("Hello World");
+                  |  }
+                  |}
+                  |""".stripMargin())
     }
 
     // helper method
@@ -99,6 +107,9 @@ class KotlinTest extends Specification {
         ]
         args.add(0, taskName)
         args.addAll(systemArgs)
+
+        // Don't print the password
+        //log.warn "runner arguments: ${args}"
 
         // execute the Gradle test build
         result = GradleRunner.create()
@@ -113,9 +124,9 @@ class KotlinTest extends Specification {
         return result
     }
 
-    def "shadowJar"() {
+    def "snowflakeJvm with GCS stage"() {
         given:
-        taskName = 'shadowJar'
+        taskName = 'snowflakeJvm'
 
         when:
         result = executeSingleTask(taskName, ['-Si'])
@@ -124,23 +135,12 @@ class KotlinTest extends Specification {
         !result.tasks.collect { it.outcome }.contains('FAILURE')
     }
 
-    def "snowflakeJvm for Kotlin"() {
+    def "snowflakeJvm with GCS stage ephemeral"() {
         given:
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm for Kotlin with ephemeral"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, "--use-ephemeral", '-Si'])
+        result = executeSingleTask(taskName, ["--use-ephemeral", '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

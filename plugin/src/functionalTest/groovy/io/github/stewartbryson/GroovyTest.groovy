@@ -7,7 +7,7 @@ import spock.lang.Specification
 import spock.lang.TempDir
 
 /**
- * A simple functional test for the 'io.github.stewartbryson.snowflake' plugin.
+ * Functional Groovy tests for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
 class GroovyTest extends Specification {

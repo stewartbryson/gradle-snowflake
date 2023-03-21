@@ -39,7 +39,7 @@ jobs:
       - name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build buildDashboard
+          arguments: build validatePlugin functionalTest integrationTest buildDashboard
 
       - name: Gradle publish
         uses: gradle/gradle-build-action@v2
