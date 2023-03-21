@@ -29,16 +29,13 @@ class GroovyTest extends Specification {
 
     @Shared
     String account = System.getProperty("snowflake.account"),
+           warehouse = System.getProperty("snowflake.warehouse"),
            user = System.getProperty("snowflake.user"),
            password = System.getProperty("snowflake.password"),
-           s3PublishUrl = System.getProperty("snowflake.s3PublishUrl"),
-           gcsPublishUrl = System.getProperty("snowflake.gcsPublishUrl"),
            role = System.getProperty("snowflake.role"),
            database = System.getProperty("snowflake.database"),
            schema = System.getProperty("snowflake.schema"),
-           internalStage = System.getProperty("internalStage"),
-           s3Stage = System.getProperty("s3Stage"),
-           gcsStage = System.getProperty("gcsStage")
+           internalStage = System.getProperty("internalStage")
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -67,6 +64,8 @@ class GroovyTest extends Specification {
                     |  role = '$role'
                     |  database = '$database'
                     |  schema = '$schema'
+                    |  warehouse = '$warehouse'
+                    |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
