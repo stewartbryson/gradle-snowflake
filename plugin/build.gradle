@@ -31,7 +31,7 @@ testing {
             useSpock('2.2-groovy-3.0')
         }
 
-        // Create a new test suite
+        // Test suite that makes a connection to Snowflake, but only uses internal stages
         functionalTest(JvmTestSuite) {
             // Use Spock test framework
             useSpock('2.2-groovy-3.0')
@@ -48,6 +48,28 @@ testing {
                         shouldRunAfter(test)
                         systemProperties project.properties.findAll { it.key.startsWith "snowflake." }
                         systemProperty 'internalStage', findProperty('internalStage')
+                        failFast true
+                    }
+                }
+            }
+        }
+
+        // Test suite that makes a connection to Snowflake and tests external stages with GCS and S3.
+        integrationTest(JvmTestSuite) {
+            // Use Spock test framework
+            useSpock('2.2-groovy-3.0')
+
+            dependencies {
+                // functionalTest test suite depends on the production code in tests
+                implementation project(":plugin")
+            }
+
+            targets {
+                all {
+                    // This test suite should run after the built-in test suite has run its tests
+                    testTask.configure {
+                        shouldRunAfter(test)
+                        systemProperties project.properties.findAll { it.key.startsWith "snowflake." }
                         systemProperty 's3Stage', findProperty('s3Stage')
                         systemProperty 'gcsStage', findProperty('gcsStage')
                         failFast true
@@ -72,6 +94,7 @@ gradlePlugin {
         }
     }
     testSourceSets.add(sourceSets.functionalTest)
+    testSourceSets.add(sourceSets.integrationTest)
 }
 
 build.dependsOn validatePlugins
