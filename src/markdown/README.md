@@ -407,7 +407,7 @@ BUILD SUCCESSFUL in 1s
 1 actionable task: 1 executed
 ```
 The `functionalTest` task contains all the tests that actually make a connection to Snowflake and test a deployment.
-> WARNING: Ensure that the credential you provide below are for a safe development database.
+> WARNING: Ensure that the credential provided below are for a safe development database.
 
 To run `functionalTest`, create the following entries in `~/.gradle/gradle.properties`:
 ```properties

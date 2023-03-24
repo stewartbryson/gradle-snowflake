@@ -30,7 +30,7 @@ abstract class SnowflakeTask extends DefaultTask {
     }
 
     /**
-     * The Snowflake account URL, for instance: https://gradle-snowflake.us-east-1.snowflakecomputing.com:443. Overrides {@link SnowflakeExtension#account}.
+     * The Snowflake account URL, for instance: https://gradle-snowflake.us-east-1.snowflakecomputing.com. Overrides {@link SnowflakeExtension#account}.
      */
     @Optional
     @Input
@@ -103,14 +103,24 @@ abstract class SnowflakeTask extends DefaultTask {
      */
     Session createSession() {
         Map props = [
-                url      : account,
-                user     : user,
-                password : password,
-                role     : role,
-                warehouse: warehouse,
-                db       : database,
-                schema   : schema
+                url     : account,
+                user    : user,
+                password: password
         ]
+        // add the optional connection parameters
+        if (role != 'null') {
+            props.role = role
+        }
+        if (warehouse != 'null') {
+            props.warehouse = warehouse
+        }
+        if (database != 'null') {
+            props.db = database
+        }
+        if (schema != 'null') {
+            props.schema = schema
+        }
+
         Map printable = props.clone()
         printable.password = "*********"
         log.info "Snowflake config: $printable"
@@ -136,7 +146,7 @@ abstract class SnowflakeTask extends DefaultTask {
      *
      * @return a scalar column value.
      */
-    def getColumnValue(String sql) {
+    def getSingleValue(String sql) {
         Statement statement = session.jdbcConnection().createStatement()
         ResultSet rs = statement.executeQuery(sql)
         def columnValue

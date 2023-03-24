@@ -40,17 +40,17 @@ class SnowflakeExtension {
      */
     String database
     /**
-     * The Snowflake schema to connect with. Default: 'public'.
+     * The Snowflake schema to connect with.
      */
-    String schema = 'public'
+    String schema
     /**
      * The Snowflake role to connect with.
      */
     String role
     /**
-     * The Snowflake warehouse to connect with. Default: 'compute_wh'.
+     * The Snowflake warehouse to connect with.
      */
-    String warehouse = "compute_wh"
+    String warehouse
     /**
      * The Snowflake stage to upload to. Default: 'maven'.
      */
