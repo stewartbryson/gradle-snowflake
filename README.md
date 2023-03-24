@@ -33,7 +33,7 @@ We applied `io.github.stewartbryson.snowflake` and removed `com.github.johnrenge
 plugins {
     id 'java'
     id 'com.github.ben-manes.versions' version '0.42.0'
-    id 'io.github.stewartbryson.snowflake' version '1.1.3'
+    id 'io.github.stewartbryson.snowflake' version '1.1.4'
 }
 ```
 
@@ -379,13 +379,11 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
 BUILD SUCCESSFUL in 35s
 3 actionable tasks: 1 executed, 2 up-to-date
 ```
-
 # Contributing
-Anyone can contribute!
 To make changes to the `README.md` file, please make them in the [master README file](src/markdown/README.md) instead.
 The version tokens in this file are automatically replaced with the current value before publishing.
 
-Three different unit test tasks are defined:
+Two different unit test tasks are defined:
 ```
 ❯ ./gradlew tasks --group verification
 
@@ -399,18 +397,17 @@ Verification tasks
 ------------------
 check - Runs all checks.
 functionalTest - Runs the functional test suite.
-integrationTest - Runs the integration test suite.
 test - Runs the test suite.
 
-To see all tasks and more detail, run gradlew tasks --all
+To see all tasks and more detail, run gradle tasks --all
 
-To see more detail about a task, run gradlew help --task <task>
+To see more detail about a task, run gradle help --task <task>
 
 BUILD SUCCESSFUL in 1s
 1 actionable task: 1 executed
 ```
 The `functionalTest` task contains all the tests that actually make a connection to Snowflake and test a deployment.
-> WARNING: Ensure that the credential you provide below are for a safe development database.
+> WARNING: Ensure that the credential provided below are for a safe development database.
 
 To run `functionalTest`, create the following entries in `~/.gradle/gradle.properties`:
 ```properties
@@ -420,16 +417,8 @@ snowflake.password=mypassword
 snowflake.database=mydatabase
 snowflake.role=myrole
 snowflake.schema=myschema
-snowflake.warehouse=mywarehouse
+snowflake.stage=mystage
+snowflake.warehouse=compute_wh
 ```
 
-The `integrationTest` requires the `~/.gradle/gradle.properties` file entries, but also requires the following external stages to exist:
-
-* `gcs_maven`: An external stage in GCS.
-* `s3_maven`: An external stage in S3.
-
-It is understandable if you are unable to test external stages as part of your contribution.
-I segmented them out for this reason.
-
 Open a pull request against the `develop` branch so that it can be merged and possibly tweaked before I open the PR against the `main` branch.
-This will also enable me to test external stages.
