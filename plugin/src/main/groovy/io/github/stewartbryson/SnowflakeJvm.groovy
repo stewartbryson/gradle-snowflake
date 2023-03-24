@@ -116,7 +116,7 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
             }
         } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned
-            String selectStage = getColumnValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'")
+            String selectStage = getSingleValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'")
             assert selectStage == extension.publishUrl
         }
 
