@@ -142,11 +142,11 @@ abstract class SnowflakeTask extends DefaultTask {
     Session session
 
     /**
-     * Return a scalar column value from a SELECT statement where only one row is returned.
+     * Return the first column from the first row of a SELECT statement.
      *
      * @return a scalar column value.
      */
-    def getSingleValue(String sql) {
+    def getScalarValue(String sql) {
         Statement statement = session.jdbcConnection().createStatement()
         ResultSet rs = statement.executeQuery(sql)
         def columnValue

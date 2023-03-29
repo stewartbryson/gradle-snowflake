@@ -82,7 +82,7 @@ class SnowflakeExtension {
     /**
      * The name of the cloned Snowflake database. Default: auto-generated.
      *
-     * When GitHub Actions environment variables are available, then an intelligent name is generated based on the type of event. When GitHub actions environment variables are not available, a simple unique name is generated.
+     * Dynamically generated name for an ephemeral Snowflake clone to create. Uses CICD properties when they are available, and a simple unique name when they are not.
      */
     String ephemeralName
 
@@ -100,7 +100,7 @@ class SnowflakeExtension {
         // determine the base name for the clone
         String baseName = ObjectUtils.firstNonNull(ci.getPullRequest(), ci.reference, RandomStringUtils.randomAlphanumeric(9))
         // determine the reference type
-        String refType = ci.isPullRequest() ? 'pr_' :(ci.isTag()? 'tag_' : (ci.isCi() ? 'branch_' : ''))
-        "ephemeral_${projectName.replace('-','')}_${refType}${baseName}"
+        String refType = ci.isPullRequest() ? 'pr_' : (ci.isTag() ? 'tag_' : (ci.isCi() ? 'branch_' : ''))
+        "ephemeral_${projectName.replace('-', '')}_${refType}${baseName}"
     }
 }

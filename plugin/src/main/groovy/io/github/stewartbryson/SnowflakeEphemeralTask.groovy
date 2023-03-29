@@ -65,9 +65,9 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
         if (useEphemeral) {
             // record connection attributes
             try {
-                connectionDatabase = getSingleValue('SELECT CURRENT_DATABASE()')
-                connectionSchema = getSingleValue('SELECT CURRENT_SCHEMA()')
-                connectionRole = getSingleValue('SELECT CURRENT_ROLE()')
+                connectionDatabase = getScalarValue('SELECT CURRENT_DATABASE()')
+                connectionSchema = getScalarValue('SELECT CURRENT_SCHEMA()')
+                connectionRole = getScalarValue('SELECT CURRENT_ROLE()')
                 log.debug "Connection database, schema, role: $connectionDatabase, $connectionSchema, $connectionRole"
             } catch (Exception e) {
                 throw new Exception("Connection context is not available.", e)
@@ -84,7 +84,7 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
     }
 
     /**
-     * Drop the ephemeral Snowflake clone and return a session to it.
+     * Drop the ephemeral Snowflake clone.
      */
     def dropClone() {
         if (useEphemeral && !keepEphemeral) {
