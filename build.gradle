@@ -16,6 +16,13 @@ allprojects {
     project.version = scmVersion.version
 }
 
+if (hasProperty('buildScan')) {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+    }
+}
+
 scmVersion {
     tag {
         prefix = 'v'

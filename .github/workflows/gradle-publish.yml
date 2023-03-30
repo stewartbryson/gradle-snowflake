@@ -44,17 +44,17 @@ jobs:
       - name: Gradle release
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: release -Prelease.disableChecks -Prelease.localOnly
+          arguments: release -Prelease.disableChecks -Prelease.localOnly --scan
 
       - name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build validatePlugin functionalTest integrationTest buildDashboard
+          arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
 
       - name: Gradle publish
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publish githubRelease publishDocs examples -PgithubToken=${{secrets.GITHUB_TOKEN}}
+          arguments: publish githubRelease publishDocs examples --scan -PgithubToken=${{secrets.GITHUB_TOKEN}}
 
       - name: Publish tests
         uses: mikepenz/action-junit-report@v3
