@@ -33,6 +33,7 @@ class SnowConfig {
         } else {
             throw new Exception("Unable to find a Snowsql config file.")
         }
+        log.warn "Using snowsql config file: ${config.absolutePath}"
     }
 
     /**

@@ -26,7 +26,7 @@ abstract class SnowflakeTask extends DefaultTask {
     }
 
     /**
-     * The Snowsql config file to use. Default: Looks first for '~/.snowsql/config' followed by './snowconfig'.
+     * The Snowsql config file to use. Default: Looks first for '~/.snowsql/config' followed by './snow-config'.
      */
     @Input
     @Optional

@@ -25,10 +25,11 @@ jobs:
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-      - run: 'echo "$SNOWCONFIG" >> snowconfig'
+      - run: 'echo "$SNOW_CONFIG" >> snow-config'
+        name: 'Write snow-config file'
         shell: bash
         env:
-          GRADLE_PROPERTIES: ${{secrets.SNOWCONFIG}}
+          SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
