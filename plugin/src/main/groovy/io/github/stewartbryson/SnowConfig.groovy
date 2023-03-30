@@ -26,7 +26,6 @@ class SnowConfig {
         def homeConfig = new File(System.getProperty("user.home").toString() + "/.snowsql/config")
         // then look for ./snowconfig
         def projectConfig = new File('snow-config')
-        log.warn "Project config: ${projectConfig.absolutePath}" //TODO Remove this line
         if (homeConfig.exists()) {
             config = homeConfig
         } else if (projectConfig.exists()) {
