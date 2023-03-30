@@ -24,8 +24,8 @@ class SnowConfig {
         this.connection = connection
         // first look for ~/.snowsql/config
         def homeConfig = new File(System.getProperty("user.home").toString() + "/.snowsql/config")
-        // then look for ~/snowconfig
-        def projectConfig = new File('snowconfig')
+        // then look for ./snowconfig
+        def projectConfig = new File('snow-config')
         if (homeConfig.exists()) {
             config = homeConfig
         } else if (projectConfig.exists()) {
