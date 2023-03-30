@@ -65,7 +65,7 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
 
         String basePath = "@${stage}/${extension.groupId.replace('.', '/')}/${extension.artifactId}/${project.version}"
         //log.warn "basePath: $basePath"
-        Statement statement = session.jdbcConnection().createStatement()
+        Statement statement = snowflake.session.jdbcConnection().createStatement()
         String sql = "LIST $basePath pattern='(.)*(-all)\\.jar'; select * from table(result_scan(last_query_id())) order by 'last_modified' asc;"
         statement.unwrap(SnowflakeStatement.class).setParameter(
                 "MULTI_STATEMENT_COUNT", 2)
@@ -102,7 +102,7 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
 
         if (!extension.publishUrl && !extension.useCustomMaven) {
             // create the internal stage if it doesn't exist
-            session.jdbcConnection().createStatement().execute("create stage if not exists ${stage}")
+            snowflake.session.jdbcConnection().createStatement().execute("create stage if not exists ${stage}")
 
             //
             def options = [
@@ -110,13 +110,13 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
                     PARALLEL     : '4',
                     OVERWRITE    : 'TRUE'
             ]
-            PutResult[] pr = session.file().put(jar, "$stage/libs", options)
+            PutResult[] pr = snowflake.session.file().put(jar, "$stage/libs", options)
             pr.each {
                 log.warn "File ${it.sourceFileName}: ${it.status}"
             }
         } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned
-            String selectStage = getScalarValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$schema') and stage_type='External Named'")
+            String selectStage = getScalarValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$snowflake.connectionSchema') and stage_type='External Named'")
             assert selectStage == extension.publishUrl
         }
 
@@ -128,13 +128,13 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
             String message = "Deploying ==> \n$createText"
             log.warn message
             output.append("$message\n")
-            session.jdbcConnection().createStatement().execute(createText)
+            snowflake.session.jdbcConnection().createStatement().execute(createText)
         }
         // drop the clone and set the USE SCHEMA
         //todo Make this automatic as part of SnowflakeEphemeralTask
         dropClone()
 
         // close the session
-        session.close()
+        snowflake.session.close()
     }
 }

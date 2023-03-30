@@ -33,11 +33,6 @@ class Snowflake {
     }
 
     /**
-     * The ephemeral Snowflake clone name.
-     */
-    String keepEphemeral
-
-    /**
      * The connection database in case it wasn't in the connection.
      */
     String connectionDatabase
@@ -63,36 +58,12 @@ class Snowflake {
     }
 
     /**
-     * Constructor using auto-detected Snowsql config file and an ephemeral clone.
-     *
-     * @return Snowflake class.
-     */
-    Snowflake(String connection, String ephemeral, Boolean keepEphemeral= false) {
-        this.snowConfig = new SnowConfig(connection)
-        this.ephemeral = ephemeral
-        this.keepEphemeral = keepEphemeral
-        construct()
-    }
-
-    /**
      * Constructor using explicit Snowsql config file as a File object.
      *
      * @return Snowflake class.
      */
     Snowflake(File config, String connection) {
         this.snowConfig = new SnowConfig(config, connection)
-        construct()
-    }
-
-    /**
-     * Constructor using explicit Snowsql config file as a File object.
-     *
-     * @return Snowflake class.
-     */
-    Snowflake(File config, String connection, String ephemeral, Boolean keepEphemeral = false) {
-        this.snowConfig = new SnowConfig(config, connection)
-        this.ephemeral = ephemeral
-        this.keepEphemeral = keepEphemeral
         construct()
     }
 
@@ -118,48 +89,26 @@ class Snowflake {
             connectionDatabase = getScalarValue('SELECT CURRENT_DATABASE()')
             connectionSchema = getScalarValue('SELECT CURRENT_SCHEMA()')
             connectionRole = getScalarValue('SELECT CURRENT_ROLE()')
-            log.debug "Connection database, schema, role: $connectionDatabase, $connectionSchema, $connectionRole"
+            log.warn "Connection database, schema, role: $connectionDatabase, $connectionSchema, $connectionRole"
         } catch (Exception e) {
             throw new Exception("Connection context is not available.", e)
         }
-
-        // create the clone if ephemeral
-        if (isEphemeral()) {
-            createClone()
-        }
     }
 
     /**
-     * Create a snowflake ephemeral clone.
+     * Set original connection context in the Snowflake session.
      */
-    private def createClone() {
-        // create the clone
-        try {
-            session.jdbcConnection().createStatement().execute("create database if not exists ${ephemeral} clone ${connectionDatabase}")
-            session.jdbcConnection().createStatement().execute("grant ownership on database ${ephemeral} to ${connectionRole}")
-            session.jdbcConnection().createStatement().execute("use database ${ephemeral}")
-            session.jdbcConnection().createStatement().execute("use schema ${ephemeral}.${connectionSchema}")
-        } catch (Exception e) {
-            throw new Exception("Cloning ephemeral clone failed.", e)
-        }
-        log.warn "Ephemeral clone $ephemeral created."
-
+    def setOriginalContext() {
+        session.jdbcConnection().createStatement().execute("use database ${connectionDatabase}")
+        session.jdbcConnection().createStatement().execute("use schema ${connectionDatabase}.${connectionSchema}")
     }
 
     /**
-     * Drop the ephemeral Snowflake clone.
+     * Set ephemeral context in the Snowflake session.
      */
-    private def dropClone() {
-        // drop the ephemeral database
-        try {
-            session.jdbcConnection().createStatement().execute("drop database if exists ${ephemeral}")
-            session.jdbcConnection().createStatement().execute("use database ${connectionDatabase}")
-            session.jdbcConnection().createStatement().execute("use schema ${connectionDatabase}.${connectionSchema}")
-        } catch (Exception e) {
-            throw new Exception("Dropping ephemeral clone failed.", e)
-        }
-        log.warn "Ephemeral clone $ephemeral dropped."
-
+    def setEphemeralContext() {
+        session.jdbcConnection().createStatement().execute("use database ${ephemeral}")
+        session.jdbcConnection().createStatement().execute("use schema ${ephemeral}.${connectionSchema}")
     }
 
     /**

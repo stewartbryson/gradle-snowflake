@@ -25,20 +25,11 @@ class BuildTest extends Specification {
     File buildFile, settingsFile, javaFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test'
+    connection = 'gradle_plugin'
 
     @Shared
-    String account = System.getProperty("snowflake.account"),
-           user = System.getProperty("snowflake.user"),
-           password = System.getProperty("snowflake.password"),
-           s3PublishUrl = System.getProperty("snowflake.s3PublishUrl"),
-           gcsPublishUrl = System.getProperty("snowflake.gcsPublishUrl"),
-           role = System.getProperty("snowflake.role"),
-           database = System.getProperty("snowflake.database"),
-           schema = System.getProperty("snowflake.schema"),
-           internalStage = System.getProperty("internalStage"),
-           s3Stage = System.getProperty("s3Stage"),
-           gcsStage = System.getProperty("gcsStage")
+    String publishUrl = System.getProperty("s3PublishUrl"),
+           stage = System.getProperty("s3Stage")
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -60,9 +51,7 @@ class BuildTest extends Specification {
                     |snowflake {
                     |  groupId = 'io.github.stewartbryson'
                     |  artifactId = 'test-gradle-snowflake'
-                    |  role = '$role'
-                    |  database = '$database'
-                    |  schema = '$schema'
+                    |  connection = '$connection'
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -97,14 +86,7 @@ class BuildTest extends Specification {
 
     // helper method
     def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
-        // ultra secure handling
-        List systemArgs = [
-                "-Psnowflake.account=$account".toString(),
-                "-Psnowflake.user=$user".toString(),
-                "-Psnowflake.password=$password".toString()
-        ]
         args.add(0, taskName)
-        args.addAll(systemArgs)
 
         // Don't print the password
         //log.warn "runner arguments: ${args}"
@@ -138,7 +120,7 @@ class BuildTest extends Specification {
         taskName = 'tasks'
 
         when:
-        result = executeSingleTask(taskName, ['--group','publishing','-S',"-Psnowflake.publishUrl=$s3PublishUrl".toString()])
+        result = executeSingleTask(taskName, ['--group','publishing','-S',"-Psnowflake.publishUrl=$publishUrl".toString()])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

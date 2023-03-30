@@ -11,33 +11,19 @@ class SnowflakeTest extends Specification {
     Snowflake snowflake
 
     def "parse snowsql config"() {
-        given:
+        given: "a Snowflake class"
         snowflake = new Snowflake('gradle_plugin')
 
-        when:
-        def sql = 'SELECT 1'
-
-        then:
-        snowflake.getScalarValue(sql).toInteger() == 1
+        expect: "SELECT statements are successful"
+        snowflake.getScalarValue("SELECT 1").toInteger() == 1
     }
 
     def "isEphemeral() function"() {
-        given:
+        given: "a Snowflake class with ephemeral updated"
         snowflake = new Snowflake('gradle_plugin')
-
-        when:
         snowflake.ephemeral = 'functional_test'
 
-        then:
+        expect: "Boolean function works"
         snowflake.isEphemeral()
-    }
-
-    def "creating ephemeral clone"() {
-        when:
-        snowflake = new Snowflake('gradle_plugin', 'functional_test')
-
-        then:
-        snowflake.isEphemeral()
-        snowflake.getScalarValue("select CURRENT_DATABASE()") == snowflake.ephemeral.toUpperCase()
     }
 }

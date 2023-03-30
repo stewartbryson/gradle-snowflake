@@ -24,33 +24,10 @@ class SnowflakeExtension {
     }
 
     /**
-     * The Snowflake account URL, for instance: https://myaccount.us-east-1.snowflakecomputing.com:443.
+     * The Snowsql connection to use.
      */
-    String account
-    /**
-     * The Snowflake user to connect as.
-     */
-    String user
-    /**
-     * The Snowflake password to connect with.
-     */
-    String password
-    /**
-     * The Snowflake database to connect to.
-     */
-    String database
-    /**
-     * The Snowflake schema to connect with.
-     */
-    String schema
-    /**
-     * The Snowflake role to connect with.
-     */
-    String role
-    /**
-     * The Snowflake warehouse to connect with.
-     */
-    String warehouse
+    String connection
+
     /**
      * The Snowflake stage to upload to. Default: 'maven'.
      */

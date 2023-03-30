@@ -41,8 +41,6 @@ testing {
                     // This test suite should run after the built-in test suite has run its tests
                     testTask.configure {
                         shouldRunAfter(test)
-                        systemProperties project.properties.findAll { it.key.startsWith "snowflake." }
-                        systemProperty 'internalStage', findProperty('internalStage')
                         failFast true
                     }
                 }
@@ -56,9 +54,10 @@ testing {
                     // This test suite should run after the built-in test suite has run its tests
                     testTask.configure {
                         shouldRunAfter(test)
-                        systemProperties project.properties.findAll { it.key.startsWith "snowflake." }
                         systemProperty 's3Stage', findProperty('s3Stage')
                         systemProperty 'gcsStage', findProperty('gcsStage')
+                        systemProperty 's3PublishUrl', findProperty('s3PublishUrl')
+                        systemProperty 'gcsPublishUrl', findProperty('gcsPublishUrl')
                         failFast true
                     }
                 }

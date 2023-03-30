@@ -3,7 +3,6 @@ package io.github.stewartbryson
 import groovy.util.logging.Slf4j
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.options.Option
 
@@ -39,47 +38,20 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
     String ephemeralName = extension.ephemeralName
 
     /**
-     * The connection database in case it wasn't in the connection.
-     */
-    @Internal
-    String connectionDatabase
-
-    /**
-     * The connection schema in case it wasn't in the connection.
-     */
-    @Internal
-    String connectionSchema
-
-    /**
-     * The connection role in case it wasn't in the connection.
-     */
-    @Internal
-    String connectionRole
-
-    /**
-     * Create an ephemeral Snowflake clone and return a session to it.
-     *
-     * @return a session to the ephemeral Snowflake clone.
+     * Create an ephemeral Snowflake clone.
      */
     def createClone() {
         if (useEphemeral) {
             // record connection attributes
             try {
-                connectionDatabase = getScalarValue('SELECT CURRENT_DATABASE()')
-                connectionSchema = getScalarValue('SELECT CURRENT_SCHEMA()')
-                connectionRole = getScalarValue('SELECT CURRENT_ROLE()')
-                log.debug "Connection database, schema, role: $connectionDatabase, $connectionSchema, $connectionRole"
-            } catch (Exception e) {
-                throw new Exception("Connection context is not available.", e)
-            }
-            try {
-                session.jdbcConnection().createStatement().execute("create database if not exists ${ephemeralName} clone ${connectionDatabase}")
-                session.jdbcConnection().createStatement().execute("grant ownership on database ${ephemeralName} to ${connectionRole}")
-                session.jdbcConnection().createStatement().execute("use schema ${ephemeralName}.${connectionSchema}")
+                snowflake.ephemeral = ephemeralName
+                snowflake.session.jdbcConnection().createStatement().execute("create database if not exists ${snowflake.ephemeral} clone ${snowflake.connectionDatabase}")
+                snowflake.session.jdbcConnection().createStatement().execute("grant ownership on database ${snowflake.ephemeral} to ${snowflake.connectionRole}")
+                snowflake.setEphemeralContext()
             } catch (Exception e) {
                 throw new Exception("Cloning ephemeral clone failed.", e)
             }
-            log.warn "Ephemeral clone $ephemeralName created."
+            log.warn "Ephemeral clone ${snowflake.ephemeral} created."
         }
     }
 
@@ -90,12 +62,13 @@ abstract class SnowflakeEphemeralTask extends SnowflakeTask {
         if (useEphemeral && !keepEphemeral) {
             // drop the ephemeral database
             try {
-                session.jdbcConnection().createStatement().execute("drop database if exists ${ephemeralName}")
-                session.jdbcConnection().createStatement().execute("use schema ${connectionDatabase}.${connectionSchema}")
+                snowflake.ephemeral = ephemeralName
+                snowflake.session.jdbcConnection().createStatement().execute("drop database if exists ${ephemeralName}")
+                snowflake.setOriginalContext()
             } catch (Exception e) {
                 throw new Exception("Dropping ephemeral clone failed.", e)
             }
-            log.warn "Ephemeral clone $ephemeralName dropped."
+            log.warn "Ephemeral clone $snowflake.ephemeral dropped."
         }
     }
 }

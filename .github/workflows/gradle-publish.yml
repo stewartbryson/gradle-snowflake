@@ -25,6 +25,11 @@ jobs:
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
+      - run: 'echo "$SNOWCONFIG" >> snowconfig'
+        shell: bash
+        env:
+          GRADLE_PROPERTIES: ${{secrets.SNOWCONFIG}}
+
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v0'

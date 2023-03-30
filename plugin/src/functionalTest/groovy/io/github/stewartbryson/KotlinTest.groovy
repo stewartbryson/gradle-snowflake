@@ -25,17 +25,7 @@ class KotlinTest extends Specification {
     File buildFile, settingsFile, classFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test', language = 'kotlin'
-
-    @Shared
-    String account = System.getProperty("snowflake.account"),
-           warehouse = System.getProperty("snowflake.warehouse"),
-           user = System.getProperty("snowflake.user"),
-           password = System.getProperty("snowflake.password"),
-           role = System.getProperty("snowflake.role"),
-           database = System.getProperty("snowflake.database"),
-           schema = System.getProperty("snowflake.schema"),
-           internalStage = System.getProperty("internalStage")
+    String ephemeralName = 'ephemeral_unit_test', language = 'kotlin', connection = 'gradle_plugin', stage = 'upload'
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -58,10 +48,7 @@ class KotlinTest extends Specification {
                     |    mavenCentral()
                     |}
                     |snowflake {
-                    |  role = '$role'
-                    |  database = '$database'
-                    |  schema = '$schema'
-                    |  warehouse = '$warehouse'
+                    |  connection = '$connection'
                     |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
@@ -91,14 +78,7 @@ class KotlinTest extends Specification {
 
     // helper method
     def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
-        // ultra secure handling
-        List systemArgs = [
-                "-Psnowflake.account=$account".toString(),
-                "-Psnowflake.user=$user".toString(),
-                "-Psnowflake.password=$password".toString()
-        ]
         args.add(0, taskName)
-        args.addAll(systemArgs)
 
         // execute the Gradle test build
         result = GradleRunner.create()
@@ -129,7 +109,7 @@ class KotlinTest extends Specification {
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
+        result = executeSingleTask(taskName, ["--stage", stage, '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -140,7 +120,7 @@ class KotlinTest extends Specification {
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, "--use-ephemeral", '-Si'])
+        result = executeSingleTask(taskName, ["--stage", stage, "--use-ephemeral", '-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')

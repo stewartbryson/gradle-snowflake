@@ -25,17 +25,10 @@ class JavaAmazonTest extends Specification {
     File buildFile, settingsFile, javaFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test'
+    String ephemeralName = 'ephemeral_unit_test', connection = 'gradle_plugin'
 
     @Shared
-    String account = System.getProperty("snowflake.account"),
-           warehouse = System.getProperty("snowflake.warehouse"),
-           user = System.getProperty("snowflake.user"),
-           password = System.getProperty("snowflake.password"),
-           publishUrl = System.getProperty("snowflake.s3PublishUrl"),
-           role = System.getProperty("snowflake.role"),
-           database = System.getProperty("snowflake.database"),
-           schema = System.getProperty("snowflake.schema"),
+    String publishUrl = System.getProperty("s3PublishUrl"),
            stage = System.getProperty("s3Stage")
 
     def setupSpec() {
@@ -58,10 +51,7 @@ class JavaAmazonTest extends Specification {
                     |snowflake {
                     |  groupId = 'io.github.stewartbryson'
                     |  artifactId = 'test-gradle-snowflake'
-                    |  role = '$role'
-                    |  database = '$database'
-                    |  schema = '$schema'
-                    |  warehouse = '$warehouse'
+                    |  connection = '$connection'
                     |  stage = '$stage'
                     |  publishUrl = '$publishUrl'
                     |  ephemeralName = '$ephemeralName'
@@ -99,14 +89,7 @@ class JavaAmazonTest extends Specification {
 
     // helper method
     def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
-        // ultra secure handling
-        List systemArgs = [
-                "-Psnowflake.account=$account".toString(),
-                "-Psnowflake.user=$user".toString(),
-                "-Psnowflake.password=$password".toString()
-        ]
         args.add(0, taskName)
-        args.addAll(systemArgs)
 
         // Don't print the password
         //log.warn "runner arguments: ${args}"
