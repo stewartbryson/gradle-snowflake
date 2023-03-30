@@ -21,7 +21,8 @@ jobs:
           fetch-depth: 0
 
       - run: |
-          echo "$GRADLE_PROPERTIES" > gradle.properties
+          mkdir -p $HOME/.gradle
+          echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
         name: 'Write gradle.properties file'
         shell: bash
         env:

@@ -32,7 +32,7 @@ class SnowConfigTest extends Specification {
 
                 |[connections.example]
                 |username = username
-                |password = password1234
+                |password = "password#1234"
                 |""".stripMargin())
 
         snow = new SnowConfig(config, "example")
@@ -47,5 +47,6 @@ class SnowConfigTest extends Specification {
         props.url == 'https://defaultaccount.snowflakecomputing.com'
         props.warehouse == 'defaultwarehouse'
         props.user == 'username'
+        props.password == 'password#1234'
     }
 }

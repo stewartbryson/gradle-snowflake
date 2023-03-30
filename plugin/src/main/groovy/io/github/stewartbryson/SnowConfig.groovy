@@ -65,12 +65,17 @@ class SnowConfig {
             props."${key.replaceAll(/name$/, '')}" = value
         }
         // now replace defaults with the connection props
-        ini.get("connections" + '.' + connection).each { key, value ->
+        String connectionName = "connections" + '.' + connection
+        ini.get(connectionName).each { key, value ->
             props."${key.replaceAll(/name$/, '')}" = value
         }
-        // add the url to the end of account
+        // construct url from account
         props.url = "https://" + props.account + ".snowflakecomputing.com"
         props.remove("account")
+        // special password handling to support quoted values
+        props.password = props.password.toString().replaceAll(/("*)([^"$]+)("*)/) {all, q1, pwd, q2 ->
+            pwd
+        }
 
         // we need at least these three to make a connection
         assert props.url
