@@ -24,14 +24,10 @@ jobs:
       - run: |
              mkdir -p $HOME/.snowsql
              echo "$SNOW_CONFIG" > $HOME/.snowsql/config
-        name: 'Write snow-config file'
+        name: 'Write .snowsql/config file'
         shell: bash
         env:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
-
-      - run: 'ls -l $HOME'
-        name: 'Look at filesystem'
-        shell: bash
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
