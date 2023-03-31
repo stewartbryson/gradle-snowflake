@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.aws.AwsImAuthentication
+
 /**
  * A Gradle plugin for publishing UDFs to Snowflake.
  */
@@ -87,6 +88,19 @@ class SnowflakePlugin implements Plugin<Project> {
             project.tasks.getByName(extension.publishTask).mustRunAfter project.test
          }
          project.snowflakeJvm.dependsOn project.test, project.shadowJar
+
+         // ephemeral tasks
+         project.tasks.register("createEphemeral", CreateCloneTask)
+         project.tasks.register("dropEphemeral", DropCloneTask)
+
+         // if an ephemeral environment is being used, then some tasks need dependencies
+         if (extension.useEphemeral) {
+            project.tasks.snowflakeJvm.configure {
+               dependsOn project.tasks.createEphemeral
+               if (!extension.keepEphemeral)
+                  finalizedBy project.tasks.dropEphemeral
+            }
+         }
       }
    }
 }

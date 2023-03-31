@@ -24,7 +24,7 @@ class SnowflakeExtension {
     }
 
     /**
-     * The Snowsql connection to use.
+     * The Snowsql connection to use. Default: use the base connection info in Snowsql config.
      */
     String connection
 

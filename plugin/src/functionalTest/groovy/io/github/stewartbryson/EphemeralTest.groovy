@@ -4,13 +4,15 @@ import groovy.util.logging.Slf4j
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Stepwise
 import spock.lang.TempDir
 
 /**
- * A simple unit test for the 'io.github.stewartbryson.snowflake' plugin.
+ * Functional Java tests for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class BuildTest extends Specification {
+@Stepwise
+class EphemeralTest extends Specification {
     @Shared
     def result
 
@@ -25,11 +27,7 @@ class BuildTest extends Specification {
     File buildFile, settingsFile, javaFile
 
     @Shared
-    connection = 'gradle_plugin'
-
-    @Shared
-    String publishUrl = System.getProperty("s3PublishUrl"),
-           stage = System.getProperty("s3Stage")
+    String ephemeralName = 'ephemeral_unit_test', language = 'java', connection = 'gradle_plugin', stage = 'upload'
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -49,9 +47,9 @@ class BuildTest extends Specification {
                     |    }
                     |}
                     |snowflake {
-                    |  groupId = 'io.github.stewartbryson'
-                    |  artifactId = 'test-gradle-snowflake'
                     |  connection = '$connection'
+                    |  stage = '$stage'
+                    |  ephemeralName = '$ephemeralName'
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -63,7 +61,7 @@ class BuildTest extends Specification {
                     |version='0.1.0'
                     |""".stripMargin())
 
-        javaFile = new File("${projectDir}/src/main/java", 'Sample.java')
+        javaFile = new File("${projectDir}/src/main/$language", "Sample.$language")
         javaFile.parentFile.mkdirs()
         javaFile.write("""
                   |public class Sample
@@ -104,58 +102,27 @@ class BuildTest extends Specification {
         return result
     }
 
-    def "tasks"() {
-        given:
-        taskName = 'tasks'
+    def "create ephemeral clone"() {
+        given: "A taskname called 'createEphemeral'."
+        taskName = 'createEphemeral'
 
-        when:
-        result = executeSingleTask(taskName, ['-S'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "help task for SnowflakeJvm"() {
-        given:
-        taskName = 'help'
-
-        when:
-        result = executeSingleTask(taskName, ['--task','snowflakeJvm','-S'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "tasks for publishing group with publishUrl"() {
-        given:
-        taskName = 'tasks'
-
-        when:
-        result = executeSingleTask(taskName, ['--group','publishing','-S',"-Psnowflake.publishUrl=$publishUrl".toString()])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "dry run without publishUrl"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ['-Sim'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "shadowJar"() {
-        given:
-        taskName = 'shadowJar'
-
-        when:
+        when: "The task is executed"
         result = executeSingleTask(taskName, ['-Si'])
 
-        then:
+        then: "We get a successful execution with 'Ephemeral <clone name> created' in the output"
         !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
+    }
+
+    def "drop ephemeral clone"() {
+        given: "A taskname called 'dropEphemeral'."
+        taskName = 'dropEphemeral'
+
+        when: "The task is executed"
+        result = executeSingleTask(taskName, ['-Si'])
+
+        then: "We get a successful execution with 'Ephemeral <clone name> created' in the output"
+        !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
     }
 }

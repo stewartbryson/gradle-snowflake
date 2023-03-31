@@ -9,7 +9,6 @@ import org.gradle.api.tasks.options.Option
  * A superclass for creating Gradle tasks that work with Snowflake.
  */
 @Slf4j
-@CacheableTask
 abstract class SnowflakeTask extends DefaultTask {
 
     @Internal
@@ -36,12 +35,11 @@ abstract class SnowflakeTask extends DefaultTask {
     String snowConfig
 
     /**
-     * The Snowsql connection to use.
+     * The Snowsql connection to use. Default: use the base connection info in Snowsql config.
      */
     @Input
-    @Optional
     @Option(option = "snow-config",
-            description = "Custom Snowsql config file."
+            description = "Custom Snowsql connection to use."
     )
     String connection = extension.connection
 
@@ -57,19 +55,11 @@ abstract class SnowflakeTask extends DefaultTask {
      * @return a Snowflake session.
      */
     def createSession() {
+        // make the initial snowflake connection
         if (snowConfig) {
             snowflake = new Snowflake(project.file(snowConfig), connection)
         } else {
             snowflake = new Snowflake(connection)
         }
-    }
-
-    /**
-     * Return the first column from the first row of a SELECT statement.
-     *
-     * @return a scalar column value.
-     */
-    def getScalarValue(String sql) {
-        return snowflake.getScalarValue(sql)
     }
 }

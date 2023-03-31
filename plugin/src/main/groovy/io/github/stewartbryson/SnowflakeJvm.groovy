@@ -19,7 +19,7 @@ import java.sql.Statement
  */
 @Slf4j
 @CacheableTask
-abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
+abstract class SnowflakeJvm extends SnowflakeTask {
 
     /**
      * The task Constructor with 'description' and 'group'.
@@ -94,9 +94,9 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
     def publish() {
         // create the session
         createSession()
-        // create the clone and set the USE SCHEMA
-        //todo Make this automatic as part of SnowflakeEphemeralTask
-        createClone()
+        if (extension.useEphemeral) {
+            snowflake.setEphemeral(extension.ephemeralName)
+        }
 
         String jar = project.tasks.shadowJar.archiveFile.get()
 
@@ -116,7 +116,7 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
             }
         } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned
-            String selectStage = getScalarValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$snowflake.connectionSchema') and stage_type='External Named'")
+            String selectStage = snowflake.getScalarValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$snowflake.connectionSchema') and stage_type='External Named'")
             assert selectStage == extension.publishUrl
         }
 
@@ -130,9 +130,6 @@ abstract class SnowflakeJvm extends SnowflakeEphemeralTask {
             output.append("$message\n")
             snowflake.session.jdbcConnection().createStatement().execute(createText)
         }
-        // drop the clone and set the USE SCHEMA
-        //todo Make this automatic as part of SnowflakeEphemeralTask
-        dropClone()
 
         // close the session
         snowflake.session.close()

@@ -1,6 +1,7 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
+import org.apache.commons.lang3.RandomStringUtils
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Shared
 import spock.lang.Specification
@@ -25,7 +26,7 @@ class ScalaTest extends Specification {
     File buildFile, settingsFile, classFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test', language = 'scala', connection = 'gradle_plugin', stage = 'upload'
+    String ephemeralName = ('ephemeral_' + RandomStringUtils.randomAlphanumeric(9)), language = 'scala', connection = 'gradle_plugin', stage = 'upload'
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -53,6 +54,8 @@ class ScalaTest extends Specification {
                     |snowflake {
                     |  connection = '$connection'
                     |  ephemeralName = '$ephemeralName'
+                    |  useEphemeral = true
+                    |  keepEphemeral = true
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -116,18 +119,11 @@ class ScalaTest extends Specification {
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
     }
 
-    def "snowflakeJvm for Scala with ephemeral"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", stage, "--use-ephemeral", '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
+    // drop the ephemeral clone at the end
+    def cleanupSpec() {
+        executeSingleTask('dropEphemeral', ['-Si'])
     }
 }

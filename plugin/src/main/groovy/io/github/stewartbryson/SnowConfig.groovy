@@ -57,7 +57,7 @@ class SnowConfig {
     }
 
     Map getConnectionsProps() {
-        Map props1 = [account: "account", user: "user", password: "password"]
+        //Map props1 = [account: "account", user: "user", password: "password"]
         Map props = [:]
         Ini ini = new Ini(config)
         // first get all the connection defaults

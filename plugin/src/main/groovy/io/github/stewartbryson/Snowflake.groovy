@@ -112,6 +112,16 @@ class Snowflake {
     }
 
     /**
+     * Set the ephemeral name.
+     */
+    def setEphemeral(String ephemeral, Boolean changeContext=true) {
+        this.ephemeral = ephemeral
+        if (changeContext) {
+            setEphemeralContext()
+        }
+    }
+
+    /**
      * Return the first column from the first row of a SELECT statement.
      *
      * @return a scalar column value.

@@ -1,6 +1,7 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
+import org.apache.commons.lang3.RandomStringUtils
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Shared
 import spock.lang.Specification
@@ -25,7 +26,7 @@ class JavaGoogleTest extends Specification {
     File buildFile, settingsFile, javaFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test', connection = 'gradle_plugin'
+    String ephemeralName = ('ephemeral_' + RandomStringUtils.randomAlphanumeric(9)), connection = 'gradle_plugin'
 
     @Shared
     String publishUrl = System.getProperty("gcsPublishUrl"),
@@ -55,6 +56,8 @@ class JavaGoogleTest extends Specification {
                     |  stage = '$stage'
                     |  publishUrl = '$publishUrl'
                     |  ephemeralName = '$ephemeralName'
+                    |  useEphemeral = true
+                    |  keepEphemeral = true
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -116,18 +119,11 @@ class JavaGoogleTest extends Specification {
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
     }
 
-    def "snowflakeJvm with GCS stage ephemeral"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--use-ephemeral", '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
+    // drop the ephemeral clone at the end
+    def cleanupSpec() {
+        executeSingleTask('dropEphemeral', ['-Si'])
     }
 }

@@ -18,7 +18,7 @@ class SnowConfigTest extends Specification {
     @Shared
     File config
 
-    def setupSpec() {
+    def setup() {
         config = new File(projectDir, "config")
         config.write("""
                 |[connections]
@@ -29,16 +29,12 @@ class SnowConfigTest extends Specification {
                 |schemaname = defaultschema
                 |warehousename = defaultwarehouse
                 |rolename = defaultrolename
-
-                |[connections.example]
-                |username = username
-                |password = "password#1234"
                 |""".stripMargin())
 
         snow = new SnowConfig(config, "example")
     }
 
-    def "Parse snowsql connection"() {
+    def "Parse snowsql default connection"() {
         when:
         def props = snow.getConnectionsProps()
 
@@ -46,6 +42,23 @@ class SnowConfigTest extends Specification {
         props.getClass() == LinkedHashMap<String, String>
         props.url == 'https://defaultaccount.snowflakecomputing.com'
         props.warehouse == 'defaultwarehouse'
+        props.user == 'defaultuser'
+        props.password == 'defaultpassword'
+    }
+
+    def "Parse snowsql connection with quoted password"() {
+        given:
+        config.append("""
+                |
+                |[connections.example]
+                |username = username
+                |password = "password#1234"
+                |""".stripMargin())
+        when:
+        def props = snow.getConnectionsProps()
+
+        then:
+        props.getClass() == LinkedHashMap<String, String>
         props.user == 'username'
         props.password == 'password#1234'
     }

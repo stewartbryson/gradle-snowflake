@@ -21,7 +21,7 @@ class SnowflakeTest extends Specification {
     def "isEphemeral() function"() {
         given: "a Snowflake class with ephemeral updated"
         snowflake = new Snowflake('gradle_plugin')
-        snowflake.ephemeral = 'functional_test'
+        snowflake.setEphemeral('functional_test', false)
 
         expect: "Boolean function works"
         snowflake.isEphemeral()

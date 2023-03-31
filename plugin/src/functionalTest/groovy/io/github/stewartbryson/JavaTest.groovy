@@ -1,6 +1,7 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
+import org.apache.commons.lang3.RandomStringUtils
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.TempDir
@@ -25,7 +26,7 @@ class JavaTest extends Specification {
     File buildFile, settingsFile, javaFile
 
     @Shared
-    String ephemeralName = 'ephemeral_unit_test', language = 'groovy', connection = 'gradle_plugin', stage = 'upload'
+    String ephemeralName = ('ephemeral_' + RandomStringUtils.randomAlphanumeric(9)), language = 'java', connection = 'gradle_plugin', stage = 'upload'
 
     def setupSpec() {
         settingsFile = new File(projectDir, 'settings.gradle')
@@ -37,7 +38,7 @@ class JavaTest extends Specification {
         buildFile.write("""
                     |plugins {
                     |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'java'
+                    |    id "$language"
                     |}
                     |java {
                     |    toolchain {
@@ -48,6 +49,8 @@ class JavaTest extends Specification {
                     |  connection = '$connection'
                     |  stage = '$stage'
                     |  ephemeralName = '$ephemeralName'
+                    |  useEphemeral = true
+                    |  keepEphemeral = true
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -59,7 +62,7 @@ class JavaTest extends Specification {
                     |version='0.1.0'
                     |""".stripMargin())
 
-        javaFile = new File("${projectDir}/src/main/java", 'Sample.java')
+        javaFile = new File("${projectDir}/src/main/$language", "Sample.$language")
         javaFile.parentFile.mkdirs()
         javaFile.write("""
                   |public class Sample
@@ -109,6 +112,7 @@ class JavaTest extends Specification {
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
     }
 
     def "snowflakeJvm with custom JAR"() {
@@ -120,6 +124,7 @@ class JavaTest extends Specification {
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
     }
 
     def "snowflakeJvm with immutable function"() {
@@ -127,7 +132,7 @@ class JavaTest extends Specification {
         buildFile.write("""
                     |plugins {
                     |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'java'
+                    |    id '$language'
                     |}
                     |java {
                     |    toolchain {
@@ -138,6 +143,8 @@ class JavaTest extends Specification {
                     |  connection = '$connection'
                     |  stage = '$stage'
                     |  ephemeralName = '$ephemeralName'
+                    |  useEphemeral = true
+                    |  keepEphemeral = true
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -156,18 +163,11 @@ class JavaTest extends Specification {
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
+        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
     }
 
-    def "snowflakeJvm with ephemeral"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--use-ephemeral", '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
+    // drop the ephemeral clone at the end
+    def cleanupSpec() {
+        executeSingleTask('dropEphemeral', ['-Si'])
     }
 }
