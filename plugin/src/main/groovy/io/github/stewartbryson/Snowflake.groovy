@@ -89,7 +89,7 @@ class Snowflake {
             connectionDatabase = getScalarValue('SELECT CURRENT_DATABASE()')
             connectionSchema = getScalarValue('SELECT CURRENT_SCHEMA()')
             connectionRole = getScalarValue('SELECT CURRENT_ROLE()')
-            log.warn "Connection database, schema, role: $connectionDatabase, $connectionSchema, $connectionRole"
+            log.info "Connection database, schema, role: $connectionDatabase, $connectionSchema, $connectionRole"
         } catch (Exception e) {
             throw new Exception("Connection context is not available.", e)
         }

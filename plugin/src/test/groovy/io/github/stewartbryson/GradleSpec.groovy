@@ -51,10 +51,11 @@ class GradleSpec extends Specification {
       return new File(mainDir, language)
    }
 
-   def writeSourceFile(String language, String className, String text) {
+   def writeSourceFile(String className, String text) {
       def sourceFile = new File(mainDir, "${language}/${className}.${language}")
       sourceFile.parentFile.mkdirs()
       sourceFile.write(text.stripMargin())
+      log.info "Source file: $sourceFile"
    }
 
    def executeTask(String taskName, List args, Boolean logOutput = true) {

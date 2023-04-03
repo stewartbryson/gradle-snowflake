@@ -28,7 +28,7 @@ class BuildTest extends GradleSpec {
                     |   }
                     |}
                     |""".stripMargin())
-      writeSourceFile('java','Sample',"""
+      writeSourceFile('Sample',"""
                   |public class Sample
                   |{
                   |  public String addNum(int num1, int num2) {
