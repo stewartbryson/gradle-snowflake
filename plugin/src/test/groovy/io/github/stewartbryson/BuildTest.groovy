@@ -1,53 +1,20 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
-import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Shared
-import spock.lang.Specification
-import spock.lang.TempDir
 
 /**
  * A simple unit test for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class BuildTest extends Specification {
-    @Shared
-    def result
+class BuildTest extends GradleSpec {
 
-    @Shared
-    String taskName
+   @Shared
+   String publishUrl = System.getProperty("s3PublishUrl")
 
-    @TempDir
-    @Shared
-    private File projectDir
-
-    @Shared
-    File buildFile, settingsFile, javaFile
-
-    @Shared
-    connection = 'gradle_plugin'
-
-    @Shared
-    String publishUrl = System.getProperty("s3PublishUrl"),
-           stage = System.getProperty("s3Stage")
-
-    def setupSpec() {
-        settingsFile = new File(projectDir, 'settings.gradle')
-        settingsFile.write("""
-                     |rootProject.name = 'unit-test'
-                     |""".stripMargin())
-
-        buildFile = new File(projectDir, 'build.gradle')
-        buildFile.write("""
-                    |plugins {
-                    |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'java'
-                    |}
-                    |java {
-                    |    toolchain {
-                    |        languageVersion = JavaLanguageVersion.of(11)
-                    |    }
-                    |}
+   def setupSpec() {
+      language = 'java'
+      buildFile.append("""
                     |snowflake {
                     |  groupId = 'io.github.stewartbryson'
                     |  artifactId = 'test-gradle-snowflake'
@@ -60,12 +27,8 @@ class BuildTest extends Specification {
                     |      }
                     |   }
                     |}
-                    |version='0.1.0'
                     |""".stripMargin())
-
-        javaFile = new File("${projectDir}/src/main/java", 'Sample.java')
-        javaFile.parentFile.mkdirs()
-        javaFile.write("""
+      writeSourceFile('java','Sample',"""
                   |public class Sample
                   |{
                   |  public String addNum(int num1, int num2) {
@@ -81,81 +44,61 @@ class BuildTest extends Specification {
                   |      System.out.println("Hello World");
                   |  }
                   |}
-                  |""".stripMargin())
-    }
+                  |""")
+   }
 
-    // helper method
-    def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
-        args.add(0, taskName)
+   def "tasks"() {
+      given:
+      taskName = 'tasks'
 
-        // Don't print the password
-        //log.warn "runner arguments: ${args}"
+      when:
+      result = executeTask(taskName, ['-S'])
 
-        // execute the Gradle test build
-        result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(args)
-                .withPluginClasspath()
-                .forwardOutput()
-                .build()
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
 
-        // log the results
-        if (logOutput) log.warn result.getOutput()
-        return result
-    }
+   def "help task for SnowflakeJvm"() {
+      given:
+      taskName = 'help'
 
-    def "tasks"() {
-        given:
-        taskName = 'tasks'
+      when:
+      result = executeTask(taskName, ['--task', 'snowflakeJvm', '-S'])
 
-        when:
-        result = executeSingleTask(taskName, ['-S'])
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
 
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
+   def "tasks for publishing group with publishUrl"() {
+      given:
+      taskName = 'tasks'
 
-    def "help task for SnowflakeJvm"() {
-        given:
-        taskName = 'help'
+      when:
+      result = executeTask(taskName, ['--group', 'publishing', '-S', "-Psnowflake.publishUrl=$publishUrl".toString()])
 
-        when:
-        result = executeSingleTask(taskName, ['--task','snowflakeJvm','-S'])
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
 
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
+   def "dry run without publishUrl"() {
+      given:
+      taskName = 'snowflakeJvm'
 
-    def "tasks for publishing group with publishUrl"() {
-        given:
-        taskName = 'tasks'
+      when:
+      result = executeTask(taskName, ['-Sim'])
 
-        when:
-        result = executeSingleTask(taskName, ['--group','publishing','-S',"-Psnowflake.publishUrl=$publishUrl".toString()])
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
 
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
+   def "shadowJar"() {
+      given:
+      taskName = 'shadowJar'
 
-    def "dry run without publishUrl"() {
-        given:
-        taskName = 'snowflakeJvm'
+      when:
+      result = executeTask(taskName, ['-Si'])
 
-        when:
-        result = executeSingleTask(taskName, ['-Sim'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "shadowJar"() {
-        given:
-        taskName = 'shadowJar'
-
-        when:
-        result = executeSingleTask(taskName, ['-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
 }
