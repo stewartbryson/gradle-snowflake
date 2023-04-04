@@ -95,6 +95,8 @@ class SnowflakePlugin implements Plugin<Project> {
 
          // if an ephemeral environment is being used, then some tasks need dependencies
          if (extension.useEphemeral) {
+            // snowflakeJvm should be cleaned if this is ephemeral
+            project.tasks.snowflakeJvm.outputs.upToDateWhen {false}
             // clone should be created before publishing
             project.tasks.snowflakeJvm.dependsOn project.tasks.createEphemeral
             // if there is a functionalTest defined, clone before running tests
