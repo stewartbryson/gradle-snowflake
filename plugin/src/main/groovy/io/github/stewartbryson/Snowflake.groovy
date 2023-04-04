@@ -74,7 +74,7 @@ class Snowflake {
         Map props = snowConfig.getConnectionsProps()
         Map printable = props.clone()
         printable.password = "*********"
-        log.warn "Snowflake config: $printable"
+        log.info "Snowflake config: $printable"
 
         // get a Snowflake session
         try {
