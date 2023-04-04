@@ -13,12 +13,13 @@ class BuildTest extends GradleSpec {
    String publishUrl = System.getProperty("s3PublishUrl")
 
    def setupSpec() {
-      language = 'java'
-      buildFile.append("""
+      writeBuildFile('java')
+      appendBuildFile("""
                     |snowflake {
                     |  groupId = 'io.github.stewartbryson'
                     |  artifactId = 'test-gradle-snowflake'
                     |  connection = '$connection'
+                    |  stage = '$stage'
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -27,7 +28,7 @@ class BuildTest extends GradleSpec {
                     |      }
                     |   }
                     |}
-                    |""".stripMargin())
+                    |""")
       writeSourceFile('Sample',"""
                   |public class Sample
                   |{

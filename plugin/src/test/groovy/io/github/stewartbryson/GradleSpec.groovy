@@ -1,6 +1,7 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
+import org.apache.commons.lang3.RandomStringUtils
 import org.gradle.testkit.runner.GradleRunner
 import spock.lang.Shared
 import spock.lang.Specification
@@ -20,10 +21,13 @@ class GradleSpec extends Specification {
    File projectDir
 
    @Shared
-   File buildFile, settingsFile, mainDir, sourceFile
+   File buildFile, settingsFile, mainDir
 
    @Shared
-   String connection = 'gradle_plugin'
+   String connection = 'gradle_plugin', stage = 'upload'
+
+   @Shared
+   String ephemeralName = ('ephemeral_' + RandomStringUtils.randomAlphanumeric(9))
 
    def setupSpec() {
       settingsFile = new File(projectDir, 'settings.gradle')
@@ -32,30 +36,41 @@ class GradleSpec extends Specification {
                      |""".stripMargin())
 
       buildFile = new File(projectDir, 'build.gradle')
+      mainDir = new File(projectDir, "src/main/")
+   }
+
+   def writeSourceFile(String className, String text) {
+      def extension = (language == 'kotlin' ? 'kt' : language)
+      def sourceFile = new File(mainDir, "${language}/${className}.${extension}")
+      sourceFile.parentFile.mkdirs()
+      sourceFile.write(text.stripMargin())
+      log.info "Source file: $sourceFile"
+   }
+
+   def appendBuildFile(String text) {
+      buildFile.append(text.stripMargin())
+   }
+
+   def writeBuildFile(String language) {
+      this.language = language
+      def plugin = (language == 'kotlin' ? /"org.jetbrains.kotlin.jvm" version "1.7.21"/ : "'${language}'")
+      log.warn "Plugin: $plugin"
       buildFile.write("""
                     |plugins {
                     |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'java'
+                    |    id ${plugin}
                     |}
                     |java {
                     |    toolchain {
                     |        languageVersion = JavaLanguageVersion.of(11)
                     |    }
                     |}
+                    |repositories {
+                    |    mavenCentral()
+                    |}
                     |version='0.1.0'
                     |""".stripMargin())
-      mainDir = new File(projectDir, "src/main/")
-   }
-
-   def getSourceDir() {
-      return new File(mainDir, language)
-   }
-
-   def writeSourceFile(String className, String text) {
-      def sourceFile = new File(mainDir, "${language}/${className}.${language}")
-      sourceFile.parentFile.mkdirs()
-      sourceFile.write(text.stripMargin())
-      log.info "Source file: $sourceFile"
+      log.warn "$buildFile"
    }
 
    def executeTask(String taskName, List args, Boolean logOutput = true) {

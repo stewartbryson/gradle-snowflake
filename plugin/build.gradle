@@ -1,115 +1,121 @@
 plugins {
-    id 'com.gradle.plugin-publish' version '1.1.0'
-    id 'groovy'
-    id 'java-library'
-    id 'com.adarshr.test-logger' version '3.2.0'
-    id "com.redpillanalytics.gradle-properties" version "1.0.8"
-    id 'com.fuseanalytics.gradle.s3' version '1.2.3'
+   id 'com.gradle.plugin-publish' version '1.1.0'
+   id 'groovy'
+   id 'java-library'
+   id 'com.adarshr.test-logger' version '3.2.0'
+   id "com.redpillanalytics.gradle-properties" version "1.0.8"
+   id 'com.fuseanalytics.gradle.s3' version '1.2.3'
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
+   toolchain {
+      languageVersion = JavaLanguageVersion.of(11)
+   }
 }
 
 dependencies {
-    implementation 'org.codehaus.groovy:groovy:3.0.17'
-    implementation 'org.slf4j:slf4j-simple:2.0.7'
-    implementation 'com.snowflake:snowpark:1.8.0'
-    implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
-    implementation 'gradle.plugin.com.github.johnrengelman:shadow:8.0.0'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
-    implementation "be.vbgn.gradle:ci-detect-plugin:0.5.0"
-    implementation 'org.ini4j:ini4j:0.5.4'
-    implementation platform("org.spockframework:spock-bom:2.3-groovy-3.0")
-    implementation "org.spockframework:spock-core"
+   implementation 'org.codehaus.groovy:groovy:3.0.17'
+   implementation 'org.slf4j:slf4j-simple:2.0.7'
+   implementation 'com.snowflake:snowpark:1.8.0'
+   implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
+   implementation 'gradle.plugin.com.github.johnrengelman:shadow:8.0.0'
+   implementation 'org.apache.commons:commons-lang3:3.12.0'
+   implementation "be.vbgn.gradle:ci-detect-plugin:0.5.0"
+   implementation 'org.ini4j:ini4j:0.5.4'
+   implementation platform("org.spockframework:spock-bom:2.3-groovy-3.0")
+   implementation "org.spockframework:spock-core"
 }
 
 testing {
-    suites {
-        configureEach {
-            useSpock('2.3-groovy-3.0')
-            dependencies {
-                implementation project()
-                implementation 'com.snowflake:snowpark:1.8.0'
-                implementation 'org.apache.commons:commons-lang3:3.12.0'
-            }
-        }
+   suites {
+      configureEach {
+         useSpock('2.3-groovy-3.0')
+         dependencies {
+            implementation project()
+            implementation 'com.snowflake:snowpark:1.8.0'
+            implementation 'org.apache.commons:commons-lang3:3.12.0'
+         }
+      }
 
-        // Test suite that makes a connection to Snowflake, but only uses internal stages
-        functionalTest(JvmTestSuite) {
-            targets {
-                all {
-                    // This test suite should run after the built-in test suite has run its tests
-                    testTask.configure {
-                        shouldRunAfter(test)
-                        failFast true
-                    }
-                }
+      // Test suite that makes a connection to Snowflake, but only uses internal stages
+      functionalTest(JvmTestSuite) {
+         targets {
+            all {
+               // This test suite should run after the built-in test suite has run its tests
+               testTask.configure {
+                  shouldRunAfter(test)
+                  failFast true
+               }
+               dependencies {
+                  implementation sourceSets.test.output
+               }
             }
-        }
+         }
+      }
 
-        // Test suite that makes a connection to Snowflake and tests external stages with GCS and S3.
-        integrationTest(JvmTestSuite) {
-            targets {
-                all {
-                    // This test suite should run after the built-in test suite has run its tests
-                    testTask.configure {
-                        shouldRunAfter(test)
-                        systemProperty 's3Stage', findProperty('s3Stage')
-                        systemProperty 'gcsStage', findProperty('gcsStage')
-                        systemProperty 's3PublishUrl', findProperty('s3PublishUrl')
-                        systemProperty 'gcsPublishUrl', findProperty('gcsPublishUrl')
-                        failFast true
-                    }
-                }
+      // Test suite that makes a connection to Snowflake and tests external stages with GCS and S3.
+      integrationTest(JvmTestSuite) {
+         targets {
+            all {
+               // This test suite should run after the built-in test suite has run its tests
+               testTask.configure {
+                  shouldRunAfter(test)
+                  systemProperty 's3Stage', findProperty('s3Stage')
+                  systemProperty 'gcsStage', findProperty('gcsStage')
+                  systemProperty 's3PublishUrl', findProperty('s3PublishUrl')
+                  systemProperty 'gcsPublishUrl', findProperty('gcsPublishUrl')
+                  failFast true
+               }
+               dependencies {
+                  implementation sourceSets.test.output
+               }
             }
-        }
-    }
+         }
+      }
+   }
 }
 
 gradlePlugin {
-    website = 'https://github.com/stewartbryson/gradle-snowflake'
-    vcsUrl = 'https://github.com/stewartbryson/gradle-snowflake'
-    // Define the plugin
-    plugins {
-        snowflake {
-            description = 'Simplifies publishing UDFs to Snowflake. Supports internal stages using Snowpark, or external stages with maven-publish.'
-            id = 'io.github.stewartbryson.snowflake'
-            displayName = 'Snowflake Plugin'
-            implementationClass = 'io.github.stewartbryson.SnowflakePlugin'
-            tags.set(['snowflake', 'snowpark', 'dataops', 'udf'])
-        }
-    }
-    testSourceSets.add(sourceSets.functionalTest)
-    testSourceSets.add(sourceSets.integrationTest)
+   website = 'https://github.com/stewartbryson/gradle-snowflake'
+   vcsUrl = 'https://github.com/stewartbryson/gradle-snowflake'
+   // Define the plugin
+   plugins {
+      snowflake {
+         description = 'Simplifies publishing UDFs to Snowflake. Supports internal stages using Snowpark, or external stages with maven-publish.'
+         id = 'io.github.stewartbryson.snowflake'
+         displayName = 'Snowflake Plugin'
+         implementationClass = 'io.github.stewartbryson.SnowflakePlugin'
+         tags.set(['snowflake', 'snowpark', 'dataops', 'udf'])
+      }
+   }
+   testSourceSets.add(sourceSets.functionalTest)
+   testSourceSets.add(sourceSets.integrationTest)
 }
 
 build.dependsOn validatePlugins
 
 s3 {
-    bucket = 'stewartbryson.docs'
-    region = 'us-east-1'
+   bucket = 'stewartbryson.docs'
+   region = 'us-east-1'
 }
 
 tasks.register("publishLatestDocs", com.fuseanalytics.gradle.s3.S3Upload) {
-    description = "Publish the latest docs to S3."
-    keyPrefix = "${rootProject.name}/latest"
-    sourceDir = tasks.groovydoc.destinationDir
-    dependsOn groovydoc
+   description = "Publish the latest docs to S3."
+   keyPrefix = "${rootProject.name}/latest"
+   sourceDir = tasks.groovydoc.destinationDir
+   dependsOn groovydoc
 }
 
 tasks.register("publishVersionDocs", com.fuseanalytics.gradle.s3.S3Upload) {
-    description = "Publish the version docs to S3."
-    keyPrefix = "${rootProject.name}/$version"
-    sourceDir = tasks.groovydoc.destinationDir
-    dependsOn groovydoc
+   description = "Publish the version docs to S3."
+   keyPrefix = "${rootProject.name}/$version"
+   sourceDir = tasks.groovydoc.destinationDir
+   dependsOn groovydoc
 }
 
 tasks.register("publishDocs") {
-    dependsOn tasks.publishLatestDocs, tasks.publishVersionDocs
-    mustRunAfter tasks.publishPlugins
+   dependsOn tasks.publishLatestDocs, tasks.publishVersionDocs
+   mustRunAfter tasks.publishPlugins
 }
 
 tasks.publish.dependsOn tasks.publishPlugins

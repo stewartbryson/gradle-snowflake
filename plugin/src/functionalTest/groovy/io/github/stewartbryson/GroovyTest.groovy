@@ -1,53 +1,16 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
-import org.gradle.testkit.runner.GradleRunner
-import spock.lang.Shared
-import spock.lang.Specification
-import spock.lang.TempDir
-import org.apache.commons.lang3.RandomStringUtils
 
 /**
  * Functional Groovy tests for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class GroovyTest extends Specification {
-    @Shared
-    def result
-
-    @Shared
-    String taskName
-
-    @TempDir
-    @Shared
-    private File projectDir
-
-    @Shared
-    File buildFile, settingsFile, classFile
-
-    @Shared
-    String ephemeralName = ('ephemeral_' + RandomStringUtils.randomAlphanumeric(9)), language = 'groovy', connection = 'gradle_plugin', stage = 'upload'
+class GroovyTest extends GradleSpec {
 
     def setupSpec() {
-        settingsFile = new File(projectDir, 'settings.gradle')
-        settingsFile.write("""
-                     |rootProject.name = "$language-test"
-                     |""".stripMargin())
-
-        buildFile = new File(projectDir, 'build.gradle')
-        buildFile.write("""
-                    |plugins {
-                    |    id 'io.github.stewartbryson.snowflake'
-                    |    id '$language'
-                    |}
-                    |java {
-                    |    toolchain {
-                    |        languageVersion = JavaLanguageVersion.of(11)
-                    |    }
-                    |}
-                    |repositories {
-                    |    mavenCentral()
-                    |}
+        writeBuildFile('groovy')
+        appendBuildFile("""
                     |dependencies {
                     |    implementation 'org.codehaus.groovy:groovy:3.0.13'
                     |}
@@ -66,38 +29,19 @@ class GroovyTest extends Specification {
                     |   }
                     |}
                     |version='0.1.0'
-                    |""".stripMargin())
+                    |""")
 
-        classFile = new File("${projectDir}/src/main/$language", "Sample.$language")
-        classFile.parentFile.mkdirs()
-        classFile.write('''|
-                            |class Sample {
-                            |  String addNum(Integer num1, Integer num2) {
-                            |    try {
-                            |      "Sum is: ${(num1 + num2)}"
-                            |    } catch (Exception e) {
-                            |      null
-                            |    }
-                            |  }
-                            |}
-                  |'''.stripMargin())
-    }
-
-    // helper method
-    def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
-        args.add(0, taskName)
-
-        // execute the Gradle test build
-        result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(args)
-                .withPluginClasspath()
-                .forwardOutput()
-                .build()
-
-        // log the results
-        if (logOutput) log.warn result.getOutput()
-        return result
+        writeSourceFile('Sample','''|
+                        |class Sample {
+                        |  String addNum(Integer num1, Integer num2) {
+                        |    try {
+                        |      "Sum is: ${(num1 + num2)}"
+                        |    } catch (Exception e) {
+                        |      null
+                        |    }
+                        |  }
+                        |}
+                        |''')
     }
 
     def "shadowJar"() {
@@ -105,7 +49,7 @@ class GroovyTest extends Specification {
         taskName = 'shadowJar'
 
         when:
-        result = executeSingleTask(taskName, ['-Si'])
+        result = executeTask(taskName, ['-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -116,7 +60,7 @@ class GroovyTest extends Specification {
         taskName = 'snowflakeJvm'
 
         when:
-        result = executeSingleTask(taskName, ['-Si'])
+        result = executeTask(taskName, ['-Si'])
 
         then:
         !result.tasks.collect { it.outcome }.contains('FAILURE')
@@ -125,6 +69,6 @@ class GroovyTest extends Specification {
 
     // drop the ephemeral clone at the end
     def cleanupSpec() {
-        executeSingleTask('dropEphemeral', ['-Si'])
+        executeTask('dropEphemeral', ['-Si'])
     }
 }
