@@ -1,7 +1,6 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
-import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.TaskAction
 
 /**
@@ -22,9 +21,9 @@ abstract class CreateCloneTask extends SnowflakeTask {
     def createClone() {
         // create the session
         createSession()
+
         // set the ephemeral name
-        // we do not want to change the context
-        snowflake.setEphemeral(extension.ephemeralName, false)
+        snowflake.ephemeral = extension.ephemeralName
         try {
             snowflake.session.jdbcConnection().createStatement().execute("create database if not exists ${snowflake.ephemeral} clone ${snowflake.connectionDatabase}")
             snowflake.session.jdbcConnection().createStatement().execute("grant ownership on database ${snowflake.ephemeral} to ${snowflake.connectionRole}")
@@ -32,5 +31,8 @@ abstract class CreateCloneTask extends SnowflakeTask {
             throw new Exception("Creating ephemeral clone failed.", e)
         }
         log.warn "Ephemeral clone ${snowflake.ephemeral} created."
+
+        // change the session context to use ephemeral stuff
+        snowflake.setEphemeralContext()
     }
 }

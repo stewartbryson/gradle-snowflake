@@ -33,6 +33,22 @@ class Snowflake {
     }
 
     /**
+     * Determines whether a session exists.
+     *
+     * @return whether a session exists.
+     */
+    Boolean hasSession() {
+        //return (session ? true : false)
+        if (!session) {
+            return false
+        } else if (session && getScalarValue("SELECT 1")) {
+            return true
+        } else {
+            return false
+        }
+    }
+
+    /**
      * The connection database in case it wasn't in the connection.
      */
     String connectionDatabase
@@ -46,6 +62,13 @@ class Snowflake {
      * The connection role in case it wasn't in the connection.
      */
     String connectionRole
+
+    /**
+     * Empty constructor for use in the Gradle project.
+     *
+     * @return Empty Snowflake class.
+     */
+    Snowflake() {}
 
     /**
      * Constructor using auto-detected Snowsql config file.
@@ -109,16 +132,6 @@ class Snowflake {
     def setEphemeralContext() {
         session.jdbcConnection().createStatement().execute("use database ${ephemeral}")
         session.jdbcConnection().createStatement().execute("use schema ${ephemeral}.${connectionSchema}")
-    }
-
-    /**
-     * Set the ephemeral name.
-     */
-    def setEphemeral(String ephemeral, Boolean changeContext=true) {
-        this.ephemeral = ephemeral
-        if (changeContext) {
-            setEphemeralContext()
-        }
     }
 
     /**

@@ -44,7 +44,6 @@ class EphemeralTest extends GradleSpec {
                   |  }
                   |}
                   |""".stripMargin())
-      log.warn buildFile.text
    }
 
    def "create ephemeral clone"() {

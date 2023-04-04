@@ -22,6 +22,8 @@ class SnowflakePlugin implements Plugin<Project> {
       // shorthand
       def extension = project.extensions."$PLUGIN"
 
+      project.ext.session = new Snowflake()
+
       project."$PLUGIN".extensions.applications = project.container(ApplicationContainer)
       project.apply plugin: 'com.redpillanalytics.gradle-properties'
       project.apply plugin: 'com.github.johnrengelman.shadow'

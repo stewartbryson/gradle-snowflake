@@ -55,11 +55,17 @@ abstract class SnowflakeTask extends DefaultTask {
      * @return a Snowflake session.
      */
     def createSession() {
-        // make the initial snowflake connection
-        if (snowConfig) {
-            snowflake = new Snowflake(project.file(snowConfig), connection)
+        // reuse an existing connection if it already exists
+        if (!project.session.hasSession()) {
+            if (snowConfig) {
+                snowflake = new Snowflake(project.file(snowConfig), connection)
+            } else {
+                snowflake = new Snowflake(connection)
+            }
+            project.session = snowflake
         } else {
-            snowflake = new Snowflake(connection)
+            log.warn "Reusing existing Snowflake session."
+            snowflake = project.session
         }
     }
 }

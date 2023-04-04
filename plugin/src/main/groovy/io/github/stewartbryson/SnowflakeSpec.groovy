@@ -2,7 +2,6 @@ package io.github.stewartbryson
 
 import spock.lang.Shared
 import spock.lang.Specification
-import spock.lang.Subject
 
 class SnowflakeSpec extends Specification {
 
@@ -13,7 +12,6 @@ class SnowflakeSpec extends Specification {
    String ephemeral
 
    @Shared
-   @Subject
    Snowflake snowflake
 
    def setupSpec() {

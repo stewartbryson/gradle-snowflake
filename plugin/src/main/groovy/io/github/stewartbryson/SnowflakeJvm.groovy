@@ -95,7 +95,8 @@ abstract class SnowflakeJvm extends SnowflakeTask {
         // create the session
         createSession()
         if (extension.useEphemeral) {
-            snowflake.setEphemeral(extension.ephemeralName)
+            snowflake.ephemeral = extension.ephemeralName
+            snowflake.setEphemeralContext()
         }
 
         String jar = project.tasks.shadowJar.archiveFile.get()
