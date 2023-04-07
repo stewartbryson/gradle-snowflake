@@ -6,7 +6,7 @@ We introduced breaking changes in version `2.0.0` described below.
 Instead of continuing to use plugin DSL or Gradle properties to provide Snowflake authentication, we made the
 decision to switch to using the SnowSQL config moving forward.
 This was inspired by the [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project, and it seems to
-be a reasonable standard moving forward.
+be a reasonable standard.
 
 ### Legacy Plugin Application
 Hopefully no one was using the Gradle legacy plugin application, but if so, the coordinates have changed.
