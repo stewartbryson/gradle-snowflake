@@ -6,7 +6,7 @@ We introduced breaking changes in version `2.0.0` described below.
 Instead of continuing to use plugin DSL or Gradle properties to provide Snowflake authentication, we made the
 decision to switch to using the SnowSQL config moving forward.
 This was inspired by the [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project, and it seems to
-be a reasonable standard moving forward.
+be a reasonable standard.
 
 ### Legacy Plugin Application
 Hopefully no one was using the Gradle legacy plugin application, but if so, the coordinates have changed.
@@ -79,7 +79,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.0.2'
+   id 'io.github.stewartbryson.snowflake' version '2.0.3'
 }
 ```
 
@@ -235,7 +235,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.0.2'
+    id 'io.github.stewartbryson.snowflake' version '2.0.3'
 }
 ```
 
@@ -276,7 +276,7 @@ class SampleTest extends Specification {
 ```
 
 All unit tests in either `src/test/java` (written using JUnit or something else) or `src/test/groovy` (written with Spock)
-we automatically run whenever the `test` or `build` task is executed.
+will automatically run whenever the `test` or `build` task is executed.
 
 ```shell
 ❯ ./gradlew build
@@ -296,7 +296,7 @@ BUILD SUCCESSFUL in 1s
 ```
 
 All Gradle testing tasks are automatically incremental and cacheable, and would be avoided if executed again without changes to the code in either the source or the spec.
-The same applies for topic of functional testing below.
+The same applies for the topic of functional testing below.
 
 ### Functional Testing
 [Functional testing](https://en.wikipedia.org/wiki/Functional_testing) describes what the system does,
@@ -312,7 +312,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.2"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.3"
            }
            testTask.configure {
                failFast true
