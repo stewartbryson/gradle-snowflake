@@ -276,7 +276,7 @@ class SampleTest extends Specification {
 ```
 
 All unit tests in either `src/test/java` (written using JUnit or something else) or `src/test/groovy` (written with Spock)
-we automatically run whenever the `test` or `build` task is executed.
+will automatically run whenever the `test` or `build` task is executed.
 
 ```shell
 ❯ ./gradlew build
@@ -296,7 +296,7 @@ BUILD SUCCESSFUL in 1s
 ```
 
 All Gradle testing tasks are automatically incremental and cacheable, and would be avoided if executed again without changes to the code in either the source or the spec.
-The same applies for topic of functional testing below.
+The same applies for the topic of functional testing below.
 
 ### Functional Testing
 [Functional testing](https://en.wikipedia.org/wiki/Functional_testing) describes what the system does,
