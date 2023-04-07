@@ -71,7 +71,7 @@ class Snowflake {
     Snowflake() {}
 
     /**
-     * Constructor using auto-detected Snowsql config file.
+     * Constructor using autodetected SnowSQL config file.
      *
      * @return Snowflake class.
      */
@@ -81,7 +81,7 @@ class Snowflake {
     }
 
     /**
-     * Constructor using explicit Snowsql config file as a File object.
+     * Constructor using explicit SnowSQL config file as a File object.
      *
      * @return Snowflake class.
      */

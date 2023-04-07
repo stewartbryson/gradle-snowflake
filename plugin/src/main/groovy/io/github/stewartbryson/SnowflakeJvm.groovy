@@ -27,7 +27,7 @@ abstract class SnowflakeJvm extends SnowflakeTask {
      * @return A custom task class.
      */
     SnowflakeJvm() {
-        description = "A Cacheable Gradle task for publishing UDFs to Snowflake."
+        description = "A Cacheable Gradle task for publishing UDFs and procedures to Snowflake"
         group = "publishing"
     }
 
@@ -100,6 +100,7 @@ abstract class SnowflakeJvm extends SnowflakeTask {
         }
 
         String jar = project.tasks.shadowJar.archiveFile.get()
+        log.info "Jar to upload: $jar"
 
         if (!extension.publishUrl && !extension.useCustomMaven) {
             // create the internal stage if it doesn't exist
@@ -118,7 +119,9 @@ abstract class SnowflakeJvm extends SnowflakeTask {
         } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned
             String selectStage = snowflake.getScalarValue("select stage_url from information_schema.stages where stage_name=upper('$stage') and stage_schema=upper('$snowflake.connectionSchema') and stage_type='External Named'")
-            assert selectStage == extension.publishUrl
+            if( selectStage != extension.publishUrl) {
+                throw new Exception("'publishUrl' does not match the external stage URL in Snowflake.")
+            }
         }
 
         // automatically create application spec objects
@@ -133,6 +136,6 @@ abstract class SnowflakeJvm extends SnowflakeTask {
         }
 
         // close the session
-        snowflake.session.close()
+        //snowflake.session.close()
     }
 }

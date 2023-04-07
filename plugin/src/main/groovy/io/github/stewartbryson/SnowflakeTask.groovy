@@ -25,21 +25,21 @@ abstract class SnowflakeTask extends DefaultTask {
     }
 
     /**
-     * The Snowsql config file to use. Default: Looks first for '~/.snowsql/config' followed by './snow-config'.
+     * The SnowSQL config file to use. Default: Looks first for '~/.snowsql/config' followed by './snow-config'.
      */
     @Input
     @Optional
     @Option(option = "snow-config",
-            description = "Custom Snowsql config file."
+            description = "Custom SnowSQL config file."
     )
     String snowConfig
 
     /**
-     * The Snowsql connection to use. Default: use the base connection info in Snowsql config.
+     * Override the SnowSQL connection to use. Default: use the base connection info in SnowSQL config.
      */
     @Input
-    @Option(option = "snow-config",
-            description = "Custom Snowsql connection to use."
+    @Option(option = "connection",
+            description = "Override the SnowSQL connection to use. Default: use the base connection info in SnowSQL config."
     )
     String connection = extension.connection
 
@@ -64,7 +64,7 @@ abstract class SnowflakeTask extends DefaultTask {
             }
             project.session = snowflake
         } else {
-            log.warn "Reusing existing Snowflake session."
+            log.warn "Reusing existing connection."
             snowflake = project.session
         }
     }

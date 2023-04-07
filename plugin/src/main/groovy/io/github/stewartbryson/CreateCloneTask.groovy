@@ -32,7 +32,7 @@ abstract class CreateCloneTask extends SnowflakeTask {
         }
         log.warn "Ephemeral clone ${snowflake.ephemeral} created."
 
-        // change the session context to use ephemeral stuff
-        snowflake.setEphemeralContext()
+        // Until we build a better testing spec, let downstream dependencies set this
+        //snowflake.setEphemeralContext()
     }
 }

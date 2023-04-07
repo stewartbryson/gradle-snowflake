@@ -6,19 +6,23 @@ import spock.lang.Specification
 class SnowflakeSpec extends Specification {
 
    @Shared
-   String connection = System.getProperty('connection')
+   private String connection = System.getProperty('connection')
 
    @Shared
-   String ephemeral
+   private String ephemeral = System.getProperty('ephemeral')
 
    @Shared
-   Snowflake snowflake
+   private Snowflake snowflake = new Snowflake()
 
    def setupSpec() {
-      ephemeral = System.getProperty('ephemeral')
-      if (ephemeral) {
-         snowflake.setEphemeral(ephemeral)
-      }
       snowflake = new Snowflake(connection)
+      if (ephemeral) {
+         snowflake.ephemeral = ephemeral
+         snowflake.setEphemeralContext()
+      }
+   }
+
+   def selectSingleValue(String sql) {
+      snowflake.getScalarValue(sql)
    }
 }

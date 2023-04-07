@@ -11,12 +11,12 @@ class SnowConfig {
     File config
 
     /**
-     * The Snowsql connection to use.
+     * The SnowSQL connection to use.
      */
     String connection
 
     /**
-     * Constructor using auto-detected Snowsql config file.
+     * Constructor using auto-detected SnowSQL config file.
      *
      * @return Snowflake class.
      */
@@ -31,13 +31,13 @@ class SnowConfig {
         } else if (projectConfig.exists()) {
             config = projectConfig
         } else {
-            throw new Exception("Unable to find a Snowsql config file.")
+            throw new Exception("Unable to find a SnowSQL config file.")
         }
         log.warn "Using snowsql config file: ${config.absolutePath}"
     }
 
     /**
-     * Constructor using explicit Snowsql config file as a File object.
+     * Constructor using explicit SnowSQL config file as a File object.
      *
      * @return Snowflake class.
      */
@@ -47,7 +47,7 @@ class SnowConfig {
     }
 
     /**
-     * Constructor using explicit Snowsql config file as a String path.
+     * Constructor using explicit SnowSQL config file as a String path.
      *
      * @return Snowflake class.
      */
@@ -78,9 +78,9 @@ class SnowConfig {
         }
 
         // we need at least these three to make a connection
-        assert props.url
-        assert props.user
-        assert props.password
+        if (!props.url || !props.user || !props.password) {
+            throw new Exception("'url', 'user', or 'password' is not configured.")
+        }
         return props
     }
 }

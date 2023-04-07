@@ -24,7 +24,7 @@ class SnowflakeExtension {
     }
 
     /**
-     * The Snowsql connection to use. Default: use the base connection info in Snowsql config.
+     * The SnowSQL connection to use. Default: use the base connection info in SnowSQL config.
      */
     String connection
 
@@ -44,6 +44,10 @@ class SnowflakeExtension {
      * Optional: specify an artifactId when using the 'maven-publish' plugin.
      */
     String artifactId = project.getName()
+    /**
+     * Name of the functional test suite to use for testing UDFs against Snowflake. Default: 'functionalTest'.
+     */
+    String testSuite = 'functionalTest'
     /**
      * Optional: do not automatically apply 'maven-publish' and allow the user to apply that plugin in the 'build.gradle' file.
      */
@@ -77,7 +81,34 @@ class SnowflakeExtension {
         // determine the base name for the clone
         String baseName = ObjectUtils.firstNonNull(ci.getPullRequest(), ci.reference, RandomStringUtils.randomAlphanumeric(9))
         // determine the reference type
-        String refType = ci.isPullRequest() ? 'pr_' : (ci.isTag() ? 'tag_' : (ci.isCi() ? 'branch_' : ''))
+        String refType = isPR() ? 'pr_' : (isTag() ? 'tag_' : (isCI() ? 'branch_' : ''))
         "ephemeral_${projectName.replace('-', '')}_${refType}${baseName}"
+    }
+
+    /**
+     * Informs whether the plugin is running inside a CICD environment.
+     *
+     * @return whether the plugin is running inside a CICD environment.
+     */
+    Boolean isCI() {
+        return ci.isCi()
+    }
+
+    /**
+     * Informs whether the plugin is running against a pull request.
+     *
+     * @return whether the plugin is running against a pull request.
+     */
+    Boolean isPR() {
+        return ci.isPullRequest()
+    }
+
+    /**
+     * Informs whether the plugin is running against a tag.
+     *
+     * @return whether the plugin is running against a tag.
+     */
+    Boolean isTag() {
+        return ci.isTag()
     }
 }

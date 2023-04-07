@@ -37,7 +37,9 @@ class SnowflakePlugin implements Plugin<Project> {
 
          if (extension.useCustomMaven || extension.publishUrl) {
             // assert that we have artifact and group
-            assert (extension.artifactId && extension.groupId)
+            if (!extension.artifactId || !extension.groupId) {
+               throw new Exception("'artifactId' and 'groupId' must be configured when publishing to external stages.")
+            }
          }
 
          // create maven publishing
@@ -95,6 +97,11 @@ class SnowflakePlugin implements Plugin<Project> {
          project.tasks.register("createEphemeral", CreateCloneTask)
          project.tasks.register("dropEphemeral", DropCloneTask)
 
+         // if there is a functionalTest defined, it depends on snowflakeJvm
+         if (project.tasks.findByName(extension.testSuite)) {
+            project.tasks."${extension.testSuite}".dependsOn project.tasks.snowflakeJvm
+         }
+
          // if an ephemeral environment is being used, then some tasks need dependencies
          if (extension.useEphemeral) {
             project.tasks.snowflakeJvm.configure {
@@ -106,8 +113,8 @@ class SnowflakePlugin implements Plugin<Project> {
             }
 
             // if there is a functionalTest defined, clone before running tests
-            if (project.tasks.findByName('functionalTest')) {
-               project.tasks.functionalTest.dependsOn project.tasks.createEphemeral
+            if (project.tasks.findByName(extension.testSuite)) {
+               project.tasks."${extension.testSuite}".dependsOn project.tasks.createEphemeral
             }
             // if we aren't keeping the ephemeral environment at the end of the run
             if (!extension.keepEphemeral) {
@@ -115,8 +122,9 @@ class SnowflakePlugin implements Plugin<Project> {
                project.tasks.snowflakeJvm.finalizedBy project.tasks.dropEphemeral
 
                // if there is a functionalTest suite defined, run it before dropping the clone
-               if (project.tasks.findByName('functionalTest')) {
-                  project.tasks.functionalTest.finalizedBy project.tasks.dropEphemeral
+               if (project.tasks.findByName(extension.testSuite)) {
+                  //project.tasks."${extension.testSuite}".finalizedBy project.tasks.dropEphemeral
+                  project.tasks.dropEphemeral.mustRunAfter project.tasks."${extension.testSuite}"
                }
             }
          }

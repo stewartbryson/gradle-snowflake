@@ -1,0 +1,3 @@
+rootProject.name = 'kotlin'
+// ignore this: used for testing examples during releases
+includeBuild('../../')
