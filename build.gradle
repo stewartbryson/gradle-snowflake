@@ -43,12 +43,13 @@ githubRelease {
     //dryRun true
 }
 
+import org.apache.tools.ant.filters.ReplaceTokens
 tasks.register('copyReadme', Copy) {
     group 'documentation'
     description 'Update README.md file with current version.'
     from('src/markdown') {
         include 'README.md'
-        expand(version: version)
+        filter(ReplaceTokens, tokens: [version: version])
     }
     into '.'
 }
@@ -58,7 +59,7 @@ tasks.register('copyExamples', Copy) {
     description 'Token replacement of current version in examples.'
     from('src/examples') {
         include '*/build.gradle'
-        expand(version: version)
+        filter(ReplaceTokens, tokens: [version: version])
     }
     into 'examples'
     mustRunAfter copyReadme
