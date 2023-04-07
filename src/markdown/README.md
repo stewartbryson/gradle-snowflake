@@ -210,7 +210,7 @@ BUILD SUCCESSFUL in 624ms
 
 This project uses the [S3 Gradle build cache plugin](https://github.com/burrunan/gradle-s3-build-cache)
 and we are very happy with it.
-Check the [Gradle settings file](setting.gradle) for an implementation example.
+Check the [Gradle settings file](settings.gradle) for an implementation example.
 
 # Testing
 Gradle
