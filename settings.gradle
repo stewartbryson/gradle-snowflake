@@ -4,6 +4,7 @@ plugins {
 
 rootProject.name = 'gradle-snowflake'
 include('plugin')
+project(':plugin').name = 'gradle-snowflake-plugin'
 
 ext.isCiServer = System.getenv().containsKey("CI")
 buildCache {

@@ -1,68 +1,22 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
-import spock.lang.Shared
-import spock.lang.Specification
-import spock.lang.TempDir
-import org.gradle.testkit.runner.GradleRunner
 
 /**
  * Functional Java tests for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class JavaTest extends Specification {
-    @Shared
-    def result
+class JavaTest extends GradleSpec {
 
-    @Shared
-    String taskName
-
-    @TempDir
-    @Shared
-    private File projectDir
-
-    @Shared
-    File buildFile, settingsFile, javaFile
-
-    @Shared
-    String ephemeralName = 'ephemeral_unit_test'
-
-    @Shared
-    String account = System.getProperty("snowflake.account"),
-           warehouse = System.getProperty("snowflake.warehouse"),
-           user = System.getProperty("snowflake.user"),
-           password = System.getProperty("snowflake.password"),
-           role = System.getProperty("snowflake.role"),
-           database = System.getProperty("snowflake.database"),
-           schema = System.getProperty("snowflake.schema"),
-           stage = System.getProperty("internalStage")
-
-    def setupSpec() {
-        settingsFile = new File(projectDir, 'settings.gradle')
-        settingsFile.write("""
-                     |rootProject.name = 'unit-test'
-                     |""".stripMargin())
-
-        buildFile = new File(projectDir, 'build.gradle')
-        buildFile.write("""
-                    |plugins {
-                    |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'java'
-                    |}
-                    |java {
-                    |    toolchain {
-                    |        languageVersion = JavaLanguageVersion.of(11)
-                    |    }
-                    |}
+   def setupSpec() {
+      writeBuildFile('java')
+      appendBuildFile("""
                     |snowflake {
-                    |  groupId = 'io.github.stewartbryson'
-                    |  artifactId = 'test-gradle-snowflake'
-                    |  role = '$role'
-                    |  database = '$database'
-                    |  schema = '$schema'
-                    |  warehouse = '$warehouse'
+                    |  connection = '$connection'
                     |  stage = '$stage'
                     |  ephemeralName = '$ephemeralName'
+                    |  useEphemeral = true
+                    |  keepEphemeral = true
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -71,12 +25,9 @@ class JavaTest extends Specification {
                     |      }
                     |   }
                     |}
-                    |version='0.1.0'
-                    |""".stripMargin())
+                    |""")
 
-        javaFile = new File("${projectDir}/src/main/java", 'Sample.java')
-        javaFile.parentFile.mkdirs()
-        javaFile.write("""
+      writeSourceFile('Sample', """
                   |public class Sample
                   |{
                   |  public String addNum(int num1, int num2) {
@@ -92,79 +43,43 @@ class JavaTest extends Specification {
                   |      System.out.println("Hello World");
                   |  }
                   |}
-                  |""".stripMargin())
-    }
+                  |""")
+   }
 
-    // helper method
-    def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
-        // ultra secure handling
-        List systemArgs = [
-                "-Psnowflake.account=$account".toString(),
-                "-Psnowflake.user=$user".toString(),
-                "-Psnowflake.password=$password".toString()
-        ]
-        args.add(0, taskName)
-        args.addAll(systemArgs)
+   def "snowflakeJvm with defaults"() {
+      given:
+      taskName = 'snowflakeJvm'
 
-        // Don't print the password
-        //log.warn "runner arguments: ${args}"
+      when:
+      result = executeTask(taskName, ['-Si'])
 
-        // execute the Gradle test build
-        result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(args)
-                .withPluginClasspath()
-                .forwardOutput()
-                .build()
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+      result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
+   }
 
-        // log the results
-        if (logOutput) log.warn result.getOutput()
-        return result
-    }
+   def "snowflakeJvm with custom JAR"() {
+      given:
+      taskName = 'snowflakeJvm'
 
-    def "snowflakeJvm with defaults"() {
-        given:
-        taskName = 'snowflakeJvm'
+      when:
+      result = executeTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '-Si'])
 
-        when:
-        result = executeSingleTask(taskName, ['-Si'])
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+      result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
+   }
 
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm with custom JAR"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ['--jar', 'build/libs/unit-test-0.1.0-all.jar', '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm with immutable function"() {
-        given:
-        buildFile.write("""
-                    |plugins {
-                    |    id 'io.github.stewartbryson.snowflake'
-                    |    id 'java'
-                    |}
-                    |java {
-                    |    toolchain {
-                    |        languageVersion = JavaLanguageVersion.of(11)
-                    |    }
-                    |}
+   def "snowflakeJvm with immutable function"() {
+      given: "A new snowflake closure with 'immutable'."
+      writeBuildFile('java')
+      appendBuildFile("""
                     |snowflake {
-                    |  groupId = 'io.github.stewartbryson'
-                    |  artifactId = 'test-gradle-snowflake'
-                    |  role = '$role'
-                    |  database = '$database'
-                    |  schema = '$schema'
-                    |  warehouse = '$warehouse'
+                    |  connection = '$connection'
                     |  stage = '$stage'
                     |  ephemeralName = '$ephemeralName'
+                    |  useEphemeral = true
+                    |  keepEphemeral = true
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -174,27 +89,19 @@ class JavaTest extends Specification {
                     |      }
                     |   }
                     |}
-                    |version='0.1.0'
-                    |""".stripMargin())
-        taskName = 'snowflakeJvm'
+                    |""")
+      taskName = 'snowflakeJvm'
 
-        when:
-        result = executeSingleTask(taskName, ['-Si'])
+      when:
+      result = executeTask(taskName, ['-Si'])
 
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+      result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
+   }
 
-    def "snowflakeJvm with ephemeral"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--use-ephemeral", '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
-    }
+   // drop the ephemeral clone at the end
+   def cleanupSpec() {
+      executeTask('dropEphemeral', ['-Si'])
+   }
 }

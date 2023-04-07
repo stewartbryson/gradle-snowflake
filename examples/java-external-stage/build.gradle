@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'com.github.ben-manes.versions' version '0.46.0'
+    id 'io.github.stewartbryson.snowflake' version '1.1.4'
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+snowflake {
+    connection = 'gradle_plugin'
+    stage = 's3_maven'
+    groupId = 'io.github.stewartbryson'
+    artifactId = 'sample-udfs'
+    applications {
+        add_numbers {
+            inputs = ["a integer", "b integer"]
+            returns = "string"
+            handler = "Sample.addNum"
+        }
+    }
+}
+
+version='0.1.0'

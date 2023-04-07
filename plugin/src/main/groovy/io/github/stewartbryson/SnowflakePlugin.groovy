@@ -5,6 +5,7 @@ import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.authentication.aws.AwsImAuthentication
+
 /**
  * A Gradle plugin for publishing UDFs to Snowflake.
  */
@@ -21,6 +22,8 @@ class SnowflakePlugin implements Plugin<Project> {
       // shorthand
       def extension = project.extensions."$PLUGIN"
 
+      project.ext.session = new Snowflake()
+
       project."$PLUGIN".extensions.applications = project.container(ApplicationContainer)
       project.apply plugin: 'com.redpillanalytics.gradle-properties'
       project.apply plugin: 'com.github.johnrengelman.shadow'
@@ -34,7 +37,9 @@ class SnowflakePlugin implements Plugin<Project> {
 
          if (extension.useCustomMaven || extension.publishUrl) {
             // assert that we have artifact and group
-            assert (extension.artifactId && extension.groupId)
+            if (!extension.artifactId || !extension.groupId) {
+               throw new Exception("'artifactId' and 'groupId' must be configured when publishing to external stages.")
+            }
          }
 
          // create maven publishing
@@ -87,6 +92,42 @@ class SnowflakePlugin implements Plugin<Project> {
             project.tasks.getByName(extension.publishTask).mustRunAfter project.test
          }
          project.snowflakeJvm.dependsOn project.test, project.shadowJar
+
+         // ephemeral tasks
+         project.tasks.register("createEphemeral", CreateCloneTask)
+         project.tasks.register("dropEphemeral", DropCloneTask)
+
+         // if there is a functionalTest defined, it depends on snowflakeJvm
+         if (project.tasks.findByName(extension.testSuite)) {
+            project.tasks."${extension.testSuite}".dependsOn project.tasks.snowflakeJvm
+         }
+
+         // if an ephemeral environment is being used, then some tasks need dependencies
+         if (extension.useEphemeral) {
+            project.tasks.snowflakeJvm.configure {
+               // snowflakeJvm should always run when using ephemeral clones
+               // that's because the clone is dropped at the end
+               outputs.upToDateWhen {false}
+               // clone should be created before publishing
+               dependsOn project.tasks.createEphemeral
+            }
+
+            // if there is a functionalTest defined, clone before running tests
+            if (project.tasks.findByName(extension.testSuite)) {
+               project.tasks."${extension.testSuite}".dependsOn project.tasks.createEphemeral
+            }
+            // if we aren't keeping the ephemeral environment at the end of the run
+            if (!extension.keepEphemeral) {
+               // publishing should be followed by dropping the clone
+               project.tasks.snowflakeJvm.finalizedBy project.tasks.dropEphemeral
+
+               // if there is a functionalTest suite defined, run it before dropping the clone
+               if (project.tasks.findByName(extension.testSuite)) {
+                  //project.tasks."${extension.testSuite}".finalizedBy project.tasks.dropEphemeral
+                  project.tasks.dropEphemeral.mustRunAfter project.tasks."${extension.testSuite}"
+               }
+            }
+         }
       }
    }
 }

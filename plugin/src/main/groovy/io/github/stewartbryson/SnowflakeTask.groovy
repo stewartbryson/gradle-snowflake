@@ -1,19 +1,14 @@
 package io.github.stewartbryson
 
-import com.snowflake.snowpark_java.Session
 import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.options.Option
 
-import java.sql.ResultSet
-import java.sql.Statement
-
 /**
  * A superclass for creating Gradle tasks that work with Snowflake.
  */
 @Slf4j
-@CacheableTask
 abstract class SnowflakeTask extends DefaultTask {
 
     @Internal
@@ -30,132 +25,47 @@ abstract class SnowflakeTask extends DefaultTask {
     }
 
     /**
-     * The Snowflake account URL, for instance: https://gradle-snowflake.us-east-1.snowflakecomputing.com. Overrides {@link SnowflakeExtension#account}.
+     * The SnowSQL config file to use. Default: Looks first for '~/.snowsql/config' followed by './snow-config'.
      */
+    @Input
     @Optional
-    @Input
-    @Option(option = "account",
-            description = "Override the URL of the Snowflake account."
+    @Option(option = "snow-config",
+            description = "Custom SnowSQL config file."
     )
-    String account = extension.account
+    String snowConfig
 
     /**
-     * The Snowflake user to connect as. Overrides {@link SnowflakeExtension#user}.
+     * Override the SnowSQL connection to use. Default: use the base connection info in SnowSQL config.
      */
-    @Optional
     @Input
-    @Option(option = "user",
-            description = "Override the Snowflake user to connect as."
+    @Option(option = "connection",
+            description = "Override the SnowSQL connection to use. Default: use the base connection info in SnowSQL config."
     )
-    String user = extension.user
+    String connection = extension.connection
 
     /**
-     * The Snowflake password to connect with. Overrides {@link SnowflakeExtension#password}.
+     * The {@link Snowflake} object.
      */
-    @Optional
-    @Input
-    @Option(option = "password",
-            description = "Override the Snowflake password to connect with."
-    )
-    String password = extension.password
-
-    /**
-     * The Snowflake database to connect to. Overrides {@link SnowflakeExtension#database}.
-     */
-    @Optional
-    @Input
-    @Option(option = "database",
-            description = "Override the Snowflake database to connect to."
-    )
-    String database = extension.database
-
-    /**
-     * The Snowflake schema to connect with. Overrides {@link SnowflakeExtension#schema}.
-     */
-    @Input
-    @Option(option = "schema",
-            description = "Override the Snowflake schema to connect with."
-    )
-    String schema = extension.schema
-
-    /**
-     * The Snowflake warehouse to use. Overrides {@link SnowflakeExtension#warehouse}.
-     */
-    @Input
-    @Option(option = "warehouse",
-            description = "Override the Snowflake warehouse to use."
-    )
-    String warehouse = extension.warehouse
-
-    /**
-     * The Snowflake role to connect with. Overrides {@link SnowflakeExtension#role}.
-     */
-    @Input
-    @Option(option = "role",
-            description = "Override the Snowflake role to connect with."
-    )
-    String role = extension.role
+    @Internal
+    Snowflake snowflake
 
     /**
      * Create a Snowflake session.
      *
      * @return a Snowflake session.
      */
-    Session createSession() {
-        Map props = [
-                url     : account,
-                user    : user,
-                password: password
-        ]
-        // add the optional connection parameters
-        if (role != 'null') {
-            props.role = role
+    def createSession() {
+        // reuse an existing connection if it already exists
+        if (!project.session.hasSession()) {
+            if (snowConfig) {
+                snowflake = new Snowflake(project.file(snowConfig), connection)
+            } else {
+                snowflake = new Snowflake(connection)
+            }
+            project.session = snowflake
+        } else {
+            log.warn "Reusing existing connection."
+            snowflake = project.session
         }
-        if (warehouse != 'null') {
-            props.warehouse = warehouse
-        }
-        if (database != 'null') {
-            props.db = database
-        }
-        if (schema != 'null') {
-            props.schema = schema
-        }
-
-        Map printable = props.clone()
-        printable.password = "*********"
-        log.info "Snowflake config: $printable"
-
-        // get a Snowflake session
-        try {
-            session = Session.builder().configs(props).create()
-            session.jdbcConnection().createStatement().execute("ALTER SESSION SET JDBC_QUERY_RESULT_FORMAT='JSON'")
-        } catch (NullPointerException npe) {
-            throw new Exception("Snowflake connection details are missing.", npe)
-        }
-        return session
-    }
-
-    /**
-     * The stored Snowflake session.
-     */
-    @Internal
-    Session session
-
-    /**
-     * Return a scalar column value from a SELECT statement where only one row is returned.
-     *
-     * @return a scalar column value.
-     */
-    def getSingleValue(String sql) {
-        Statement statement = session.jdbcConnection().createStatement()
-        ResultSet rs = statement.executeQuery(sql)
-        def columnValue
-        if (rs.next()) {
-            columnValue = rs.getString(1)
-        }
-        // ensure we are matching our stage with our url
-        rs.close()
-        statement.close()
-        return columnValue
     }
 }

@@ -1,68 +1,22 @@
 package io.github.stewartbryson
 
 import groovy.util.logging.Slf4j
-import org.gradle.testkit.runner.GradleRunner
-import spock.lang.Shared
-import spock.lang.Specification
-import spock.lang.TempDir
 
 /**
  * Functional Kotlin tests for the 'io.github.stewartbryson.snowflake' plugin.
  */
 @Slf4j
-class KotlinTest extends Specification {
-    @Shared
-    def result
+class KotlinTest extends GradleSpec {
 
-    @Shared
-    String taskName
+   def setupSpec() {
+      writeBuildFile('kotlin')
 
-    @TempDir
-    @Shared
-    private File projectDir
-
-    @Shared
-    File buildFile, settingsFile, classFile
-
-    @Shared
-    String ephemeralName = 'ephemeral_unit_test', language = 'kotlin'
-
-    @Shared
-    String account = System.getProperty("snowflake.account"),
-           warehouse = System.getProperty("snowflake.warehouse"),
-           user = System.getProperty("snowflake.user"),
-           password = System.getProperty("snowflake.password"),
-           role = System.getProperty("snowflake.role"),
-           database = System.getProperty("snowflake.database"),
-           schema = System.getProperty("snowflake.schema"),
-           internalStage = System.getProperty("internalStage")
-
-    def setupSpec() {
-        settingsFile = new File(projectDir, 'settings.gradle')
-        settingsFile.write("""
-                     |rootProject.name = "$language-test"
-                     |""".stripMargin())
-
-        buildFile = new File(projectDir, 'build.gradle')
-        buildFile.write("""
-                    |plugins {
-                    |    id 'io.github.stewartbryson.snowflake'
-                    |    id "org.jetbrains.kotlin.jvm" version "1.7.21"
-                    |}
-                    |java {
-                    |    toolchain {
-                    |        languageVersion = JavaLanguageVersion.of(11)
-                    |    }
-                    |}
-                    |repositories {
-                    |    mavenCentral()
-                    |}
+      appendBuildFile("""
                     |snowflake {
-                    |  role = '$role'
-                    |  database = '$database'
-                    |  schema = '$schema'
-                    |  warehouse = '$warehouse'
+                    |  connection = '$connection'
                     |  ephemeralName = '$ephemeralName'
+                    |  useEphemeral = true
+                    |  keepEphemeral = true
                     |  applications {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
@@ -72,79 +26,46 @@ class KotlinTest extends Specification {
                     |   }
                     |}
                     |version='0.1.0'
-                    |""".stripMargin())
+                    |""")
 
-        classFile = new File("${projectDir}/src/main/$language", "Sample.kt")
-        classFile.parentFile.mkdirs()
-        classFile.write('''|
-                            |class Sample {
-                            |  fun addNum(num1: Int, num2: Int): String {
-                            |    try {
-                            |      return "Sum is: " + (num1 + num2).toString()
-                            |    } catch (e: Exception) {
-                            |      return null.toString()
-                            |    }
-                            |  }
-                            |}
-                  |'''.stripMargin())
-    }
+      writeSourceFile('Sample', '''|
+                   |class Sample {
+                   |  fun addNum(num1: Int, num2: Int): String {
+                   |    try {
+                   |      return "Sum is: " + (num1 + num2).toString()
+                   |    } catch (e: Exception) {
+                   |      return null.toString()
+                   |    }
+                   |  }
+                   |}
+                   |'''.stripMargin())
+   }
 
-    // helper method
-    def executeSingleTask(String taskName, List args, Boolean logOutput = true) {
-        // ultra secure handling
-        List systemArgs = [
-                "-Psnowflake.account=$account".toString(),
-                "-Psnowflake.user=$user".toString(),
-                "-Psnowflake.password=$password".toString()
-        ]
-        args.add(0, taskName)
-        args.addAll(systemArgs)
+   def "shadowJar"() {
+      given:
+      taskName = 'shadowJar'
 
-        // execute the Gradle test build
-        result = GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(args)
-                .withPluginClasspath()
-                .forwardOutput()
-                .build()
+      when:
+      result = executeTask(taskName, ['-Si'])
 
-        // log the results
-        if (logOutput) log.warn result.getOutput()
-        return result
-    }
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+   }
 
-    def "shadowJar"() {
-        given:
-        taskName = 'shadowJar'
+   def "snowflakeJvm for Kotlin"() {
+      given:
+      taskName = 'snowflakeJvm'
 
-        when:
-        result = executeSingleTask(taskName, ['-Si'])
+      when:
+      result = executeTask(taskName, ["--stage", stage, '-Si'])
 
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
+      then:
+      !result.tasks.collect { it.outcome }.contains('FAILURE')
+      result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
+   }
 
-    def "snowflakeJvm for Kotlin"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-    }
-
-    def "snowflakeJvm for Kotlin with ephemeral"() {
-        given:
-        taskName = 'snowflakeJvm'
-
-        when:
-        result = executeSingleTask(taskName, ["--stage", internalStage, "--use-ephemeral", '-Si'])
-
-        then:
-        !result.tasks.collect { it.outcome }.contains('FAILURE')
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(created)(.+)/)
-        result.output.matches(/(?ms)(.+)(Ephemeral clone)(.+)(dropped)(.+)/)
-    }
+   // drop the ephemeral clone at the end
+   def cleanupSpec() {
+      executeTask('dropEphemeral', ['-Si'])
+   }
 }

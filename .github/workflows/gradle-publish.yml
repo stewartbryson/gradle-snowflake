@@ -20,10 +20,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - run: 'echo "$GRADLE_PROPERTIES" >> gradle.properties'
+      - run: |
+          mkdir -p $HOME/.gradle
+          echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
+        name: 'Write gradle.properties file'
         shell: bash
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
+
+      - run: |
+          mkdir -p $HOME/.snowsql
+          echo "$SNOW_CONFIG" > $HOME/.snowsql/config
+        name: 'Write .snowsql/config file'
+        shell: bash
+        env:
+          SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
       - id: 'auth'
         name: 'Authenticate to Google Cloud'
@@ -34,17 +45,17 @@ jobs:
       - name: Gradle release
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: release -Prelease.disableChecks -Prelease.localOnly
+          arguments: release -Prelease.disableChecks -Prelease.localOnly --scan
 
       - name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build validatePlugin functionalTest integrationTest buildDashboard
+          arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
 
       - name: Gradle publish
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publish githubRelease publishDocs examples -PgithubToken=${{secrets.GITHUB_TOKEN}}
+          arguments: publish githubRelease publishDocs examples --scan -PgithubToken=${{secrets.GITHUB_TOKEN}}
 
       - name: Publish tests
         uses: mikepenz/action-junit-report@v3

@@ -1,0 +1,3 @@
+rootProject.name = 'java-external-stage'
+// ignore this: used for testing examples during releases
+includeBuild('../../')

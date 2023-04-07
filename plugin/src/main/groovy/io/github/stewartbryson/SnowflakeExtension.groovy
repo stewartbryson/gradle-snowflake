@@ -24,33 +24,10 @@ class SnowflakeExtension {
     }
 
     /**
-     * The Snowflake account URL, for instance: https://myaccount.us-east-1.snowflakecomputing.com:443.
+     * The SnowSQL connection to use. Default: use the base connection info in SnowSQL config.
      */
-    String account
-    /**
-     * The Snowflake user to connect as.
-     */
-    String user
-    /**
-     * The Snowflake password to connect with.
-     */
-    String password
-    /**
-     * The Snowflake database to connect to.
-     */
-    String database
-    /**
-     * The Snowflake schema to connect with.
-     */
-    String schema
-    /**
-     * The Snowflake role to connect with.
-     */
-    String role
-    /**
-     * The Snowflake warehouse to connect with.
-     */
-    String warehouse
+    String connection
+
     /**
      * The Snowflake stage to upload to. Default: 'maven'.
      */
@@ -68,6 +45,10 @@ class SnowflakeExtension {
      */
     String artifactId = project.getName()
     /**
+     * Name of the functional test suite to use for testing UDFs against Snowflake. Default: 'functionalTest'.
+     */
+    String testSuite = 'functionalTest'
+    /**
      * Optional: do not automatically apply 'maven-publish' and allow the user to apply that plugin in the 'build.gradle' file.
      */
     Boolean useCustomMaven = false
@@ -82,7 +63,7 @@ class SnowflakeExtension {
     /**
      * The name of the cloned Snowflake database. Default: auto-generated.
      *
-     * When GitHub Actions environment variables are available, then an intelligent name is generated based on the type of event. When GitHub actions environment variables are not available, a simple unique name is generated.
+     * Dynamically generated name for an ephemeral Snowflake clone to create. Uses CICD properties when they are available, and a simple unique name when they are not.
      */
     String ephemeralName
 
@@ -100,7 +81,34 @@ class SnowflakeExtension {
         // determine the base name for the clone
         String baseName = ObjectUtils.firstNonNull(ci.getPullRequest(), ci.reference, RandomStringUtils.randomAlphanumeric(9))
         // determine the reference type
-        String refType = ci.isPullRequest() ? 'pr_' :(ci.isTag()? 'tag_' : (ci.isCi() ? 'branch_' : ''))
-        "ephemeral_${projectName.replace('-','')}_${refType}${baseName}"
+        String refType = isPR() ? 'pr_' : (isTag() ? 'tag_' : (ci.branch ? 'branch_' : ''))
+        "ephemeral_${projectName.replace('-', '_')}_${refType}${baseName}".toUpperCase()
+    }
+
+    /**
+     * Informs whether the plugin is running inside a CICD environment.
+     *
+     * @return whether the plugin is running inside a CICD environment.
+     */
+    Boolean isCI() {
+        return ci.isCi()
+    }
+
+    /**
+     * Informs whether the plugin is running against a pull request.
+     *
+     * @return whether the plugin is running against a pull request.
+     */
+    Boolean isPR() {
+        return ci.isPullRequest()
+    }
+
+    /**
+     * Informs whether the plugin is running against a tag.
+     *
+     * @return whether the plugin is running against a tag.
+     */
+    Boolean isTag() {
+        return ci.isTag()
     }
 }
