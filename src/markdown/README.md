@@ -279,7 +279,20 @@ All unit tests in either `src/test/java` (written using JUnit or something else)
 we automatically run whenever the `test` or `build` task is executed.
 
 ```shell
-./gradlew build
+❯ ./gradlew build
+
+> Task :test
+
+SampleTest
+
+  Test adding 1 and 2 PASSED
+  Test adding 3 and 4 PASSED
+
+SUCCESS: Executed 2 tests in 487ms
+
+
+BUILD SUCCESSFUL in 1s
+9 actionable tasks: 5 executed, 4 up-to-date
 ```
 
 All Gradle testing tasks are automatically incremental and cacheable, and would be avoided if executed again without changes to the code in either the source or the spec.
@@ -351,6 +364,44 @@ class SnowflakeSampleTest extends SnowflakeSpec {
 ```
 The `selectSingleValue` method returns the first column from the first row in a `SELECT` statement,
 so it's perfect for testing a function. And of course, this executes against Snowflake in real time.
+
+```shell
+❯ ./gradlew functionalTest
+
+> Task :test
+
+SampleTest
+
+  Test adding 1 and 2 PASSED
+  Test adding 3 and 4 PASSED
+
+SUCCESS: Executed 2 tests in 462ms
+
+
+> Task :snowflakeJvm
+Using snowsql config file: /Users/stewartbryson/.snowsql/config
+File java-testing-0.1.0-all.jar: UPLOADED
+Deploying ==>
+CREATE OR REPLACE function add_numbers (a integer, b integer)
+  returns string
+  language JAVA
+  handler = 'Sample.addNum'
+  imports = ('@upload/libs/java-testing-0.1.0-all.jar')
+
+
+> Task :functionalTest
+
+SnowflakeSampleTest
+
+  Test ADD_NUMBERS() function with 1 and 2 PASSED
+  Test ADD_NUMBERS() function with 3 and 4 PASSED
+
+SUCCESS: Executed 2 tests in 3.4s
+
+
+BUILD SUCCESSFUL in 9s
+11 actionable tasks: 7 executed, 4 up-to-date
+```
 
 ### Testing with Ephemeral Database Clones
 Running functional tests using static Snowflake databases is boring, especially considering
