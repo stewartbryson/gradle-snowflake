@@ -14,9 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: ./echo-environment.sh
-        name: "Echo environment"
-        shell: bash
+#      - run: ./echo-environment.sh
+#        name: "Echo environment"
+#        shell: bash
 
       - run: |
              mkdir -p $HOME/.gradle

@@ -81,8 +81,8 @@ class SnowflakeExtension {
         // determine the base name for the clone
         String baseName = ObjectUtils.firstNonNull(ci.getPullRequest(), ci.reference, RandomStringUtils.randomAlphanumeric(9))
         // determine the reference type
-        String refType = isPR() ? 'pr_' : (isTag() ? 'tag_' : (isCI() ? 'branch_' : ''))
-        "ephemeral_${projectName.replace('-', '')}_${refType}${baseName}"
+        String refType = isPR() ? 'pr_' : (isTag() ? 'tag_' : (ci.branch ? 'branch_' : ''))
+        "ephemeral_${projectName.replace('-', '_')}_${refType}${baseName}".toUpperCase()
     }
 
     /**
