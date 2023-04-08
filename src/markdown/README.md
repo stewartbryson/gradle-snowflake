@@ -39,7 +39,7 @@ recreated if its signature changed.
 I wanted an experience using Snowflake that is as natural to developers using IntelliJ or VS Code for standard Java
 projects.
 
-# The Snowflake Plugin
+# The Gradle Snowflake Plugin
 
 This plugin provides easy configuration options for those getting started with Gradle but also provides advanced
 features for teams already using Gradle in other areas of the organization.
@@ -146,9 +146,9 @@ It first loads all the default values, and replaces any values from the connecti
 Unfortunately, it doesn't yet look for a config file in all the places that SnowSQL does.
 Instead, it looks in this order:
 
-1. `<HOME_DIR>/.snowsql/config`
-2. `./snow-config` (Useful in CI/CD pipelines, where secrets can be easily written to this file.)
-3. A custom location of your choosing, configured with the `--snow-config` option in applicable tasks.
+1. A custom location of your choosing, configured with the `--snow-config` option in applicable tasks.
+2. `<HOME_DIR>/.snowsql/config`
+3. ./snow-config` (Useful in CI/CD pipelines, where secrets can be easily written to this file.)
 
 The nested 
 [`applications` DSL](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/ApplicationContainer.html)
@@ -327,7 +327,7 @@ functionalTest(JvmTestSuite) {
 I'll walk through a few of these points.
 So that the `SnowflakeSpec` is available in the test classpath, we have to declare the plugin as a dependency
 to the test suite.
-Notice that we use the library standard maven coordinates, which are different than the coordinates in the `plugin` DSL.
+Notice that we use the library maven coordinates, which are different from the coordinates in the `plugin` DSL.
 Additionally, our test specs are unaware of all the configurations of our Gradle build, so we have to pass our `connection`
 property as a Java system property to the `SnowflakeSpec` class.
 
@@ -666,11 +666,11 @@ the plugin will ensure it matches the metadata for the `stage` property.
 the `CREATE OR REPLACE...` statement.
 
 # Contributing
-Anyone can contribute!
+Anyone can contribute! You don't need permission, my blessing, or expertise, clearly.
 To make changes to the `README.md` file, please make them in the [master README file](src/markdown/README.md) instead.
 The version tokens in this file are automatically replaced with the current value before publishing.
 
-Three different unit test tasks are defined:
+Three different testing tasks are defined:
 ```
 ❯ ./gradlew tasks --group verification
 
@@ -698,9 +698,9 @@ BUILD SUCCESSFUL in 1s
 The `functionalTest` task contains all the tests that actually make a connection to Snowflake and test a deployment,
 except those involved with external stages.
 You need to add a connection in `~/.snowsql/config` called `gradle_plugin`.
-> WARNING: Ensure that the credential you provide below are for a safe development database.
+> WARNING: Ensure that the credentials you provide in `gradle_plugin` are safe for development purposes.
 
-The `integrationTest` requires the following external stages to exist in your Snowflake account:
+The `integrationTest` task requires the following external stages to exist in your Snowflake account:
 
 * `gcs_maven`: An external stage in GCS.
 * `s3_maven`: An external stage in S3.
