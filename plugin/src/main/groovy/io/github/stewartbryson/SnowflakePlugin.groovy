@@ -27,6 +27,7 @@ class SnowflakePlugin implements Plugin<Project> {
       project."$PLUGIN".extensions.applications = project.container(ApplicationContainer)
       project.apply plugin: 'com.redpillanalytics.gradle-properties'
       project.apply plugin: 'com.github.johnrengelman.shadow'
+      project.apply plugin: 'java'
       project.pluginProps.setParameters(project, PLUGIN)
 
       project.afterEvaluate {

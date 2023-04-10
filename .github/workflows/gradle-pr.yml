@@ -43,15 +43,12 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - id: gradle_setup
-        name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-
       - id: gradle_build
         name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
+          cache-read-only: ${{ github.base_ref == 'main' }}
 
       - id: publish_tests
         name: Publish tests
