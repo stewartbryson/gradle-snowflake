@@ -61,55 +61,36 @@ jobs:
           report_paths: '**/build/test-results/**/TEST-*.xml'
 
   run_examples:
-    needs: gradle_build
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
+
     steps:
-      - id: java-manual
-        name: Java manual build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
-          build-root-directory: examples/java-manual
+      # Should really make these reusable
+      - uses: actions/checkout@v3
 
-      - id: java
-        name: Java build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: -p snowflakeJvm
-          build-root-directory: examples/java
+      - id: gradle_properties
+        run: |
+          mkdir -p $HOME/.gradle
+          echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
+        name: 'Write gradle.properties file'
+        shell: bash
+        env:
+          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-      - id: java_external_stage
-        name: Java external stage
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: snowflakeJvm
-          build-root-directory: examples/java-external-stage
+      - id: snowsql_config
+        run: |
+          mkdir -p $HOME/.snowsql
+          echo "$SNOW_CONFIG" > $HOME/.snowsql/config
+        name: 'Write .snowsql/config file'
+        shell: bash
+        env:
+          SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
-      - id: java_testing
-        name: Java testing
+      - name: ${{ matrix.directory }}
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: functionalTest
-          build-root-directory: examples/java-testing
-
-      - id: groovy
-        name: Groovy build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: snowflakeJvm
-          build-root-directory: examples/groovy
-
-      - id: scala
-        name: Scala build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: snowflakeJvm
-          build-root-directory: examples/scala
-
-      - id: kotlin
-        name: Kotlin build
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: snowflakeJvm
-          build-root-directory: examples/kotlin
+          arguments: matrixStrategy
+          build-root-directory: examples/${{ matrix.directory }}
