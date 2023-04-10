@@ -3,7 +3,7 @@ package io.github.stewartbryson
 import groovy.util.logging.Slf4j
 
 /**
- * A domain container that allows for defining "Snowflake Applications." The plugin automatically creates the UDFs configured in this container.
+ * A domain container that allows for defining "Snowflake Applications." The plugin automatically creates the UDFs and procedures configured in this container.
  */
 @Slf4j
 class ApplicationContainer {
@@ -11,7 +11,7 @@ class ApplicationContainer {
       this.name = name
    }
    /**
-    * The name of the domain container.
+    * The name of the domain container, which equates to the name of the function or procedure.
     */
    String name
    /**
@@ -27,7 +27,7 @@ class ApplicationContainer {
     */
    String type = 'function'
    /**
-    * The 'language' property of the UDF, currently only 'JAVA' is supported. DEFAULT: 'JAVA'.
+    * The 'language' property of the UDF. DEFAULT: 'JAVA'.
     */
    String language = 'JAVA'
    /**

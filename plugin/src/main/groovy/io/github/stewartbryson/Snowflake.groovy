@@ -6,6 +6,9 @@ import groovy.util.logging.Slf4j
 import java.sql.ResultSet
 import java.sql.Statement
 
+/**
+ * A class that manages connecting to Snowflake, as well as providing information about that connection. Used by core plugin tasks as well as the {@link SnowflakeSpec} specification.
+ */
 @Slf4j
 class Snowflake {
     /**

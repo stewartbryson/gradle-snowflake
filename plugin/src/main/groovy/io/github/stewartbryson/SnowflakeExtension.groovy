@@ -16,6 +16,11 @@ class SnowflakeExtension {
     private String projectName
     private CiInformation ci
 
+    /**
+     * Constructor.
+     *
+     * @param project
+     */
     SnowflakeExtension(Project project) {
         this.project = project
         this.projectName = project.rootProject.name
