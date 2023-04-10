@@ -1,7 +1,7 @@
 plugins {
     id "org.jetbrains.kotlin.jvm" version "1.7.21"
     id 'com.github.ben-manes.versions' version '0.46.0'
-    id 'io.github.stewartbryson.snowflake' version '2.0.5'
+    id 'io.github.stewartbryson.snowflake' version '2.0.6'
 }
 
 repositories {
@@ -27,6 +27,7 @@ snowflake {
 }
 
 version='0.1.0'
+
 
 // empty task for matrix strategy execution in GitHub Actions
 // please ignore
