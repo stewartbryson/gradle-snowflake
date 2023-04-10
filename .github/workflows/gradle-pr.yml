@@ -66,6 +66,8 @@ jobs:
     strategy:
       matrix:
         directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
+      fail-fast: true
+      max-parallel: 1
 
     steps:
       # Should really make these reusable
