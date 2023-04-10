@@ -79,7 +79,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.0.6'
+   id 'io.github.stewartbryson.snowflake' version '2.0.7'
 }
 ```
 
@@ -235,7 +235,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.0.6'
+    id 'io.github.stewartbryson.snowflake' version '2.0.7'
 }
 ```
 
@@ -246,7 +246,7 @@ test {
 }
 ```
 
-And the unit test `SampleTest` spec:
+And the unit test `SampleTest` spec in `src/test/groovy`:
 ```groovy
 import spock.lang.Shared
 import spock.lang.Specification
@@ -312,7 +312,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.6"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.7"
            }
            testTask.configure {
                failFast true
@@ -327,7 +327,7 @@ functionalTest(JvmTestSuite) {
 I'll walk through a few of these points.
 So that the `SnowflakeSpec` is available in the test classpath, we have to declare the plugin as a dependency
 to the test suite.
-Notice that we use the library maven coordinates, which are different from the coordinates in the `plugin` DSL.
+Notice that we use the library maven coordinates, which are different from the coordinates in the `plugins` DSL.
 Additionally, our test specs are unaware of all the configurations of our Gradle build, so we have to pass our `connection`
 property as a Java system property to the `SnowflakeSpec` class.
 
@@ -709,8 +709,13 @@ The `integrationTest` task requires the following external stages to exist in yo
 * `gcs_maven`: An external stage in GCS.
 * `s3_maven`: An external stage in S3.
 
+It also requires the following gradle properties to be set, with the easiest method being placing them in `~/.gradle/gradle.properties`:
+* `gcsPublishUrl`: the GCS url of `gcs_maven`.
+* `s3PublishUrl`: the S3 url of `s3_maven`.
+
 It is understandable if you are unable to test external stages as part of your contribution.
 I segmented them out for this reason.
 
-Open a pull request against the `develop` branch so that it can be merged and possibly tweaked before I open the PR against the `main` branch.
+Open a pull request against the `develop` branch so that it can be merged and possibly tweaked before 
+I open the PR against the `main` branch.
 This will also enable me to test external stages.
