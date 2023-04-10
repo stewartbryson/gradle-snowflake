@@ -48,7 +48,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
-          cache-read-only: ${{ github.event.pull_request.merged }}
+          cache-read-only: ${{ github.base_ref == 'main' }}
 
       - id: publish_tests
         name: Publish tests
