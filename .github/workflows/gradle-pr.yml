@@ -43,6 +43,10 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
+      - id: gradle_setup
+        name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
       - id: gradle_build
         name: Gradle build and test
         uses: gradle/gradle-build-action@v2
@@ -65,40 +69,47 @@ jobs:
         name: Java manual build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -p examples/java-manual build
+          arguments: build
+          build-root-directory: examples/java-manual
 
       - id: java
         name: Java build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -p examples/java snowflakeJvm
+          arguments: -p snowflakeJvm
+          build-root-directory: examples/java
 
       - id: java_external_stage
         name: Java external stage
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -p examples/java-external-stage snowflakeJvm
+          arguments: snowflakeJvm
+          build-root-directory: examples/java-external-stage
 
       - id: java_testing
         name: Java testing
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -p examples/java-testing functionalTest
+          arguments: functionalTest
+          build-root-directory: examples/java-testing
 
       - id: groovy
         name: Groovy build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -p examples/groovy snowflakeJvm
+          arguments: snowflakeJvm
+          build-root-directory: examples/groovy
 
       - id: scala
         name: Scala build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -p examples/scala snowflakeJvm
+          arguments: snowflakeJvm
+          build-root-directory: examples/scala
 
       - id: kotlin
         name: Kotlin build
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -p examples/kotlin snowflakeJvm
+          arguments: snowflakeJvm
+          build-root-directory: examples/kotlin
