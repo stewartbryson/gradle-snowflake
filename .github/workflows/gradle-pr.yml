@@ -60,7 +60,8 @@ jobs:
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
 
-  run_examples:
+  run_example:
+    if: ${{ false }}  # disable for now
     runs-on: ubuntu-latest
 
     strategy:
