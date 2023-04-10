@@ -43,7 +43,7 @@ testing {
                 all {
                     useSpock('2.3-groovy-3.0')
                     dependencies {
-                        implementation "io.github.stewartbryson:gradle-snowflake-plugin:1.1.4"
+                        implementation "io.github.stewartbryson:gradle-snowflake-plugin:@version@"
                     }
                     testTask.configure {
                         failFast true
