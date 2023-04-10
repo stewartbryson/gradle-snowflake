@@ -4,13 +4,16 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.tasks.TaskAction
 
 /**
- * A superclass for creating Gradle tasks that use ephemeral Snowflake clones.
+ * A Gradle task for creating ephemeral testing environments in Snowflake.
  */
 @Slf4j
 abstract class CreateCloneTask extends SnowflakeTask {
 
+    /**
+     * Constructor.
+     */
     CreateCloneTask() {
-        description = "A Cacheable Gradle task for creating ephemeral testing environments in Snowflake."
+        description = "A Gradle task for creating ephemeral testing environments in Snowflake."
         group = "verification"
     }
 

@@ -3,6 +3,9 @@ package io.github.stewartbryson
 import groovy.util.logging.Slf4j
 import org.ini4j.Ini
 
+/**
+ * A class for parsing a SnowSQL config file.
+ */
 @Slf4j
 class SnowConfig {
     /**
@@ -56,6 +59,11 @@ class SnowConfig {
         this.config = new File(config)
     }
 
+    /**
+     * Build a Map of connection properties for making a Snowflake connection.
+     *
+     * @return Snowflake connection properties.
+     */
     Map getConnectionsProps() {
         //Map props1 = [account: "account", user: "user", password: "password"]
         Map props = [:]

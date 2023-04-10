@@ -67,5 +67,6 @@ abstract class SnowflakeTask extends DefaultTask {
             log.warn "Reusing existing connection."
             snowflake = project.session
         }
+        snowflake.session
     }
 }

@@ -46,7 +46,7 @@ features for teams already using Gradle in other areas of the organization.
 It has three basic modes:
 
 1. Lightweight publishing to internal Snowflake stages using Snowpark.
-2. Slightly heavier publishing using external Snowflake stages and auto-configuration of
+2. Slightly heavier publishing using external Snowflake stages and autoconfiguration of
    the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 3. Publishing to Snowflake using external stages and custom configuration of
    the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.

@@ -15,7 +15,7 @@ import java.sql.ResultSet
 import java.sql.Statement
 
 /**
- * A Cacheable Gradle task for publishing UDFs to Snowflake.
+ * A Cacheable Gradle task for publishing UDFs and procedures to Snowflake.
  */
 @Slf4j
 @CacheableTask
