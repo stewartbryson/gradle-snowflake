@@ -8,17 +8,19 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
 jobs:
-  build:
+  gradle_build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-#      - run: ./echo-environment.sh
+#      - id: echo_environment
+#        run: ./echo-environment.sh
 #        name: "Echo environment"
 #        shell: bash
 
-      - run: |
+      - id: gradle_properties
+        run: |
              mkdir -p $HOME/.gradle
              echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
         name: 'Write gradle.properties file'
@@ -26,7 +28,8 @@ jobs:
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-      - run: |
+      - id: snowsql_config
+        run: |
              mkdir -p $HOME/.snowsql
              echo "$SNOW_CONFIG" > $HOME/.snowsql/config
         name: 'Write .snowsql/config file'
@@ -34,19 +37,68 @@ jobs:
         env:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
-      - id: 'auth'
+      - id: google_auth
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Gradle build and test
+      - id: gradle_build
+        name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
 
-      - name: Publish tests
+      - id: publish_tests
+        name: Publish tests
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
+
+  run_examples:
+    needs: gradle_build
+    runs-on: ubuntu-latest
+
+    steps:
+      - id: java-manual
+        name: Java manual build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -p examples/java-manual build
+
+      - id: java
+        name: Java build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -p examples/java snowflakeJvm
+
+      - id: java_external_stage
+        name: Java external stage
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -p examples/java-external-stage snowflakeJvm
+
+      - id: java_testing
+        name: Java testing
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -p examples/java-testing functionalTest
+
+      - id: groovy
+        name: Groovy build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -p examples/groovy snowflakeJvm
+
+      - id: scala
+        name: Scala build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -p examples/scala snowflakeJvm
+
+      - id: kotlin
+        name: Kotlin build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: -p examples/kotlin snowflakeJvm
