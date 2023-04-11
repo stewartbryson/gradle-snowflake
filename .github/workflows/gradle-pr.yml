@@ -63,8 +63,8 @@ jobs:
 
     strategy:
       matrix:
-        #directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
-        directory: [java]
+        directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
+        #directory: [java]
       fail-fast: true
       max-parallel: 1
 
@@ -79,7 +79,7 @@ jobs:
         name: 'Write gradle.properties file'
         shell: bash
         env:
-          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES_EXAMPLE}}
+          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
       - id: snowsql_config
         run: |
@@ -93,5 +93,5 @@ jobs:
       - name: ${{ matrix.directory }}
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: matrixStrategy
+          arguments: matrixStrategy -Psnowflake.useEphemeral=true -Psnowfalke.keepEphemeral=true
           build-root-directory: examples/${{ matrix.directory }}

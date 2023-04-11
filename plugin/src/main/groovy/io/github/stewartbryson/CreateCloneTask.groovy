@@ -33,7 +33,7 @@ abstract class CreateCloneTask extends SnowflakeTask {
         } catch (Exception e) {
             throw new Exception("Creating ephemeral clone failed.", e)
         }
-        log.warn "Ephemeral clone ${snowflake.ephemeral} created."
+        log.warn "Ephemeral clone ${snowflake.ephemeral} created if not exists."
 
         // Until we build a better testing spec, let downstream dependencies set this
         //snowflake.setEphemeralContext()
