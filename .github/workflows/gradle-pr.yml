@@ -47,7 +47,7 @@ jobs:
         name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
+          arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan -S
           cache-read-only: ${{ github.base_ref == 'main' }}
 
       - id: publish_tests
@@ -58,14 +58,13 @@ jobs:
           report_paths: '**/build/test-results/**/TEST-*.xml'
 
   run_example:
-    if: ${{ false }}  # disable for now
+    #if: ${{ false }}  # disable for now
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
-      fail-fast: true
-      max-parallel: 1
+        directory: [java, java-manual, java-testing, groovy, scala, kotlin]
+        #directory: [java]
 
     steps:
       # Should really make these reusable
@@ -92,5 +91,5 @@ jobs:
       - name: ${{ matrix.directory }}
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: matrixStrategy
+          arguments: matrixStrategy -Psnowflake.useEphemeral=true -Psnowflake.keepEphemeral=true -S
           build-root-directory: examples/${{ matrix.directory }}
