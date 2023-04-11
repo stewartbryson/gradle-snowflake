@@ -2,6 +2,7 @@ package io.github.stewartbryson
 
 import com.snowflake.snowpark_java.PutResult
 import groovy.util.logging.Slf4j
+import net.snowflake.client.jdbc.SnowflakeSQLException
 import net.snowflake.client.jdbc.SnowflakeStatement
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -112,9 +113,17 @@ abstract class SnowflakeJvm extends SnowflakeTask {
                     PARALLEL     : '4',
                     OVERWRITE    : 'TRUE'
             ]
-            PutResult[] pr = snowflake.session.file().put(jar, "$stage/libs", options)
-            pr.each {
-                log.warn "File ${it.sourceFileName}: ${it.status}"
+            try {
+                PutResult[] pr = snowflake.session.file().put(jar, "$stage/libs", options)
+                pr.each {
+                    log.warn "File ${it.sourceFileName}: ${it.status}"
+                }
+            } catch (SnowflakeSQLException e) {
+                // this tells us there's misconfiguration
+                // we are using an external stage without setting publishUrl
+                if (e.message.contains("GET and PUT commands are not supported with external stage")) {
+                    throw new Exception("Using an external stage requires setting the 'publishUrl' property.")
+                }
             }
         } else if (extension.publishUrl) {
             // ensure that the stage and the publishUrl are aligned

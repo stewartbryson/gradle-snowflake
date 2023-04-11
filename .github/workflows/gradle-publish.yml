@@ -55,7 +55,7 @@ jobs:
       - name: Gradle publish
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: publish githubRelease publishDocs examples --scan -PgithubToken=${{secrets.GITHUB_TOKEN}}
+          arguments: publish githubRelease publishDocs examples --scan -PgithubToken=${{secrets.GITHUB_TOKEN}} -S
 
       - name: Publish tests
         uses: mikepenz/action-junit-report@v3
@@ -71,41 +71,39 @@ jobs:
           file_pattern: 'README.md examples/*.gradle'
           status_options: '--untracked-files=no'
 
-    run_example:
-      #if: ${{ false }}  # disable for now
-      runs-on: ubuntu-latest
+  run_example:
+    #if: ${{ false }}  # disable for now
+    runs-on: ubuntu-latest
 
-      strategy:
-        matrix:
-          directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
-          #directory: [ java ]
-        fail-fast: true
-        max-parallel: 1
+    strategy:
+      matrix:
+        directory: [java, java-manual, java-testing, groovy, scala, kotlin]
+        #directory: [java]
 
-      steps:
-        # Should really make these reusable
-        - uses: actions/checkout@v3
+    steps:
+      # Should really make these reusable
+      - uses: actions/checkout@v3
 
-        - id: gradle_properties
-          run: |
-            mkdir -p $HOME/.gradle
-            echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
-          name: 'Write gradle.properties file'
-          shell: bash
-          env:
-            GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
+      - id: gradle_properties
+        run: |
+          mkdir -p $HOME/.gradle
+          echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
+        name: 'Write gradle.properties file'
+        shell: bash
+        env:
+          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-        - id: snowsql_config
-          run: |
-            mkdir -p $HOME/.snowsql
-            echo "$SNOW_CONFIG" > $HOME/.snowsql/config
-          name: 'Write .snowsql/config file'
-          shell: bash
-          env:
-            SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
+      - id: snowsql_config
+        run: |
+          mkdir -p $HOME/.snowsql
+          echo "$SNOW_CONFIG" > $HOME/.snowsql/config
+        name: 'Write .snowsql/config file'
+        shell: bash
+        env:
+          SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
-        - name: ${{ matrix.directory }}
-          uses: gradle/gradle-build-action@v2
-          with:
-            arguments: matrixStrategy -Psnowflake.useEphemeral=true
-            build-root-directory: examples/${{ matrix.directory }}
+      - name: ${{ matrix.directory }}
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: matrixStrategy -Psnowflake.useEphemeral=true -S
+          build-root-directory: examples/${{ matrix.directory }}

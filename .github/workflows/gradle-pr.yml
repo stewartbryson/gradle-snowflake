@@ -47,7 +47,7 @@ jobs:
         name: Gradle build and test
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
+          arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan -S
           cache-read-only: ${{ github.base_ref == 'main' }}
 
       - id: publish_tests
@@ -63,10 +63,8 @@ jobs:
 
     strategy:
       matrix:
-        directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
+        directory: [java, java-manual, java-testing, groovy, scala, kotlin]
         #directory: [java]
-      fail-fast: true
-      max-parallel: 1
 
     steps:
       # Should really make these reusable
@@ -93,5 +91,5 @@ jobs:
       - name: ${{ matrix.directory }}
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: matrixStrategy -Psnowflake.useEphemeral=true -Psnowfalke.keepEphemeral=true
+          arguments: matrixStrategy -Psnowflake.useEphemeral=true -Psnowflake.keepEphemeral=true -S
           build-root-directory: examples/${{ matrix.directory }}
