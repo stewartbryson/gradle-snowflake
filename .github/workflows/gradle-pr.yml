@@ -58,12 +58,13 @@ jobs:
           report_paths: '**/build/test-results/**/TEST-*.xml'
 
   run_example:
-    if: ${{ false }}  # disable for now
+    #if: ${{ false }}  # disable for now
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
+        #directory: [java, java-manual, java-external-stage, java-testing, groovy, scala, kotlin]
+        directory: [java]
       fail-fast: true
       max-parallel: 1
 
@@ -78,7 +79,7 @@ jobs:
         name: 'Write gradle.properties file'
         shell: bash
         env:
-          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
+          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES_EXAMPLE}}
 
       - id: snowsql_config
         run: |
