@@ -35,6 +35,12 @@ class SnowflakePlugin implements Plugin<Project> {
 
          // add shadowJar to build
          project.build.dependsOn project.shadowJar
+         // exclude some things in shadowJar
+         project.shadowJar {
+            dependencies {
+               exclude(dependency('com.snowflake:snowpark:.*'))
+            }
+         }
 
          if (extension.useCustomMaven || extension.publishUrl) {
             // assert that we have artifact and group
@@ -107,7 +113,8 @@ class SnowflakePlugin implements Plugin<Project> {
          if (extension.useEphemeral) {
             project.tasks.snowflakeJvm.configure {
                // snowflakeJvm should always run when using ephemeral clones
-               // that's because the clone is dropped at the end
+               // that's because the clone may be dropped at the end of the last run
+               //TODO #88
                outputs.upToDateWhen {false}
                // clone should be created before publishing
                dependsOn project.tasks.createEphemeral
