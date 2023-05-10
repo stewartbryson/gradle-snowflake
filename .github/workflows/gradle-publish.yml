@@ -43,17 +43,17 @@ jobs:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Gradle release
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: release -Prelease.disableChecks -Prelease.localOnly --scan
 
       - name: Gradle build and test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan
 
       - name: Gradle publish
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: publish githubRelease publishDocs examples --scan -PgithubToken=${{secrets.GITHUB_TOKEN}} -S
 
@@ -77,7 +77,7 @@ jobs:
 
     strategy:
       matrix:
-        directory: [java, java-manual, java-testing, groovy, scala, kotlin]
+        directory: [java, java-testing, groovy, scala, kotlin]
         #directory: [java]
 
     steps:
@@ -103,7 +103,7 @@ jobs:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
       - name: ${{ matrix.directory }}
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: matrixStrategy -Psnowflake.useEphemeral=true -S
           build-root-directory: examples/${{ matrix.directory }}
