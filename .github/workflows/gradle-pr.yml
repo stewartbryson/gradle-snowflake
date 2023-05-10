@@ -45,7 +45,7 @@ jobs:
 
       - id: gradle_build
         name: Gradle build and test
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan -S
           cache-read-only: ${{ github.base_ref == 'main' }}
@@ -89,7 +89,7 @@ jobs:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
       - name: ${{ matrix.directory }}
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: matrixStrategy -Psnowflake.useEphemeral=true -Psnowflake.keepEphemeral=true -S
           build-root-directory: examples/${{ matrix.directory }}
