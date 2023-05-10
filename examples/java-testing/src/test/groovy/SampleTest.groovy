@@ -9,17 +9,17 @@ class SampleTest extends Specification {
 
    def "adding 1 and 2"() {
       when: "Two numbers"
-      def one = 1
-      def two = 2
+      def a = 1
+      def b = 2
       then: "Add numbers"
-      sample.addNum(one, two) == "Sum is: 3"
+      sample.addNum(a, b) == "Sum is: 3"
    }
 
    def "adding 3 and 4"() {
       when: "Two numbers"
-      def one = 3
-      def two = 4
+      def a = 3
+      def b = 4
       then: "Add numbers"
-      sample.addNum(one, two) == "Sum is: 7"
+      sample.addNum(a, b) == "Sum is: 7"
    }
 }

@@ -9,20 +9,20 @@ class SnowflakeSampleTest extends SnowflakeSpec {
 
     def 'ADD_NUMBERS() function with 1 and 2'() {
         when: "Two numbers exist"
-        def one = 1
-        def two = 2
+        def a = 1
+        def b = 2
 
         then: 'Add two numbers using ADD_NUMBERS()'
-        selectSingleValue("select add_numbers($one,$two);") == 'Sum is: 3'
+        selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 3'
     }
 
     def 'ADD_NUMBERS() function with 3 and 4'() {
         when: "Two numbers exist"
-        def three = 3
-        def four = 4
+        def a = 3
+        def b = 4
 
         then: 'Add two numbers using ADD_NUMBERS()'
-        selectSingleValue("select add_numbers($three,$four);") == 'Sum is: 7'
+        selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 7'
     }
 
 }

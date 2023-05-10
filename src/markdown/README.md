@@ -1,6 +1,6 @@
 # Breaking Changes
 
-We introduced breaking changes in version `2.0.0` described below.
+We introduced the following breaking changes in version `2.0.0`:
 
 ### SnowSQL Config File
 Instead of continuing to use plugin DSL or Gradle properties to provide Snowflake authentication, we made the
@@ -36,7 +36,7 @@ cd examples/java-manual &&
 
 But this JAR would still have to be uploaded to a stage in Snowflake, and the UDF would have to be created or possibly
 recreated if its signature changed.
-I wanted an experience using Snowflake that is as natural to developers using IntelliJ or VS Code for standard Java
+I wanted an experience using Snowflake that is as natural to developers using IntelliJ or VS Code for standard JVM
 projects.
 
 # The Gradle Snowflake Plugin
@@ -148,12 +148,12 @@ Instead, it looks in this order:
 
 1. A custom location of your choosing, configured with the `--snow-config` option in applicable tasks.
 2. `<HOME_DIR>/.snowsql/config`
-3. ./snow-config` (Useful in CI/CD pipelines, where secrets can be easily written to this file.)
+3. `./snow-config` (This is useful in CI/CD pipelines, where secrets can easily be written to this file.)
 
 The nested 
 [`applications` DSL](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/ApplicationContainer.html)
 might seem a bit daunting.
-This is a simple way to configure all the different UDFs or procedures we want to automatically create (or recreate)
+This is a simple way to configure all the different UDFs and procedures we want to automatically create (or recreate)
 each time we publish the JAR file.
 The example above will generate and execute the following statement.
 Notice that the `imports` part of the statement is automatically added by the plugin as the JAR (including our code and all dependencies) is automatically uploaded to Snowflake:
@@ -259,18 +259,18 @@ class SampleTest extends Specification {
 
    def "adding 1 and 2"() {
       when: "Two numbers"
-      def one = 1
-      def two = 2
+      def a = 1
+      def b = 2
       then: "Add numbers"
-      sample.addNum(one, two) == "Sum is: 3"
+      sample.addNum(a, b) == "Sum is: 3"
    }
 
    def "adding 3 and 4"() {
       when: "Two numbers"
-      def one = 3
-      def two = 4
+      def a = 3
+      def b = 4
       then: "Add numbers"
-      sample.addNum(one, two) == "Sum is: 7"
+      sample.addNum(a, b) == "Sum is: 7"
    }
 }
 ```
@@ -290,7 +290,6 @@ SampleTest
 
 SUCCESS: Executed 2 tests in 487ms
 
-
 BUILD SUCCESSFUL in 1s
 9 actionable tasks: 5 executed, 4 up-to-date
 ```
@@ -305,7 +304,8 @@ Regardless of what we call it, we _know we need this_, and it's a crucial compon
 This plugin contains a custom Spock Specification class called `SnowflakeSpec` that can be used in a new test suite.
 By default, this test suite is called `functionalTest`, though the name can be configured using the `testSuite` property.
 
-Here is our configuration of the `functionalTest` test suite. It's convoluted DSL (in my opinion), but no one asked me:
+Here is our configuration of the `functionalTest` test suite.
+The DSL provided by Gradle in JVM Testing is convoluted (in my opinion), but no one asked me:
 ```grovy
 functionalTest(JvmTestSuite) {
    targets {
@@ -337,30 +337,31 @@ import groovy.util.logging.Slf4j
 import io.github.stewartbryson.SnowflakeSpec
 
 /**
-* The SnowflakeSpec used for testing functions.
-*/
+ * The SnowflakeSpec used for testing functions.
+ */
 @Slf4j
 class SnowflakeSampleTest extends SnowflakeSpec {
 
-    def 'ADD_NUMBERS() function with 1 and 2'() {
-        when: "Two numbers exist"
-        def one = 1
-        def two = 2
+   def 'ADD_NUMBERS() function with 1 and 2'() {
+      when: "Two numbers exist"
+      def a = 1
+      def b = 2
 
-        then: 'Add two numbers using ADD_NUMBERS()'
-        selectSingleValue("select add_numbers($one,$two);") == 'Sum is: 3'
-    }
+      then: 'Add two numbers using ADD_NUMBERS()'
+      selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 3'
+   }
 
-    def 'ADD_NUMBERS() function with 3 and 4'() {
-        when: "Two numbers exist"
-        def three = 3
-        def four = 4
+   def 'ADD_NUMBERS() function with 3 and 4'() {
+      when: "Two numbers exist"
+      def a = 3
+      def b = 4
 
-        then: 'Add two numbers using ADD_NUMBERS()'
-        selectSingleValue("select add_numbers($three,$four);") == 'Sum is: 7'
-    }
+      then: 'Add two numbers using ADD_NUMBERS()'
+      selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 7'
+   }
 
 }
+
 ```
 The `selectSingleValue` method returns the first column from the first row in a `SELECT` statement,
 so it's perfect for testing a function. And of course, this executes against Snowflake in real time.
@@ -440,7 +441,7 @@ The `useEphemeral` property will determine whether the `createEphemeral` and `dr
 are added at the beginning and end of the build, respectively.
 This allows for the `functionalTest` task to be run in the ephemeral clone just after our application is published.
 We've also added a little extra magic to keep the clone when building a pull request.
-The `createEphemeral` task issues a `CREATE DATABASE... IF NOT EXISTS` statement, so it exists from a prior run.
+The `createEphemeral` task issues a `CREATE DATABASE... IF NOT EXISTS` statement, so if will not fail if the clone exists from a prior run.
 Remember that our `SnowflakeSpec` class doesn't automatically know the details of our build, so we have to provide
 the ephemeral name using java system properties. Here is our modified testing suite:
 
@@ -474,7 +475,7 @@ We can simulate a GitHub Actions environment just by setting the `GITHUB_ACTIONS
 
 > Task :createEphemeral
 Using snowsql config file: /Users/stewartbryson/.snowsql/config
-Ephemeral clone EPHEMERAL_JAVA_TESTING_JYLM4SB2W created.
+Ephemeral clone EPHEMERAL_JAVA_TESTING_PR_4 created.
 
 > Task :snowflakeJvm
 Reusing existing connection.
@@ -495,11 +496,6 @@ SnowflakeSampleTest
   Test ADD_NUMBERS() function with 3 and 4 PASSED
 
 SUCCESS: Executed 2 tests in 3s
-
-
-> Task :dropEphemeral
-Reusing existing connection.
-Ephemeral clone EPHEMERAL_JAVA_TESTING_JYLM4SB2W dropped.
 
 BUILD SUCCESSFUL in 6s
 13 actionable tasks: 4 executed, 9 up-to-date
