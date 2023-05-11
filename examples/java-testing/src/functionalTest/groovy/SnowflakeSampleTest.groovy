@@ -13,7 +13,7 @@ class SnowflakeSampleTest extends SnowflakeSpec {
         def b = 2
 
         then: 'Add two numbers using ADD_NUMBERS()'
-        selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 3'
+        selectFunction("add_numbers", [a,b]) == 'Sum is: 3'
     }
 
     def 'ADD_NUMBERS() function with 3 and 4'() {
@@ -22,7 +22,7 @@ class SnowflakeSampleTest extends SnowflakeSpec {
         def b = 4
 
         then: 'Add two numbers using ADD_NUMBERS()'
-        selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 7'
+        selectFunction("add_numbers", [a,b]) == 'Sum is: 7'
     }
 
 }
