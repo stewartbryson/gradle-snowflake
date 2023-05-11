@@ -79,7 +79,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.0.11'
+   id 'io.github.stewartbryson.snowflake' version '2.0.12'
 }
 ```
 
@@ -235,7 +235,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.0.11'
+    id 'io.github.stewartbryson.snowflake' version '2.0.12'
 }
 ```
 
@@ -312,7 +312,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.11"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.12"
            }
            testTask.configure {
                failFast true
@@ -348,7 +348,7 @@ class SnowflakeSampleTest extends SnowflakeSpec {
       def b = 2
 
       then: 'Add two numbers using ADD_NUMBERS()'
-      selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 3'
+      selectFunction("add_numbers", [a,b]) == 'Sum is: 3'
    }
 
    def 'ADD_NUMBERS() function with 3 and 4'() {
@@ -357,14 +357,13 @@ class SnowflakeSampleTest extends SnowflakeSpec {
       def b = 4
 
       then: 'Add two numbers using ADD_NUMBERS()'
-      selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 7'
+      selectFunction("add_numbers", [a,b]) == 'Sum is: 7'
    }
 
 }
-
 ```
-The `selectSingleValue` method returns the first column from the first row in a `SELECT` statement,
-so it's perfect for testing a function. And of course, this executes against Snowflake in real time.
+The `selectFunction` method is an easy way to execute a function and test the results by just passing the function name and a list of arguments to pass to that function.
+And of course, this executes against Snowflake in real time.
 
 ```shell
 ❯ ./gradlew functionalTest
