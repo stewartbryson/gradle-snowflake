@@ -348,7 +348,7 @@ class SnowflakeSampleTest extends SnowflakeSpec {
       def b = 2
 
       then: 'Add two numbers using ADD_NUMBERS()'
-      selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 3'
+      selectFunction("add_numbers", [a,b]) == 'Sum is: 3'
    }
 
    def 'ADD_NUMBERS() function with 3 and 4'() {
@@ -357,14 +357,13 @@ class SnowflakeSampleTest extends SnowflakeSpec {
       def b = 4
 
       then: 'Add two numbers using ADD_NUMBERS()'
-      selectSingleValue("select add_numbers($a,$b);") == 'Sum is: 7'
+      selectFunction("add_numbers", [a,b]) == 'Sum is: 7'
    }
 
 }
-
 ```
-The `selectSingleValue` method returns the first column from the first row in a `SELECT` statement,
-so it's perfect for testing a function. And of course, this executes against Snowflake in real time.
+The `selectFunction` method is an easy way to execute a function and test the results by just passing the function name and a list of arguments to pass to that function.
+And of course, this executes against Snowflake in real time.
 
 ```shell
 ❯ ./gradlew functionalTest
