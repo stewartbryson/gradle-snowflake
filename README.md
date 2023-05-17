@@ -52,8 +52,7 @@ It has three basic modes:
    the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 
 Have a look at
-the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/package-summary.html)
-.
+the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/package-summary.html).
 
 This plugin can be used to build UDFs and procedures in any JVM language supported by Gradle, which currently provides
 official support
@@ -79,7 +78,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.0.12'
+   id 'io.github.stewartbryson.snowflake' version '2.0.13'
 }
 ```
 
@@ -235,7 +234,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.0.12'
+    id 'io.github.stewartbryson.snowflake' version '2.0.13'
 }
 ```
 
@@ -312,7 +311,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.12"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.13"
            }
            testTask.configure {
                failFast true
