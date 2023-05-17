@@ -52,8 +52,7 @@ It has three basic modes:
    the [`maven-publish`](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
 
 Have a look at
-the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/package-summary.html)
-.
+the [API docs](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/package-summary.html).
 
 This plugin can be used to build UDFs and procedures in any JVM language supported by Gradle, which currently provides
 official support
