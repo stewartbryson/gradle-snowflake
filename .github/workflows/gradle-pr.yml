@@ -63,7 +63,7 @@ jobs:
 
     strategy:
       matrix:
-        directory: [java, java-testing, groovy, scala, kotlin]
+        directory: [java-manual, java, java-testing, groovy, scala, kotlin]
         #directory: [java]
 
     steps:
