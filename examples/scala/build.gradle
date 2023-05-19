@@ -18,6 +18,8 @@ java {
     }
 }
 
+version='0.1.0'
+
 snowflake {
     connection = 'gradle_plugin'
     stage = 'upload'
@@ -29,9 +31,6 @@ snowflake {
         }
     }
 }
-
-version='0.1.0'
-
 
 // empty task for matrix strategy execution in GitHub Actions
 // please ignore

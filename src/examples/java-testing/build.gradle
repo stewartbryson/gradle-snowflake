@@ -21,8 +21,8 @@ snowflake {
     connection = 'gradle_plugin'
     stage = 'upload'
     // Explained in the Ephemeral Cloning section
-    useEphemeral = project.snowflake.isCI() // use ephemeral with CICD workflows
-    keepEphemeral = project.snowflake.isPR() // keep ephemeral for PRs
+    useEphemeral = snowflake.isCI() // use ephemeral with CICD workflows
+    keepEphemeral = snowflake.isPR() // keep ephemeral for PRs
     applications {
         add_numbers {
             inputs = ["a integer", "b integer"]
@@ -48,9 +48,9 @@ testing {
                     testTask.configure {
                         failFast true
                         // which SnowSQL connection to use
-                        systemProperty 'connection', project.snowflake.connection
+                        systemProperty 'connection', snowflake.connection
                         // if this is ephemeral, the test spec needs the name to connect to
-                        if (project.snowflake.useEphemeral) {
+                        if (snowflake.useEphemeral) {
                             systemProperty 'ephemeralName', snowflake.ephemeralName
                         }
                     }

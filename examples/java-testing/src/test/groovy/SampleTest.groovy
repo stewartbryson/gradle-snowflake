@@ -1,9 +1,7 @@
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 
 class SampleTest extends Specification {
-   @Shared
    @Subject
    def sample = new Sample()
 
@@ -11,6 +9,7 @@ class SampleTest extends Specification {
       when: "Two numbers"
       def a = 1
       def b = 2
+
       then: "Add numbers"
       sample.addNum(a, b) == "Sum is: 3"
    }
@@ -19,6 +18,7 @@ class SampleTest extends Specification {
       when: "Two numbers"
       def a = 3
       def b = 4
+
       then: "Add numbers"
       sample.addNum(a, b) == "Sum is: 7"
    }
