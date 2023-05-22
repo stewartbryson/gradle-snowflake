@@ -67,6 +67,6 @@ version='0.1.0'
 afterEvaluate {
     tasks.register('matrixStrategy') {
         description 'Empty task for matrix strategy execution in GitHub Actions.'
-        dependsOn functionalTest
+        dependsOn functionalTest, dropEphemeral
     }
 }

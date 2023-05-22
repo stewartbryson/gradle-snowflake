@@ -78,7 +78,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.0.13'
+   id 'io.github.stewartbryson.snowflake' version '2.0.14'
 }
 ```
 
@@ -234,7 +234,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.0.13'
+    id 'io.github.stewartbryson.snowflake' version '2.0.14'
 }
 ```
 
@@ -299,7 +299,7 @@ The same applies for the topic of functional testing below.
 ### Functional Testing
 [Functional testing](https://en.wikipedia.org/wiki/Functional_testing) describes what the system does,
 and in my mind, this involves testing our deployed code in Snowflake. 
-Regardless of what we call it, we _know we need this_, and it's a crucial component in our build chain.
+Regardless of what we call it, we _know we need this_ as a crucial component in our build chain.
 This plugin contains a custom Spock Specification class called `SnowflakeSpec` that can be used in a new test suite.
 By default, this test suite is called `functionalTest`, though the name can be configured using the `testSuite` property.
 
@@ -311,7 +311,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.13"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.14"
            }
            testTask.configure {
                failFast true
