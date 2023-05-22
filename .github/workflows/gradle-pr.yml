@@ -91,5 +91,5 @@ jobs:
       - name: ${{ matrix.directory }}
         uses: gradle/gradle-build-action@v2.4.2
         with:
-          arguments: matrixStrategy -Psnowflake.useEphemeral=true -Psnowflake.keepEphemeral=false -S
+          arguments: matrixStrategy -Psnowflake.useEphemeral=true -S
           build-root-directory: examples/${{ matrix.directory }}
