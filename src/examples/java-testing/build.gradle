@@ -21,7 +21,7 @@ snowflake {
     connection = 'gradle_plugin'
     stage = 'upload'
     // Explained in the Ephemeral Cloning section
-    useEphemeral = snowflake.isCI() // use ephemeral with CICD workflows
+    useEphemeral = snowflake.isCI() // use ephemeral with CI/CD workflows
     keepEphemeral = snowflake.isPR() // keep ephemeral for PRs
     applications {
         add_numbers {
