@@ -107,6 +107,9 @@ class SnowflakePlugin implements Plugin<Project> {
          // if there is a functionalTest defined, it depends on snowflakeJvm
          if (project.tasks.findByName(extension.testSuite)) {
             project.tasks."${extension.testSuite}".dependsOn project.tasks.snowflakeJvm
+            // in case the tasks are called directly
+            project.tasks."${extension.testSuite}".mustRunAfter project.tasks.createEphemeral
+            project.tasks.dropEphemeral.mustRunAfter project.tasks."${extension.testSuite}"
          }
 
          // if an ephemeral environment is being used, then some tasks need dependencies
@@ -115,7 +118,7 @@ class SnowflakePlugin implements Plugin<Project> {
                // snowflakeJvm should always run when using ephemeral clones
                // that's because the clone may be dropped at the end of the last run
                //TODO #88
-               outputs.upToDateWhen {false}
+               outputs.upToDateWhen { false }
                // clone should be created before publishing
                dependsOn project.tasks.createEphemeral
             }
