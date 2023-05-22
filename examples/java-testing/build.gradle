@@ -7,29 +7,29 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
-    gradlePluginPortal() // added for functionalTest dependency
+   mavenCentral()
+   gradlePluginPortal() // added for functionalTest dependency
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
+   toolchain {
+      languageVersion = JavaLanguageVersion.of(11)
+   }
 }
 
 snowflake {
-    connection = 'gradle_plugin'
-    stage = 'upload'
-    // Explained in the Ephemeral Cloning section
-    useEphemeral = snowflake.isCI() // use ephemeral with CICD workflows
-    keepEphemeral = snowflake.isPR() // keep ephemeral for PRs
-    applications {
-        add_numbers {
-            inputs = ["a integer", "b integer"]
-            returns = "string"
-            handler = "Sample.addNum"
-        }
-    }
+   connection = 'gradle_plugin'
+   stage = 'upload'
+   // Explained in the Ephemeral Cloning section
+   useEphemeral = snowflake.isCI() // use ephemeral with CICD workflows
+   keepEphemeral = snowflake.isPR() // keep ephemeral for PRs
+   applications {
+      add_numbers {
+         inputs = ["a integer", "b integer"]
+         returns = "string"
+         handler = "Sample.addNum"
+      }
+   }
 }
 
 // Explained in the Testing section
@@ -43,14 +43,14 @@ testing {
                 all {
                     useSpock('2.3-groovy-3.0')
                     dependencies {
-                        implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.14"
+                        implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.13"
                     }
                     testTask.configure {
                         failFast true
                         // which SnowSQL connection to use
                         systemProperty 'connection', snowflake.connection
                         // if this is ephemeral, the test spec needs the name to connect to
-                        if (snowflake.useEphemeral) {
+                        if (project.snowflake.useEphemeral) {
                             systemProperty 'ephemeralName', snowflake.ephemeralName
                         }
                     }
@@ -60,13 +60,13 @@ testing {
     }
 }
 
-version='0.1.0'
+version = '0.1.0'
 
 // empty task for matrix strategy execution in GitHub Actions
 // please ignore
 afterEvaluate {
-    tasks.register('matrixStrategy') {
-        description 'Empty task for matrix strategy execution in GitHub Actions.'
-        dependsOn functionalTest
-    }
+   tasks.register('matrixStrategy') {
+      description 'Empty task for matrix strategy execution in GitHub Actions.'
+      dependsOn functionalTest, dropEphemeral
+   }
 }
