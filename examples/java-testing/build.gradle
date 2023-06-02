@@ -1,72 +1,72 @@
 plugins {
-    id 'java'
-    id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.0.15'
-    id 'com.adarshr.test-logger' version '3.2.0' // added for testing
-    id 'com.github.ben-manes.versions' version '0.46.0'
+   id 'java'
+   id 'groovy' // needed for Spock testing framework
+   id 'io.github.stewartbryson.snowflake' version '2.0.16'
+   id 'com.adarshr.test-logger' version '3.2.0' // added for testing
+   id 'com.github.ben-manes.versions' version '0.46.0'
 }
 
 repositories {
-    mavenCentral()
-    gradlePluginPortal() // added for functionalTest dependency
+   mavenCentral()
+   gradlePluginPortal() // added for functionalTest dependency
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
+   toolchain {
+      languageVersion = JavaLanguageVersion.of(11)
+   }
 }
 
 snowflake {
-    connection = 'gradle_plugin'
-    stage = 'upload'
-    // Explained in the Ephemeral Cloning section
-    useEphemeral = snowflake.isCI() // use ephemeral with CI/CD workflows
-    keepEphemeral = snowflake.isPR() // keep ephemeral for PRs
-    applications {
-        add_numbers {
-            inputs = ["a integer", "b integer"]
-            returns = "string"
-            handler = "Sample.addNum"
-        }
-    }
+   connection = 'gradle_plugin'
+   stage = 'upload'
+   // Explained in the Ephemeral Cloning section
+   useEphemeral = snowflake.isCI() // use ephemeral with CI/CD workflows
+   keepEphemeral = snowflake.isPR() // keep ephemeral for PRs
+   applications {
+      add_numbers {
+         inputs = ["a integer", "b integer"]
+         returns = "string"
+         handler = "Sample.addNum"
+      }
+   }
 }
 
 // Explained in the Testing section
 testing {
-    suites {
-        test {
-            useSpock('2.3-groovy-3.0')
-        }
-        functionalTest(JvmTestSuite) {
-            targets {
-                all {
-                    useSpock('2.3-groovy-3.0')
-                    dependencies {
-                        implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.15"
-                    }
-                    testTask.configure {
-                        failFast true
-                        // which SnowSQL connection to use
-                        systemProperty 'connection', snowflake.connection
-                        // if this is ephemeral, the test spec needs the name to connect to
-                        if (snowflake.useEphemeral) {
-                            systemProperty 'ephemeralName', snowflake.ephemeralName
-                        }
-                    }
-                }
+   suites {
+      test {
+         useSpock('2.3-groovy-3.0')
+      }
+      functionalTest(JvmTestSuite) {
+         targets {
+            all {
+               useSpock('2.3-groovy-3.0')
+               dependencies {
+                  implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.16"
+               }
+               testTask.configure {
+                  failFast true
+                  // which SnowSQL connection to use
+                  systemProperty 'connection', snowflake.connection
+                  // if this is ephemeral, the test spec needs the name to connect to
+                  if (snowflake.useEphemeral) {
+                     systemProperty 'ephemeralName', snowflake.ephemeralName
+                  }
+               }
             }
-        }
-    }
+         }
+      }
+   }
 }
 
-version='0.1.0'
+version = '0.1.0'
 
 // empty task for matrix strategy execution in GitHub Actions
 // please ignore
 afterEvaluate {
-    tasks.register('matrixStrategy') {
-        description 'Empty task for matrix strategy execution in GitHub Actions.'
-        dependsOn functionalTest, dropEphemeral
-    }
+   tasks.register('matrixStrategy') {
+      description 'Empty task for matrix strategy execution in GitHub Actions.'
+      dependsOn functionalTest, dropEphemeral
+   }
 }

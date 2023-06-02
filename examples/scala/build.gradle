@@ -1,43 +1,43 @@
 plugins {
-    id 'scala'
-    id 'com.github.ben-manes.versions' version '0.46.0'
-    id 'io.github.stewartbryson.snowflake' version '2.0.15'
+   id 'scala'
+   id 'com.github.ben-manes.versions' version '0.46.0'
+   id 'io.github.stewartbryson.snowflake' version '2.0.16'
 }
 
 repositories {
-    mavenCentral()
+   mavenCentral()
 }
 
 dependencies {
-    implementation 'org.scala-lang:scala-library:2.13.10'
+   implementation 'org.scala-lang:scala-library:2.13.10'
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
+   toolchain {
+      languageVersion = JavaLanguageVersion.of(11)
+   }
 }
 
 snowflake {
-    connection = 'gradle_plugin'
-    stage = 'upload'
-    applications {
-        add_numbers {
-            inputs = ["a integer", "b integer"]
-            returns = "string"
-            handler = "Sample.addNum"
-        }
-    }
+   connection = 'gradle_plugin'
+   stage = 'upload'
+   applications {
+      add_numbers {
+         inputs = ["a integer", "b integer"]
+         returns = "string"
+         handler = "Sample.addNum"
+      }
+   }
 }
 
-version='0.1.0'
+version = '0.1.0'
 
 
 // empty task for matrix strategy execution in GitHub Actions
 // please ignore
 afterEvaluate {
-    tasks.register('matrixStrategy') {
-        description 'Empty task for matrix strategy execution in GitHub Actions.'
-        dependsOn snowflakeJvm
-    }
+   tasks.register('matrixStrategy') {
+      description 'Empty task for matrix strategy execution in GitHub Actions.'
+      dependsOn snowflakeJvm
+   }
 }
