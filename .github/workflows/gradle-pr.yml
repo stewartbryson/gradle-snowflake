@@ -14,15 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-#      - id: echo_environment
-#        run: ./echo-environment.sh
-#        name: "Echo environment"
-#        shell: bash
+      #      - id: echo_environment
+      #        run: ./echo-environment.sh
+      #        name: "Echo environment"
+      #        shell: bash
 
       - id: gradle_properties
         run: |
-             mkdir -p $HOME/.gradle
-             echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
+          mkdir -p $HOME/.gradle
+          echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
         name: 'Write gradle.properties file'
         shell: bash
         env:
@@ -30,8 +30,8 @@ jobs:
 
       - id: snowsql_config
         run: |
-             mkdir -p $HOME/.snowsql
-             echo "$SNOW_CONFIG" > $HOME/.snowsql/config
+          mkdir -p $HOME/.snowsql
+          echo "$SNOW_CONFIG" > $HOME/.snowsql/config
         name: 'Write .snowsql/config file'
         shell: bash
         env:
@@ -63,7 +63,7 @@ jobs:
 
     strategy:
       matrix:
-        directory: [java-manual, java, java-testing, groovy, scala, kotlin]
+        directory: [ java-manual, java, java-testing, groovy, scala, kotlin ]
         #directory: [java]
 
     steps:
