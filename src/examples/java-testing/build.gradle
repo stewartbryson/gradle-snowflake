@@ -3,7 +3,7 @@ plugins {
    id 'groovy' // needed for Spock testing framework
    id 'io.github.stewartbryson.snowflake' version '@version@'
    id 'com.adarshr.test-logger' version '3.2.0' // added for testing
-   id 'com.github.ben-manes.versions' version '0.46.0'
+   id 'com.github.ben-manes.versions' version '0.47.0'
 }
 
 repositories {
