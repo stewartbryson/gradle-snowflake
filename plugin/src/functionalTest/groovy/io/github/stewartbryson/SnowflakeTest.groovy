@@ -10,7 +10,7 @@ class SnowflakeTest extends Specification {
     @Shared
     Snowflake snowflake
 
-    def "parse snowsql config"() {
+    def "parse credentials config"() {
         given: "a Snowflake class"
         snowflake = new Snowflake('gradle_plugin')
 

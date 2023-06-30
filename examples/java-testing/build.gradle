@@ -47,7 +47,7 @@ testing {
                }
                testTask.configure {
                   failFast true
-                  // which SnowSQL connection to use
+                  // which credentials connection to use
                   systemProperty 'connection', snowflake.connection
                   // if this is ephemeral, the test spec needs the name to connect to
                   if (snowflake.useEphemeral) {

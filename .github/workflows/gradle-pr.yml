@@ -28,11 +28,11 @@ jobs:
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-      - id: snowsql_config
+      - id: credentials_file
         run: |
-          mkdir -p $HOME/.snowsql
-          echo "$SNOW_CONFIG" > $HOME/.snowsql/config
-        name: 'Write .snowsql/config file'
+          mkdir -p $HOME/.snowflake
+          echo "$SNOW_CONFIG" > $HOME/.snowflake/config.toml
+        name: 'Write .snowflake/config.toml file'
         shell: bash
         env:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
@@ -79,11 +79,11 @@ jobs:
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-      - id: snowsql_config
+      - id: credentials_file
         run: |
-          mkdir -p $HOME/.snowsql
-          echo "$SNOW_CONFIG" > $HOME/.snowsql/config
-        name: 'Write .snowsql/config file'
+          mkdir -p $HOME/.snowflake
+          echo "$SNOW_CONFIG" > $HOME/.snowflake/config.toml
+        name: 'Write .snowflake/config.toml file'
         shell: bash
         env:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}

@@ -29,7 +29,7 @@ class SnowflakeExtension {
     }
 
     /**
-     * The SnowSQL connection to use. Default: use the base connection info in SnowSQL config.
+     * The credentials connection to use. Default: use the base connection info in credentials config.
      */
     String connection
 
