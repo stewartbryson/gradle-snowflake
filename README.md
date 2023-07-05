@@ -60,7 +60,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.1.1'
+   id 'io.github.stewartbryson.snowflake' version '2.1.2'
 }
 ```
 
@@ -129,7 +129,7 @@ In searching for a credentials config file, the plugin works in the following or
 
 The `connection` property in the plugin DSL defines which connection to use from the config file, relying on the default values if none is
 provided.
-It first loads all the default values, and replaces any values from the connection, similar to how Snowflake CLI and SnowSQL works.
+It first loads all the default values, and replaces any values from the connection, similar to how Snowflake CLI and SnowSQL work.
 
 The nested 
 [`applications` DSL](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/ApplicationContainer.html)
@@ -216,7 +216,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.1.1'
+    id 'io.github.stewartbryson.snowflake' version '2.1.2'
 }
 ```
 
@@ -293,7 +293,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.1"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.2"
            }
            testTask.configure {
                failFast true
