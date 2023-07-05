@@ -1,7 +1,7 @@
 plugins {
    id 'java'
    id 'groovy' // needed for Spock testing framework
-   id 'io.github.stewartbryson.snowflake' version '2.0.17'
+   id 'io.github.stewartbryson.snowflake' version '2.1.0'
    id 'com.adarshr.test-logger' version '3.2.0' // added for testing
    id 'com.github.ben-manes.versions' version '0.47.0'
 }
@@ -43,7 +43,7 @@ testing {
             all {
                useSpock('2.3-groovy-3.0')
                dependencies {
-                  implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.17"
+                  implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.0"
                }
                testTask.configure {
                   failFast true

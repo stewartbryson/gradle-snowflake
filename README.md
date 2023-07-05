@@ -1,26 +1,8 @@
-# Breaking Changes
+# Recent changes
 
-We introduced the following breaking changes in version `2.0.0`:
-
-### SnowSQL Config File
-Instead of continuing to use plugin DSL or Gradle properties to provide Snowflake authentication, we made the
-decision to switch to using the SnowSQL config moving forward.
-This was inspired by the [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project, and it seems to
-be a reasonable standard.
-
-### Legacy Plugin Application
-Hopefully no one was using the Gradle legacy plugin application, but if so, the coordinates have changed.
-You can always get the most recent coordinates on
-the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/io.github.stewartbryson.snowflake).
-
-### Ephemeral Cloning for Functional Testing
-Initially, the ephemeral cloning functionality was only present for the `snowflakeJvm` task, with the clone being
-created (and possibly dropped) as part of that task.
-To support the new functional testing feature (described below), ephemeral cloning was moved out into the `createEphemeral`
-and `dropEphemeral` tasks that are now added at the beginning and end of the build, respectively.
-This allows for the `functionalTest` task (if applied) to be run in the ephemeral clone just after `snowflakeJvm`.
-As described below, cloning tasks are automatically managed with the `useEphemeral`, `keepEphemeral`
-and `ephemeralName` properties as before, but the task options on `snowflakeJvm` have been removed.
+### snowcli `config.toml` support
+The [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project recently introduced the `~/.snowflake/config.toml` for credentials.
+We are mirroring that support by first looking for `~/.snowflake/config.toml` and then looking for `~/.snowsql/config`.
 
 # Motivation
 
@@ -78,7 +60,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.0.17'
+   id 'io.github.stewartbryson.snowflake' version '2.1.0'
 }
 ```
 
@@ -97,24 +79,24 @@ Type
      SnowflakeJvm (io.github.stewartbryson.SnowflakeJvm)
 
 Options
-     --connection     Override the SnowSQL connection to use. Default: use the base connection info in SnowSQL config.
+     --config     Custom credentials config file.
+
+     --connection     Override the credentials connection to use. Default: use the base connection info in credentials config.
 
      --jar     Optional: manually pass a JAR file path to upload instead of relying on Gradle metadata.
-
-     --snow-config     Custom SnowSQL config file.
 
      --stage     Override the Snowflake stage to publish to.
 
      --rerun     Causes the task to be re-run even if up-to-date.
 
 Description
-     A Cacheable Gradle task for publishing UDFs and procedures to Snowflake.
+     A Cacheable Gradle task for publishing UDFs and procedures to Snowflake
 
 Group
      publishing
 
-BUILD SUCCESSFUL in 1s
-5 actionable tasks: 1 executed, 4 up-to-date
+BUILD SUCCESSFUL in 2s
+5 actionable tasks: 3 executed, 2 up-to-date
 ```
 
 Several command-line options mention _overriding_ other configuration values.
@@ -136,18 +118,18 @@ snowflake {
 }
 ```
 
-Beginning in version `2.0.0`, the plugin uses
-the [SnowSQL config](https://docs.snowflake.com/en/user-guide/snowsql-config) file, a choice that was inspired by
-the [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project.
-The `connection` property in the plugin DSL defines which connection from the config file to use, relying on the default values if none is
-provided.
-It first loads all the default values, and replaces any values from the connection, similar to how SnowSQL works.
-Unfortunately, it doesn't yet look for a config file in all the places that SnowSQL does.
-Instead, it looks in this order:
+Snowflake ceedentials are managed in a config file, with the default being `~/.snowflake/config.toml` as prescribed by the [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project.
+As a secondary location, we also support the [SnowSQL config](https://docs.snowflake.com/en/user-guide/snowsql-config) file.
+In searching for a credentials config file, the plugin works in the following order:
 
-1. A custom location of your choosing, configured with the `--snow-config` option in applicable tasks.
-2. `<HOME_DIR>/.snowsql/config`
-3. `./snow-config` (This is useful in CI/CD pipelines, where secrets can easily be written to this file.)
+1. A custom location of your choosing, configured with the `--config` option in applicable tasks.
+2. `<HOME_DIR>/.snowflake/config.toml`
+3. `<HOME_DIR>/.snowsql/config`
+4. `./config.toml` (This is useful in CI/CD pipelines, where secrets can be written easily to this file.)
+
+The `connection` property in the plugin DSL defines which connection to use from the config file, relying on the default values if none is
+provided.
+It first loads all the default values, and replaces any values from the connection, similar to how Snowflake CLI and SnowSQL works.
 
 The nested 
 [`applications` DSL](https://s3.amazonaws.com/stewartbryson.docs/gradle-snowflake/latest/io/github/stewartbryson/ApplicationContainer.html)
@@ -174,7 +156,7 @@ Note that if the named internal stage does not exist, the plugin will create it 
 ❯ ./gradlew snowflakeJvm
 
 > Task :snowflakeJvm
-Using snowsql config file: /Users/stewartbryson/.snowsql/config
+Using credentials config file: /Users/stewartbryson/.snowflake/config.toml
 File java-0.1.0-all.jar: UPLOADED
 Deploying ==>
 CREATE OR REPLACE function add_numbers (a integer, b integer)
@@ -184,8 +166,8 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   imports = ('@upload/libs/java-0.1.0-all.jar')
 
 
-BUILD SUCCESSFUL in 4s
-7 actionable tasks: 7 executed
+BUILD SUCCESSFUL in 5s
+7 actionable tasks: 2 executed, 5 up-to-date
 ```
 
 Our function now exists in Snowflake:
@@ -234,7 +216,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.0.17'
+    id 'io.github.stewartbryson.snowflake' version '2.1.0'
 }
 ```
 
@@ -311,7 +293,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.0.17"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.0"
            }
            testTask.configure {
                failFast true
