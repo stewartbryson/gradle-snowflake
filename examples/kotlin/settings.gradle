@@ -1,3 +1,30 @@
-rootProject.name = 'kotlin'
-// ignore this: used for testing examples during releases
+// Part 1
+// The content here is simply for the CICD testing of this example
+// It is not relevant for understanding the example
+plugins {
+   id "com.github.burrunan.s3-build-cache" version "1.5"
+}
+
+// Ensures the example tests the plugin being built
 includeBuild('../../')
+
+// Build cache configuration
+ext.isCiServer = System.getenv().containsKey("CI")
+buildCache {
+   local {
+      // Local build cache is dangerous as it might produce inconsistent results
+      // in case developer modifies files while the build is running
+      enabled = false
+   }
+   remote(com.github.burrunan.s3cache.AwsS3BuildCache) {
+      region = 'us-east-1'
+      bucket = 'nio-gradle-cache'
+      prefix = "${rootProject.name}/"
+      push = isCiServer
+      lookupDefaultAwsCredentials = true
+   }
+}
+
+// Part 2
+// This is the only relevant section for the example
+rootProject.name = 'kotlin'
