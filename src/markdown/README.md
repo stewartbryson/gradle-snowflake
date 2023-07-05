@@ -297,7 +297,7 @@ functionalTest(JvmTestSuite) {
            }
            testTask.configure {
                failFast true
-               // which SnowSQL connection to use
+               // which credentials connection to use
                systemProperty 'connection', project.snowflake.connection
            }
        }
@@ -356,11 +356,11 @@ SampleTest
   Test adding 1 and 2 PASSED
   Test adding 3 and 4 PASSED
 
-SUCCESS: Executed 2 tests in 462ms
+SUCCESS: Executed 2 tests in 481ms
 
 
 > Task :snowflakeJvm
-Using snowsql config file: /Users/stewartbryson/.snowsql/config
+Using credentials config file: /Users/stewartbryson/.snowflake/config.toml
 File java-testing-0.1.0-all.jar: UPLOADED
 Deploying ==>
 CREATE OR REPLACE function add_numbers (a integer, b integer)
@@ -374,13 +374,13 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
 
 SnowflakeSampleTest
 
-  Test ADD_NUMBERS() function with 1 and 2 PASSED
+  Test ADD_NUMBERS() function with 1 and 2 PASSED (1.1s)
   Test ADD_NUMBERS() function with 3 and 4 PASSED
 
-SUCCESS: Executed 2 tests in 3.4s
+SUCCESS: Executed 2 tests in 3.8s
 
 
-BUILD SUCCESSFUL in 9s
+BUILD SUCCESSFUL in 11s
 11 actionable tasks: 7 executed, 4 up-to-date
 ```
 
@@ -435,7 +435,7 @@ functionalTest(JvmTestSuite) {
            }
            testTask.configure {
                failFast true
-               // which SnowSQL connection to use
+               // which credentials connection to use
                systemProperty 'connection', project.snowflake.connection
                // if this is ephemeral, the test spec needs the name to connect to
                if (project.snowflake.useEphemeral) {
@@ -454,7 +454,7 @@ We can simulate a GitHub Actions environment just by setting the `GITHUB_ACTIONS
 ❯ ./gradlew functionalTest
 
 > Task :createEphemeral
-Using snowsql config file: /Users/stewartbryson/.snowsql/config
+Using credentials config file: /Users/stewartbryson/.snowflake/config.toml
 Ephemeral clone EPHEMERAL_JAVA_TESTING_PR_4 created.
 
 > Task :snowflakeJvm
@@ -493,7 +493,7 @@ ephemeralName = 'testing_db'
 ❯ ./gradlew functionalTest
 
 > Task :createEphemeral
-Using snowsql config file: /Users/stewartbryson/.snowsql/config
+Using credentials config file: /Users/stewartbryson/.snowflake/config.toml
 Ephemeral clone testing_db created.
 
 > Task :snowflakeJvm
@@ -596,7 +596,7 @@ including `publishSnowflakePublicationToS3_mavenRepository` which uploads the ar
 console output to that effect:
 
 ```
-❯ gradle snowflakeJvm --no-build-cache --console plain
+❯ ./gradlew snowflakeJvm --no-build-cache --console plain
 > Task :gradle-snowflake:gradle-snowflake-plugin:compileJava NO-SOURCE
 > Task :gradle-snowflake:gradle-snowflake-plugin:compileGroovy UP-TO-DATE
 > Task :gradle-snowflake:gradle-snowflake-plugin:pluginDescriptors UP-TO-DATE
@@ -615,7 +615,7 @@ console output to that effect:
 > Task :publishSnowflakePublicationToS3_mavenRepository
 
 > Task :snowflakeJvm
-Using snowsql config file: /Users/stewartbryson/.snowsql/config
+Using credentials config file: /Users/stewartbryson/.snowflake/config.toml
 Deploying ==>
 CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
@@ -677,7 +677,7 @@ BUILD SUCCESSFUL in 1s
 
 The `functionalTest` task contains all the tests that actually make a connection to Snowflake and test a deployment,
 except those involved with external stages.
-You need to add a connection in `~/.snowsql/config` called `gradle_plugin`.
+You need to add a connection in `~/.snowflake/config.toml` called `gradle_plugin`.
 > WARNING: Ensure that the credentials you provide in `gradle_plugin` are safe for development purposes.
 
 The `integrationTest` task requires the following external stages to exist in your Snowflake account:
