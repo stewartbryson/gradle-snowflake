@@ -25,21 +25,21 @@ abstract class SnowflakeTask extends DefaultTask {
     }
 
     /**
-     * The SnowSQL config file to use. Default: Looks first for '~/.snowsql/config' followed by './snow-config'.
+     * The credentials config file to use. Default: Looks first for '~/.snowflake/config.toml' followed by '~/.snowsql/config'.
      */
     @Input
     @Optional
-    @Option(option = "snow-config",
-            description = "Custom SnowSQL config file."
+    @Option(option = "config",
+            description = "Custom credentials config file."
     )
     String snowConfig
 
     /**
-     * Override the SnowSQL connection to use. Default: use the base connection info in SnowSQL config.
+     * Override the credentials connection to use. Default: use the base connection info in credentials config.
      */
     @Input
     @Option(option = "connection",
-            description = "Override the SnowSQL connection to use. Default: use the base connection info in SnowSQL config."
+            description = "Override the credentials connection to use. Default: use the base connection info in credentials config."
     )
     String connection = extension.connection
 

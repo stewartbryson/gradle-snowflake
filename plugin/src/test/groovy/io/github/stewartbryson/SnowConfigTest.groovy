@@ -34,7 +34,7 @@ class SnowConfigTest extends Specification {
         snow = new SnowConfig(config, "example")
     }
 
-    def "Parse snowsql default connection"() {
+    def "Parse credentials default connection"() {
         when:
         def props = snow.getConnectionsProps()
 
@@ -46,7 +46,7 @@ class SnowConfigTest extends Specification {
         props.password == 'defaultpassword'
     }
 
-    def "Parse snowsql connection with quoted password"() {
+    def "Parse credentials connection with quoted password"() {
         given:
         config.append("""
                 |
