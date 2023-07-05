@@ -29,7 +29,7 @@ abstract class SnowflakeTask extends DefaultTask {
      */
     @Input
     @Optional
-    @Option(option = "snow-config",
+    @Option(option = "config",
             description = "Custom credentials config file."
     )
     String snowConfig
