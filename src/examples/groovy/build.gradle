@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-   implementation 'org.codehaus.groovy:groovy:3.0.18'
+   implementation 'org.codehaus.groovy:groovy:3.0.19'
 }
 
 java {

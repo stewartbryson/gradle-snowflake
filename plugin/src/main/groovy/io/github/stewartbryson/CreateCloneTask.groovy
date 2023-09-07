@@ -26,14 +26,14 @@ abstract class CreateCloneTask extends SnowflakeTask {
         createSession()
 
         // set the ephemeral name
-        snowflake.ephemeral = extension.ephemeralName
+        snowflake.ephemeralName = extension.ephemeralName
         try {
-            snowflake.session.jdbcConnection().createStatement().execute("create database if not exists ${snowflake.ephemeral} clone ${snowflake.connectionDatabase}")
-            snowflake.session.jdbcConnection().createStatement().execute("grant ownership on database ${snowflake.ephemeral} to ${snowflake.connectionRole}")
+            snowflake.session.jdbcConnection().createStatement().execute("create database if not exists ${snowflake.ephemeralName} clone ${snowflake.connectionDatabase}")
+            snowflake.session.jdbcConnection().createStatement().execute("grant ownership on database ${snowflake.ephemeralName} to ${snowflake.connectionRole}")
         } catch (Exception e) {
             throw new Exception("Creating ephemeral clone failed.", e)
         }
-        log.warn "Ephemeral clone ${snowflake.ephemeral} created if not exists."
+        log.warn "Ephemeral clone ${snowflake.ephemeralName} created if not exists."
 
         // Until we build a better testing spec, let downstream dependencies set this
         //snowflake.setEphemeralContext()
