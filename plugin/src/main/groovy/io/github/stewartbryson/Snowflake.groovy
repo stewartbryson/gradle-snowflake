@@ -24,15 +24,15 @@ class Snowflake {
     /**
      * The ephemeral Snowflake clone name.
      */
-    String ephemeral
+    String ephemeralName
 
     /**
      * Whether an ephemeral clone is in use.
      *
      * @return whether an ephemeral clone is in use.
      */
-    Boolean isEphemeral() {
-        (ephemeral ? true : false)
+    Boolean isUsingEphemeral() {
+        (ephemeralName ? true : false)
     }
 
     /**
@@ -133,8 +133,8 @@ class Snowflake {
      * Set ephemeral context in the Snowflake session.
      */
     def setEphemeralContext() {
-        session.jdbcConnection().createStatement().execute("use database ${ephemeral}")
-        session.jdbcConnection().createStatement().execute("use schema ${ephemeral}.${connectionSchema}")
+        session.jdbcConnection().createStatement().execute("use database ${ephemeralName}")
+        session.jdbcConnection().createStatement().execute("use schema ${ephemeralName}.${connectionSchema}")
     }
 
     /**

@@ -14,7 +14,7 @@ class SnowflakeSpec extends Specification {
    private String connection = System.getProperty('connection')
 
    @Shared
-   private String ephemeral = System.getProperty('ephemeral')
+   private String ephemeralName = System.getProperty('ephemeralName')
 
    @Shared
    private Snowflake snowflake = new Snowflake()
@@ -24,8 +24,8 @@ class SnowflakeSpec extends Specification {
     */
    def setupSpec() {
       snowflake = new Snowflake(connection)
-      if (ephemeral) {
-         snowflake.ephemeral = ephemeral
+      if (ephemeralName) {
+         snowflake.ephemeralName = ephemeralName
          snowflake.setEphemeralContext()
       }
    }
