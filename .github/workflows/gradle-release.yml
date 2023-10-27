@@ -1,4 +1,4 @@
-name: Gradle Package
+name: Gradle Release
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
 jobs:
-  gradle_build:
+  gradle-release:
     if: ${{ github.event.pull_request.merged }}
     runs-on: ubuntu-latest
 
@@ -70,40 +70,3 @@ jobs:
           branch: main
           file_pattern: 'README.md examples/*.gradle'
           status_options: '--untracked-files=no'
-
-  run_example:
-    #if: ${{ false }}  # disable for now
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        directory: [java-manual, java, java-testing, groovy, scala, kotlin]
-        #directory: [java]
-
-    steps:
-      # Should really make these reusable
-      - uses: actions/checkout@v3
-
-      - id: gradle_properties
-        run: |
-          mkdir -p $HOME/.gradle
-          echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
-        name: 'Write gradle.properties file'
-        shell: bash
-        env:
-          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
-
-      - id: credentials_file
-        run: |
-          mkdir -p $HOME/.snowflake
-          echo "$SNOW_CONFIG" > $HOME/.snowflake/config.toml
-        name: 'Write .snowflake/config.toml file'
-        shell: bash
-        env:
-          SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
-
-      - name: ${{ matrix.directory }}
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          arguments: matrixStrategy -Psnowflake.useEphemeral=true -S
-          build-root-directory: examples/${{ matrix.directory }}
