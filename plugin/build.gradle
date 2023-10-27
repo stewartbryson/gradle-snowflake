@@ -118,4 +118,4 @@ tasks.register("publishDocs") {
    mustRunAfter tasks.publishPlugins
 }
 
-tasks.publish.dependsOn tasks.publishPlugins
+tasks.publish.dependsOn tasks.publishPlugins, tasks.publishDocs
