@@ -1,63 +1,86 @@
-name: Run Gradle on PRs
+name: Gradle Pull Request
 
 on:
-  pull_request
+  push:
+    # branches to consider in the event; optional, defaults to all
+    branches:
+      - main
+  # pull_request event is required only for autolabeler
+  pull_request:
+    # Only following types are handled by the action, but one can default to all as well
+    types: [opened, reopened, synchronize]
+  # pull_request_target event is required for autolabeler to support PRs from forks
+  # pull_request_target:
+  #   types: [opened, reopened, synchronize]
 
 env:
   AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
   AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
 jobs:
-  gradle_build:
+  gradle-pr:
+    permissions:
+      # write permission is required to create a GitHub release
+      contents: write
+      # write permission is required for autolabeler
+      # otherwise, read permission is required at least
+      pull-requests: write
+      # for publish-tests
+      checks: write
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      #      - id: echo_environment
-      #        run: ./echo-environment.sh
-      #        name: "Echo environment"
-      #        shell: bash
-
-      - id: gradle_properties
+      - name: Write gradle.properties file
+        id: gradle-properties
         run: |
           mkdir -p $HOME/.gradle
           echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
-        name: 'Write gradle.properties file'
         shell: bash
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-      - id: credentials_file
+      - name: Write .snowflake/config.toml file
+        id: credentials-file
         run: |
           mkdir -p $HOME/.snowflake
           echo "$SNOW_CONFIG" > $HOME/.snowflake/config.toml
-        name: 'Write .snowflake/config.toml file'
         shell: bash
         env:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
-      - id: google_auth
-        name: 'Authenticate to Google Cloud'
+      - name: Authenticate to Google Cloud
+        id: google-auth
         uses: 'google-github-actions/auth@v0'
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - id: gradle_build
-        name: Gradle build and test
+      - name: Gradle build and test
+        id: gradle-build
         uses: gradle/gradle-build-action@v2.4.2
         with:
           arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan -S
           cache-read-only: ${{ github.base_ref == 'main' }}
 
-      - id: publish_tests
-        name: Publish tests
+      - name: Publish tests
+        id: publish-tests
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
 
-  run_example:
+      - name: Create a draft release from PR.
+        id: release-draft
+        uses: release-drafter/release-drafter@v5
+        with:
+          commitish: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  run-example:
     #if: ${{ false }}  # disable for now
     runs-on: ubuntu-latest
 
@@ -70,20 +93,20 @@ jobs:
       # Should really make these reusable
       - uses: actions/checkout@v3
 
-      - id: gradle_properties
+      - name: Write gradle.properties file
+        id: gradle-properties
         run: |
           mkdir -p $HOME/.gradle
           echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
-        name: 'Write gradle.properties file'
         shell: bash
         env:
           GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
 
-      - id: credentials_file
+      - name: Write .snowflake/config.toml file
+        id: credentials-file
         run: |
           mkdir -p $HOME/.snowflake
           echo "$SNOW_CONFIG" > $HOME/.snowflake/config.toml
-        name: 'Write .snowflake/config.toml file'
         shell: bash
         env:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}

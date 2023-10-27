@@ -1,0 +1,86 @@
+name: Gradle Release
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+env:
+  AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+  AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+jobs:
+  gradle-release:
+    if: ${{ github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Write gradle.properties file
+        id: gradle-properties
+        run: |
+          mkdir -p $HOME/.gradle
+          echo "$GRADLE_PROPERTIES" > $HOME/.gradle/gradle.properties
+        shell: bash
+        env:
+          GRADLE_PROPERTIES: ${{secrets.GRADLE_PROPERTIES}}
+
+      - name: Write .snowflake/config.toml file
+        id: credentials-file
+        run: |
+          mkdir -p $HOME/.snowflake
+          echo "$SNOW_CONFIG" > $HOME/.snowflake/config.toml
+        shell: bash
+        env:
+          SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
+
+      - name: Authenticate to Google Cloud
+        id: google-auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+
+      - name: Set Values
+        id: set-values
+        run: |
+          echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Echo Version
+        id: echo-version
+        run: |
+          echo ${{ steps.set-values.outputs.version }}
+
+      - name: Gradle publish
+        id: gradle-publish
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: build validatePlugin publish examples buildDashboard -Pversion=${{ steps.set-values.outputs.version }} -S --scan
+
+      - name: Publish tests
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: '**/build/test-results/**/TEST-*.xml'
+
+      - name: Upload binaries to release
+        id: upload-binaries
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: '**/build/libs/*.jar'
+          asset_name: gradle-plugin
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+
+      - name: Update Documentation
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Updating README and examples.
+          branch: main
+          file_pattern: 'README.md examples/*.gradle'
+          status_options: '--untracked-files=no'
