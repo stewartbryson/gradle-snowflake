@@ -2,7 +2,7 @@ plugins {
    id 'com.gradle.plugin-publish' version '1.2.1'
    id 'groovy'
    id 'java-library'
-   id 'com.adarshr.test-logger' version '3.2.0'
+   id 'com.adarshr.test-logger' version '4.0.0'
    id "com.redpillanalytics.gradle-properties" version "1.0.8"
    id 'com.fuseanalytics.gradle.s3' version '1.2.3'
 }
