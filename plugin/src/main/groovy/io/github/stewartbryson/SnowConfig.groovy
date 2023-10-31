@@ -82,13 +82,13 @@ class SnowConfig {
       ini.get(connectionName).each { key, value ->
          props."${key.replaceAll(/name$/, '')}" = value
       }
+
+      // Remove surrounding quotes from properties values
+      props = props.collectEntries { k, v -> [k, v.replaceAll(/^\"|\"$/, "")] }
+
       // construct url from account
       props.url = "https://" + props.account + ".snowflakecomputing.com"
       props.remove("account")
-      // special password handling to support quoted values
-      props.password = props.password.toString().replaceAll(/("*)([^"$]+)("*)/) { all, q1, pwd, q2 ->
-         pwd
-      }
 
       // we need at least these three to make a connection
       if (!props.url || !props.user || !props.password) {
