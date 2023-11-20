@@ -1,7 +1,7 @@
 plugins {
    id 'scala'
-   id 'com.github.ben-manes.versions' version '0.49.0'
-   id 'io.github.stewartbryson.snowflake' version '2.1.9'
+   id 'com.github.ben-manes.versions' version '0.50.0'
+   id 'io.github.stewartbryson.snowflake' version '2.1.10'
 }
 
 repositories {
