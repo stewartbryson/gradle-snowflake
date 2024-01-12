@@ -60,7 +60,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.1.10'
+   id 'io.github.stewartbryson.snowflake' version '2.1.11'
 }
 ```
 
@@ -216,7 +216,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.1.10'
+    id 'io.github.stewartbryson.snowflake' version '2.1.11'
 }
 ```
 
@@ -293,7 +293,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.10"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.11"
            }
            testTask.configure {
                failFast true
