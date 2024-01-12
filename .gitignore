@@ -31,3 +31,6 @@ bin/
 .factorypath
 .vscode/
 .java-version
+
+# Ignore google auth files
+gha-creds-*.json
