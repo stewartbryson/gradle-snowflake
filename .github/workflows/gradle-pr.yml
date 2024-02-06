@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -60,21 +60,21 @@ jobs:
 
       - name: Gradle build and test
         id: gradle-build
-        uses: gradle/gradle-build-action@v2.4.2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan -S
           cache-read-only: ${{ github.base_ref == 'main' }}
 
       - name: Publish tests
         id: publish-tests
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
 
       - name: Create a draft release from PR.
         id: release-draft
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         with:
           commitish: main
         env:
@@ -91,7 +91,7 @@ jobs:
 
     steps:
       # Should really make these reusable
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Write gradle.properties file
         id: gradle-properties
@@ -112,7 +112,7 @@ jobs:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
       - name: ${{ matrix.directory }}
-        uses: gradle/gradle-build-action@v2.4.2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: matrixStrategy -Psnowflake.useEphemeral=true -S
           build-root-directory: examples/${{ matrix.directory }}

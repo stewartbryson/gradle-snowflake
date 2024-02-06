@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -55,12 +55,12 @@ jobs:
 
       - name: Gradle publish
         id: gradle-publish
-        uses: gradle/gradle-build-action@v2.4.2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: build validatePlugin publish examples buildDashboard -Pversion=${{ steps.set-values.outputs.version }} -S --scan
 
       - name: Publish tests
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
