@@ -60,7 +60,7 @@ jobs:
           arguments: build validatePlugin publish examples buildDashboard -Pversion=${{ steps.set-values.outputs.version }} -S --scan
 
       - name: Publish tests
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'

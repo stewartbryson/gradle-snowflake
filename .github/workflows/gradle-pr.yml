@@ -67,14 +67,14 @@ jobs:
 
       - name: Publish tests
         id: publish-tests
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v4
         if: always()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
 
       - name: Create a draft release from PR.
         id: release-draft
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v6
         with:
           commitish: main
         env:
