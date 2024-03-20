@@ -3,7 +3,7 @@ plugins {
    id 'groovy' // needed for Spock testing framework
    id 'io.github.stewartbryson.snowflake' version '2.1.11'
    id 'com.adarshr.test-logger' version '4.0.0' // added for testing
-   id 'com.github.ben-manes.versions' version '0.50.0'
+   id 'com.github.ben-manes.versions' version '0.51.0'
 }
 
 repositories {
@@ -13,7 +13,7 @@ repositories {
 
 java {
    toolchain {
-      languageVersion = JavaLanguageVersion.of(11)
+      languageVersion = JavaLanguageVersion.of(17)
    }
 }
 
@@ -27,6 +27,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }
