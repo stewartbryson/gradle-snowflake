@@ -1,8 +1,10 @@
 # Recent changes
 
-### snowcli `config.toml` support
-The [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project recently introduced the `~/.snowflake/config.toml` for credentials.
-We are mirroring that support by first looking for `~/.snowflake/config.toml` and then looking for `~/.snowsql/config`.
+### Java 17 Support
+To support Java 17, we also had to add support for the `RUNTIME_VERSION` option when creating procedures and functions with JVM languages.
+The `runtime` parameter was added to the `applications` DSL to support this change, but the default value will stay `11` for now.
+
+Additionally, Java 17 is also being used now to compile and build this plugin.
 
 # Motivation
 
