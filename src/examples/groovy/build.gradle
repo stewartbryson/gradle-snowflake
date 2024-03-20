@@ -8,12 +8,12 @@ repositories {
 }
 
 dependencies {
-   implementation 'org.codehaus.groovy:groovy:3.0.20'
+   implementation 'org.codehaus.groovy:groovy:3.0.21'
 }
 
 java {
    toolchain {
-      languageVersion = JavaLanguageVersion.of(11)
+      languageVersion = JavaLanguageVersion.of(17)
    }
 }
 
@@ -24,6 +24,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }

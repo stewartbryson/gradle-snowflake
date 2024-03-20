@@ -34,3 +34,6 @@ bin/
 
 # Ignore google auth files
 gha-creds-*.json
+
+# downloaded libs
+lib/

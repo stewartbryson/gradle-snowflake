@@ -24,6 +24,7 @@ class GroovyTest extends GradleSpec {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
                     |         returns = "string"
+                    |         runtime = '17'
                     |         handler = "Sample.addNum"
                     |      }
                     |   }

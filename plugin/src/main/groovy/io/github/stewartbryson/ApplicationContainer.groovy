@@ -31,6 +31,10 @@ class ApplicationContainer {
     */
    String language = 'JAVA'
    /**
+    * The Java runtime version. DEFAULT: '11'.
+    */
+   String runtime = '11'
+   /**
     * The 'handler' property of the UDF.
     */
    String handler
@@ -49,6 +53,7 @@ class ApplicationContainer {
          |  returns $returns
          |  language $language ${immutable ? "\n  IMMUTABLE" : ""}
          |  handler = '$handler'
+         |  runtime_version = '$runtime'
          |  imports = ($imports)
          |""".stripMargin()
    }

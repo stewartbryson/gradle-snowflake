@@ -62,7 +62,7 @@ class GradleSpec extends Specification {
                     |}
                     |java {
                     |    toolchain {
-                    |        languageVersion = JavaLanguageVersion.of(11)
+                    |        languageVersion = JavaLanguageVersion.of(17)
                     |    }
                     |}
                     |repositories {
