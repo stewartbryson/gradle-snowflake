@@ -30,7 +30,7 @@ class JavaAmazonTest extends GradleSpec {
                     |      add_numbers {
                     |         inputs = ["a integer", "b integer"]
                     |         returns = "string"
-                    |         runtme = '17'
+                    |         runtime = '17'
                     |         handler = "Sample.addNum"
                     |      }
                     |   }
