@@ -112,6 +112,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }
@@ -144,6 +145,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-0.1.0-all.jar')
 ```
 
@@ -163,6 +165,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-0.1.0-all.jar')
 
 
@@ -367,6 +370,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-testing-0.1.0-all.jar')
 
 
@@ -411,6 +415,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }
@@ -465,6 +470,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-testing-0.1.0-all.jar')
 
 
@@ -504,6 +510,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-testing-0.1.0-all.jar')
 
 
@@ -543,6 +550,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }
@@ -621,6 +629,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@s3_maven/io/github/stewartbryson/sample-udfs/0.1.0/sample-udfs-0.1.0-all.jar')
 
 
