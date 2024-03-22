@@ -1,8 +1,10 @@
 # Recent changes
 
-### snowcli `config.toml` support
-The [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project recently introduced the `~/.snowflake/config.toml` for credentials.
-We are mirroring that support by first looking for `~/.snowflake/config.toml` and then looking for `~/.snowsql/config`.
+### Java 17 Support
+To support Java 17, we also had to add support for the `RUNTIME_VERSION` option when creating procedures and functions with JVM languages.
+The `runtime` parameter was added to the `applications` DSL to support this change, but the default value will stay `11` for now.
+
+Additionally, Java 17 is also being used now to compile and build this plugin.
 
 # Motivation
 
@@ -60,7 +62,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.1.12'
+   id 'io.github.stewartbryson.snowflake' version '2.1.14'
 }
 ```
 
@@ -112,6 +114,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }
@@ -144,6 +147,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-0.1.0-all.jar')
 ```
 
@@ -163,6 +167,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-0.1.0-all.jar')
 
 
@@ -216,7 +221,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.1.12'
+    id 'io.github.stewartbryson.snowflake' version '2.1.14'
 }
 ```
 
@@ -293,7 +298,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.12"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.14"
            }
            testTask.configure {
                failFast true
@@ -367,6 +372,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-testing-0.1.0-all.jar')
 
 
@@ -411,6 +417,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }
@@ -465,6 +472,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-testing-0.1.0-all.jar')
 
 
@@ -504,6 +512,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@upload/libs/java-testing-0.1.0-all.jar')
 
 
@@ -543,6 +552,7 @@ snowflake {
       add_numbers {
          inputs = ["a integer", "b integer"]
          returns = "string"
+         runtime = '17'
          handler = "Sample.addNum"
       }
    }
@@ -621,6 +631,7 @@ CREATE OR REPLACE function add_numbers (a integer, b integer)
   returns string
   language JAVA
   handler = 'Sample.addNum'
+  runtime_version = '17'
   imports = ('@s3_maven/io/github/stewartbryson/sample-udfs/0.1.0/sample-udfs-0.1.0-all.jar')
 
 

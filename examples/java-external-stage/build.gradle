@@ -1,6 +1,6 @@
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.1.12'
+   id 'io.github.stewartbryson.snowflake' version '2.1.14'
 }
 
 repositories {
