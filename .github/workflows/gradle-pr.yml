@@ -34,6 +34,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: Write gradle.properties file
         id: gradle-properties
         run: |
@@ -92,6 +97,11 @@ jobs:
     steps:
       # Should really make these reusable
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Write gradle.properties file
         id: gradle-properties
