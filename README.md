@@ -62,7 +62,7 @@ is automatically applied by the `snowflake` plugin:
 ```groovy
 plugins {
    id 'java'
-   id 'io.github.stewartbryson.snowflake' version '2.1.14'
+   id 'io.github.stewartbryson.snowflake' version '2.1.15'
 }
 ```
 
@@ -121,7 +121,7 @@ snowflake {
 }
 ```
 
-Snowflake ceedentials are managed in a config file, with the default being `~/.snowflake/config.toml` as prescribed by the [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project.
+Snowflake credentials are managed in a config file, with the default being `~/.snowflake/config.toml` as prescribed by the [Snowflake Developer CLI](https://github.com/Snowflake-Labs/snowcli) project.
 As a secondary location, we also support the [SnowSQL config](https://docs.snowflake.com/en/user-guide/snowsql-config) file.
 In searching for a credentials config file, the plugin works in the following order:
 
@@ -221,7 +221,7 @@ Our `plugins` DSL from the build file:
 plugins {
     id 'java'
     id 'groovy' // needed for Spock testing framework
-    id 'io.github.stewartbryson.snowflake' version '2.1.14'
+    id 'io.github.stewartbryson.snowflake' version '2.1.15'
 }
 ```
 
@@ -298,7 +298,7 @@ functionalTest(JvmTestSuite) {
        all {
            useSpock('2.3-groovy-3.0')
            dependencies {
-               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.14"
+               implementation "io.github.stewartbryson:gradle-snowflake-plugin:2.1.15"
            }
            testTask.configure {
                failFast true
@@ -701,8 +701,8 @@ It also requires the following gradle properties to be set, with the easiest met
 * `s3PublishUrl`: the S3 url of `s3_maven`.
 
 It is understandable if you are unable to test external stages as part of your contribution.
-I segmented them out for this reason.
+We segmented them out for this reason.
 
 Open a pull request against the `develop` branch so that it can be merged and possibly tweaked before 
-I open the PR against the `main` branch.
-This will also enable me to test external stages.
+we open the PR against the `main` branch.
+This will also enable us to test external stages.
