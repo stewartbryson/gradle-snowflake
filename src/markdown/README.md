@@ -1,8 +1,8 @@
 # Recent changes
 
 ### Java 17 Support
-To support Java 17, we also had to add support for the `RUNTIME_VERSION` option when creating procedures and functions with JVM languages.
-The `runtime` parameter was added to the `applications` DSL to support this change, but the default value will stay `11` for now.
+To support Java 17, we needed to add support for the `RUNTIME_VERSION` option when creating procedures and functions with JVM languages.
+The `runtime` parameter was added to the `applications` DSL to support this change, but the default value will stay `11` for now to align with the Snowflake default.
 
 Additionally, Java 17 is also being used now to compile and build this plugin.
 
