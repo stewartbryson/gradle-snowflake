@@ -16,7 +16,7 @@ java {
 dependencies {
    implementation 'org.codehaus.groovy:groovy:3.0.21'
    implementation 'org.slf4j:slf4j-simple:2.0.9'
-   implementation 'com.snowflake:snowpark:1.12.0'
+   implementation 'com.snowflake:snowpark:1.12.1'
    implementation 'gradle.plugin.com.redpillanalytics:gradle-properties:1.0.7'
    implementation 'gradle.plugin.com.github.johnrengelman:shadow:8.0.0'
    implementation 'org.apache.commons:commons-lang3:3.14.0'
@@ -32,7 +32,7 @@ testing {
          useSpock('2.3-groovy-3.0')
          dependencies {
             implementation project()
-            implementation 'com.snowflake:snowpark:1.12.0'
+            implementation 'com.snowflake:snowpark:1.12.1'
             implementation 'org.apache.commons:commons-lang3:3.14.0'
          }
       }
