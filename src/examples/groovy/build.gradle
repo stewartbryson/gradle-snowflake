@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-   implementation 'org.codehaus.groovy:groovy:3.0.21'
+   implementation 'org.codehaus.groovy:groovy:3.0.22'
 }
 
 java {
