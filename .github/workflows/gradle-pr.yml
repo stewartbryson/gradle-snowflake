@@ -63,12 +63,12 @@ jobs:
         with:
           credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Gradle build and test
         id: gradle-build
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: build validatePlugin functionalTest integrationTest buildDashboard --scan -S
-          cache-read-only: ${{ github.base_ref == 'main' }}
+        run: ./gradlew build validatePlugin functionalTest integrationTest buildDashboard --scan -S
 
       - name: Publish tests
         id: publish-tests
@@ -121,8 +121,9 @@ jobs:
         env:
           SNOW_CONFIG: ${{secrets.SNOW_CONFIG}}
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: ${{ matrix.directory }}
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: matrixStrategy -Psnowflake.useEphemeral=true -S
-          build-root-directory: examples/${{ matrix.directory }}
+        working-directory: examples/${{ matrix.directory }}
+        run: ./gradlew matrixStrategy -Psnowflake.useEphemeral=true -S
