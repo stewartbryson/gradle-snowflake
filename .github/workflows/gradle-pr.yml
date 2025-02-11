@@ -126,4 +126,4 @@ jobs:
 
       - name: ${{ matrix.directory }}
         working-directory: examples/${{ matrix.directory }}
-        run: matrixStrategy -Psnowflake.useEphemeral=true -S
+        run: ./gradlew matrixStrategy -Psnowflake.useEphemeral=true -S
